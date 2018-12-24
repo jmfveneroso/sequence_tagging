@@ -1,2 +1,6 @@
 data/*
 results/*
+logs/*
+old_models/*
+model/*
+cifar-10-batches-py/*

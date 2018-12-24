@@ -1,3 +1,7 @@
 data
 results
 model/__pycache__
+old_models
+cifar-10-batches-py
+.ipynb_checkpoints
+logs
