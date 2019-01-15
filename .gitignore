@@ -5,3 +5,6 @@ old_models
 cifar-10-batches-py
 .ipynb_checkpoints
 logs
+checkpoints
+MNIST_tflearn_checkpoints
+imdb.pkl

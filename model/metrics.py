@@ -2,96 +2,88 @@ from tensorflow.python.ops.metrics_impl import _streaming_confusion_matrix
 import tensorflow as tf
 import numpy as np 
 
-def safe_div(numerator, denominator):
-  numerator, denominator = tf.to_float(numerator), tf.to_float(denominator)
-  zeros = tf.zeros_like(numerator, dtype=numerator.dtype)
-  denominator_is_zero = tf.equal(denominator, zeros)
-  return tf.where(denominator_is_zero, zeros, numerator / denominator)
+def get_named_entities(tags):
+  r = []
+  i = 0
+  while i < len(tags):
+    if tags[i].decode("utf-8") == 'O':
+      i += 1
+    else:
+      expected_tag = 'I-' + tags[i].decode("utf-8")[2:]
+      start, end = i, i
+      i += 1
+      while i < len(tags):
+        if tags[i].decode("utf-8") == expected_tag:
+          end = i
+        else:
+          break
+        i += 1
+      r.append((start, end))
+  return r
 
-def pr_re_fbeta(cm, pos_indices, beta=1):
-  num_classes = cm.shape[0]
-  neg_indices = [i for i in range(num_classes) if i not in pos_indices]
-  cm_mask = np.ones([num_classes, num_classes])
-  cm_mask[neg_indices, neg_indices] = 0
-  diag_sum = tf.reduce_sum(tf.diag_part(cm * cm_mask))
+def evaluate(val_predict, val_target, tokens, verbose=False):
+  correct_count, total = 0, 0
+  num_correct, num_predicted, num_expected = 0, 0, 0
+  for i in range(len(val_predict)):
+    correct_count += sum(p == t for p, t in zip(val_predict[i], val_target[i]))
+    total += len(val_target[i])
+    p_ne = get_named_entities(val_predict[i])
+    t_ne = get_named_entities(val_target[i])
 
-  cm_mask = np.ones([num_classes, num_classes])
-  cm_mask[:, neg_indices] = 0
-  tot_pred = tf.reduce_sum(cm * cm_mask)
+    num_correct   += len(set(p_ne) & set(t_ne))
+    num_predicted += len(p_ne)
+    num_expected  += len(t_ne)
 
-  cm_mask = np.ones([num_classes, num_classes])
-  cm_mask[neg_indices, :] = 0
-  tot_gold = tf.reduce_sum(cm * cm_mask)
+  precision, recall, f1, accuracy = 0, 0, 0, 0
 
-  pr = safe_div(diag_sum, tot_pred)
-  re = safe_div(diag_sum, tot_gold)
-  fbeta = safe_div((1. + beta**2) * pr * re, beta**2 * pr + re)
+  if num_predicted > 0:
+    precision = num_correct / float(num_predicted)
 
-  return pr, re, fbeta
+  if num_expected > 0:
+    recall = num_correct / float(num_expected)
 
-def metrics_from_confusion_matrix(cm, pos_indices=None, average='micro',beta=1):
-  num_classes = cm.shape[0]
-  if pos_indices is None:
-    pos_indices = [i for i in range(num_classes)]
+  if precision + recall > 0:
+    f1 = 2 * precision * recall / (precision + recall)
 
-  if average == 'micro':
-    return pr_re_fbeta(cm, pos_indices, beta)
-  elif average in {'macro', 'weighted'}:
-    precisions, recalls, fbetas, n_golds = [], [], [], []
-    for idx in pos_indices:
-      pr, re, fbeta = pr_re_fbeta(cm, [idx], beta)
-      precisions.append(pr)
-      recalls.append(re)
-      fbetas.append(fbeta)
-      cm_mask = np.zeros([num_classes, num_classes])
-      cm_mask[idx, :] = 1
-      n_golds.append(tf.to_float(tf.reduce_sum(cm * cm_mask)))
+  if total > 0:
+    accuracy = correct_count / float(total)
 
-    if average == 'macro':
-      pr = tf.reduce_mean(precisions)
-      re = tf.reduce_mean(recalls)
-      fbeta = tf.reduce_mean(fbetas)
-      return pr, re, fbeta
-    if average == 'weighted':
-      n_gold = tf.reduce_sum(n_golds)
-      pr_sum = sum(p * n for p, n in zip(precisions, n_golds))
-      pr = safe_div(pr_sum, n_gold)
-      re_sum = sum(r * n for r, n in zip(recalls, n_golds))
-      re = safe_div(re_sum, n_gold)
-      fbeta_sum = sum(f * n for f, n in zip(fbetas, n_golds))
-      fbeta = safe_div(fbeta_sum, n_gold)
-      return pr, re, fbeta
+  correct = num_correct
+  incorrect = num_predicted - num_correct
+  missed = num_expected - num_correct
 
-  else:
-    raise NotImplementedError()
+  return {
+    'accuracy': accuracy,
+    'precision': precision,
+    'recall': recall,
+    'f1': f1,
+    'correct': correct,
+    'incorrect': incorrect,
+    'missed': missed
+  }
 
-def precision(labels, predictions, num_classes, pos_indices=None, weights=None, average='micro'):
-  cm, op = _streaming_confusion_matrix(
-    labels, predictions, num_classes, weights)
-  pr, _, _ = metrics_from_confusion_matrix(
-    cm, pos_indices, average=average)
-  op, _, _ = metrics_from_confusion_matrix(
-    op, pos_indices, average=average)
-  return (pr, op)
-
-
-def recall(labels, predictions, num_classes, pos_indices=None, weights=None,average='micro'):
-  cm, op = _streaming_confusion_matrix(
-    labels, predictions, num_classes, weights)
-  _, re, _ = metrics_from_confusion_matrix(
-    cm, pos_indices, average=average)
-  _, op, _ = metrics_from_confusion_matrix(
-    op, pos_indices, average=average)
-  return (re, op)
-
-def fbeta(labels, predictions, num_classes, pos_indices=None, weights=None,average='micro', beta=1):
-  cm, op = _streaming_confusion_matrix(
-    labels, predictions, num_classes, weights)
-  _, _, fbeta = metrics_from_confusion_matrix(
-    cm, pos_indices, average=average, beta=beta)
-  _, _, op = metrics_from_confusion_matrix(
-    op, pos_indices, average=average, beta=beta)
-  return (fbeta, op)
-
-def f1(labels, predictions, num_classes, pos_indices=None, weights=None,average='micro'):
-  return fbeta(labels, predictions, num_classes, pos_indices, weights,average)
+# MAX_TOKEN_LENGTH = 10
+# MINIBATCH_SIZE = 10
+# DATADIR = 'data/conll2003'
+# LABEL_COL = 3
+# 
+# # Params
+# params = {
+#   'dim_chars': 100,
+#   'dim': 300,
+#   'dropout': 0.5,
+#   'num_oov_buckets': 1,
+#   'epochs': 25,
+#   'batch_size': 20,
+#   'buffer': 15000,
+#   'filters': 50,
+#   'kernel_size': 3,
+#   'lstm_size': 100,
+#   'words': str(Path(DATADIR, 'vocab.words.txt')),
+#   'chars': str(Path(DATADIR, 'vocab.chars.txt')),
+#   'tags': str(Path(DATADIR, 'vocab.tags.txt')),
+#   'glove': str(Path(DATADIR, 'glove.npz')),
+#   'fulldoc': False
+# }
+# 
+# DL().set_params(params)

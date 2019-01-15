@@ -1,152 +1,161 @@
 import numpy as np 
 import tensorflow as tf
 from pathlib import Path
-from model.metrics import precision, recall, f1
 from model.cnn import masked_conv1d_and_max
 
-def attention(inputs, attention_size, time_major=False, return_alphas=False):
-  # if isinstance(inputs, tuple):
-  #   # In case of Bi-RNN, concatenate the forward and the backward RNN outputs.
-  #   inputs = tf.concat(inputs, 2)
+MAX_TOKEN_LENGTH = 10
+MINIBATCH_SIZE = 10
+DATADIR = 'data/conll2003'
+LABEL_COL = 3
 
-  # if time_major:
-  #   # (T,B,D) => (B,T,D)
-  #   inputs = tf.array_ops.transpose(inputs, [1, 0, 2])
+# Params
+params = {
+    'dim_chars': 100,
+    'dim': 300,
+    'dropout': 0.5,
+    'num_oov_buckets': 1,
+    'epochs': 25,
+    'batch_size': 20,
+    'buffer': 15000,
+    'filters': 50,
+    'kernel_size': 3,
+    'lstm_size': 100,
+    'words': str(Path(DATADIR, 'vocab.words.txt')),
+    'chars': str(Path(DATADIR, 'vocab.chars.txt')),
+    'tags': str(Path(DATADIR, 'vocab.tags.txt')),
+    'glove': str(Path(DATADIR, 'glove.npz')),
+    'fulldoc': False
+}
 
-  print(inputs.shape[2])
-  hidden_size = inputs.shape[2].value  # D value - hidden size of the RNN layer
-  print(hidden_size)
+# def bahdanau_attention(inputs, attention_size):
+#   pass
+# 
+# def luong_attention(inputs, attention_size):
+#   hidden_size = inputs.shape[2].value
+#   print(inputs)
+# 
+#   # Dense layer.
+#   w_omega = tf.Variable(tf.random_normal([hidden_size, attention_size], stddev=0.1))
+#   b_omega = tf.Variable(tf.random_normal([attention_size], stddev=0.1))
+#   print(w_omega)
+#   v = tf.tanh(tf.tensordot(inputs, w_omega, axes=1) + b_omega, name='v')
+#   print(v)
+# 
+#   u_omega = tf.Variable(tf.random_normal([attention_size], stddev=0.1))
+#   vu = tf.tensordot(v, u_omega, axes=1, name='vu')
+#   print(vu)
+#   
+#   alphas = tf.nn.softmax(vu, name='alphas')
+#   print(tf.expand_dims(alphas, -1))
+# 
+#   output = inputs * tf.expand_dims(alphas, -1)
+#   return output, alphas
 
-  # Trainable parameters
-  w_omega = tf.Variable(tf.random_normal([hidden_size, attention_size], stddev=0.1))
-  b_omega = tf.Variable(tf.random_normal([attention_size], stddev=0.1))
-  u_omega = tf.Variable(tf.random_normal([attention_size], stddev=0.1))
+def john_attention(inputs, attention_size):
+  hidden_size = inputs.shape[2].value
 
-  with tf.name_scope('v'):
-    # Applying fully connected layer with non-linear activation to each of the B*T timestamps;
-    #  the shape of `v` is (B,T,D)*(D,A)=(B,T,A), where A=attention_size
-    v = tf.tanh(tf.tensordot(inputs, w_omega, axes=1) + b_omega)
+  # Dense layer.
+  w1 = tf.Variable(tf.random_normal([hidden_size, attention_size], stddev=0.1))
+  b1 = tf.Variable(tf.random_normal([attention_size], stddev=0.1))
 
-  # For each of the timestamps its vector of size A from `v` is reduced with `u` vector
-  vu = tf.tensordot(v, u_omega, axes=1, name='vu')  # (B,T) shape
-  alphas = tf.nn.softmax(vu, name='alphas')     # (B,T) shape
+  w2 = tf.Variable(tf.random_normal([hidden_size, attention_size], stddev=0.1))
+  b2 = tf.Variable(tf.random_normal([attention_size], stddev=0.1))
 
-  # Output of (Bi-)RNN is reduced with attention vector; the result has (B,D) shape
-  output = tf.reduce_sum(inputs * tf.expand_dims(alphas, -1), 1)
+  u = tf.tanh(tf.tensordot(inputs, w1, axes=1) + b1, name='u')
+  v = tf.tanh(tf.tensordot(inputs, w2, axes=1) + b2, name='v')
+ 
+  v = tf.transpose(v, [0, 2, 1])
+  m = tf.matmul(u, v)
+  alphas = tf.nn.softmax(m, name='alphas')
+  outputs = tf.matmul(alphas, inputs)
 
-  if not return_alphas:
-    print('mama')
-    print(output.shape)
-    return output
-  else:
-    return output, alphas
+  return outputs, alphas
 
-def model_fn(features, labels, mode, params):
-  # For serving features are a bit different.
-  if isinstance(features, dict):
-    features = (
-      (features['words'], features['nwords']),
-      (features['chars'], features['nchars'])
-    )
+def attention(inputs, attention_size):
+  return john_attention(inputs, attention_size)
 
-  # Read vocabs and inputs.
-  dropout = params['dropout']
-  (words, nwords), (chars, nchars) = features
-  training = (mode == tf.estimator.ModeKeys.TRAIN)
-  vocab_words = tf.contrib.lookup.index_table_from_file(
-    params['words'], num_oov_buckets=params['num_oov_buckets'])
-  vocab_chars = tf.contrib.lookup.index_table_from_file(
-    params['chars'], num_oov_buckets=params['num_oov_buckets'])
-
+def create_model():
   with Path(params['tags']).open() as f:
     indices = [idx for idx, tag in enumerate(f) if tag.strip() != 'O']
     num_tags = len(indices) + 1
+  
   with Path(params['chars']).open() as f:
     num_chars = sum(1 for _ in f) + params['num_oov_buckets']
-
-  # Char Embeddings
-  char_ids = vocab_chars.lookup(chars)
-  variable = tf.get_variable(
-    'chars_embeddings', [num_chars + 1, params['dim_chars']], tf.float32)
-  char_embeddings = tf.nn.embedding_lookup(variable, char_ids)
-  char_embeddings = tf.layers.dropout(char_embeddings, rate=dropout,
-                    training=training)
-
-  # Char 1d convolution
-  weights = tf.sequence_mask(nchars)
-  char_embeddings = masked_conv1d_and_max(
-    char_embeddings, weights, params['filters'], params['kernel_size'])
-
-  # Word Embeddings
-  word_ids = vocab_words.lookup(words)
-  glove = np.load(params['glove'])['embeddings']  # np.array
-  variable = np.vstack([glove, [[0.] * params['dim']]])
-  variable = tf.Variable(variable, dtype=tf.float32, trainable=False)
-  word_embeddings = tf.nn.embedding_lookup(variable, word_ids)
-
-  # Concatenate Word and Char Embeddings
-  embeddings = tf.concat([word_embeddings, char_embeddings], axis=-1)
-  embeddings = tf.layers.dropout(embeddings, rate=dropout, training=training)
-
-  # LSTM
-  t = tf.transpose(embeddings, perm=[1, 0, 2])  # Need time-major
-  lstm_cell_fw = tf.contrib.rnn.LSTMBlockFusedCell(params['lstm_size'])
-  lstm_cell_bw = tf.contrib.rnn.LSTMBlockFusedCell(params['lstm_size'])
-  lstm_cell_bw = tf.contrib.rnn.TimeReversedFusedRNN(lstm_cell_bw)
-  output_fw, _ = lstm_cell_fw(t, dtype=tf.float32, sequence_length=nwords)
-  output_bw, _ = lstm_cell_bw(t, dtype=tf.float32, sequence_length=nwords)
-  output = tf.concat([output_fw, output_bw], axis=-1)
-  output = tf.transpose(output, perm=[1, 0, 2])
-  output = tf.layers.dropout(output, rate=dropout, training=training)
-
-  print('mim')
-  print(output.shape)
-
-  # output, alphas = attention(output, 50, return_alphas=True)
-  # tf.summary.histogram('alphas', alphas)
-  output = attention(output, 50)
-
-
-  # CRF
-  logits = tf.layers.dense(output, num_tags)
-  crf_params = tf.get_variable("crf", [num_tags, num_tags], dtype=tf.float32)
-  pred_ids, _ = tf.contrib.crf.crf_decode(logits, crf_params, nwords)
-
-  if mode == tf.estimator.ModeKeys.PREDICT:
-    # Predictions
-    reverse_vocab_tags = tf.contrib.lookup.index_to_string_table_from_file(
-      params['tags'])
-    pred_strings = reverse_vocab_tags.lookup(tf.to_int64(pred_ids))
-    predictions = {
-      'pred_ids': pred_ids,
-      'tags': pred_strings
-    }
-    return tf.estimator.EstimatorSpec(mode, predictions=predictions)
-  else:
-    # Loss
+  
+  with tf.name_scope('inputs'):
+    words = tf.placeholder(tf.string, shape=(None, None), name='words')
+    nwords = tf.placeholder(tf.int32, shape=(None,), name='nwords')
+    chars = tf.placeholder(tf.string, shape=(None, None, None), name='chars')
+    nchars = tf.placeholder(tf.int32, shape=(None, None), name='nchars')
+    labels = tf.placeholder(tf.string, shape=(None, None), name='labels')
+    training = tf.placeholder(tf.bool, shape=(), name='training')
+  
+  with tf.name_scope('embeddings'):
+    dropout = params['dropout']
+    vocab_words = tf.contrib.lookup.index_table_from_file(
+      params['words'], num_oov_buckets=params['num_oov_buckets']
+    )
+    vocab_chars = tf.contrib.lookup.index_table_from_file(
+      params['chars'], num_oov_buckets=params['num_oov_buckets']
+    )
+  
+    # Char Embeddings
+    char_ids = vocab_chars.lookup(chars)
+    variable = tf.get_variable(
+      'chars_embeddings', [num_chars + 1, params['dim_chars']], tf.float32)
+    char_embeddings = tf.nn.embedding_lookup(variable, char_ids)
+    char_embeddings = tf.layers.dropout(char_embeddings, rate=dropout, training=training)
+  
+    # Char 1d convolution
+    weights = tf.sequence_mask(nchars)
+    char_embeddings = masked_conv1d_and_max(char_embeddings, weights, params['filters'], params['kernel_size'])
+  
+    # Word Embeddings
+    word_ids = vocab_words.lookup(words)
+    glove = np.load(params['glove'])['embeddings']  # np.array
+    variable = np.vstack([glove, [[0.] * params['dim']]])
+    variable = tf.Variable(variable, dtype=tf.float32, trainable=False)
+    word_embeddings = tf.nn.embedding_lookup(variable, word_ids)
+  
+    # Concatenate Word and Char Embeddings
+    embeddings = tf.concat([word_embeddings, char_embeddings], axis=-1)
+    embeddings = tf.layers.dropout(embeddings, rate=dropout, training=training)
+  
+  with tf.name_scope('lstm'):
+    t = embeddings
+  
+    lstm_cell_fw = tf.nn.rnn_cell.LSTMCell(params['lstm_size'])
+    lstm_cell_bw = tf.nn.rnn_cell.LSTMCell(params['lstm_size'])
+  
+    (output_fw, output_bw), (_, _) = tf.nn.bidirectional_dynamic_rnn(
+      lstm_cell_fw, lstm_cell_bw, t,
+      dtype=tf.float32,
+      sequence_length=nwords
+    )
+  
+    output = tf.concat([output_fw, output_bw], axis=-1)
+    output, _ = attention(output, 100)
+    output = tf.layers.dropout(output, rate=dropout, training=training)
+  
+  with tf.name_scope('output'):
+    logits = tf.layers.dense(output, num_tags)
+    crf_params = tf.get_variable("crf", [num_tags, num_tags], dtype=tf.float32)
+    pred_ids, _ = tf.contrib.crf.crf_decode(logits, crf_params, nwords)
+  
+  with tf.name_scope('loss'):
     vocab_tags = tf.contrib.lookup.index_table_from_file(params['tags'])
     tags = vocab_tags.lookup(labels)
     log_likelihood, _ = tf.contrib.crf.crf_log_likelihood(
       logits, tags, nwords, crf_params)
-    loss = tf.reduce_mean(-log_likelihood)
-
-    # Metrics
-    weights = tf.sequence_mask(nwords)
-    metrics = {
-      'acc': tf.metrics.accuracy(tags, pred_ids, weights),
-      'precision': precision(tags, pred_ids, num_tags, indices, weights),
-      'recall': recall(tags, pred_ids, num_tags, indices, weights),
-      'f1': f1(tags, pred_ids, num_tags, indices, weights),
-    }
-    for metric_name, op in metrics.items():
-      tf.summary.scalar(metric_name, op[1])
-
-    if mode == tf.estimator.ModeKeys.EVAL:
-      return tf.estimator.EstimatorSpec(
-        mode, loss=loss, eval_metric_ops=metrics)
-
-    elif mode == tf.estimator.ModeKeys.TRAIN:
-      train_op = tf.train.AdamOptimizer().minimize(
-        loss, global_step=tf.train.get_or_create_global_step())
-      return tf.estimator.EstimatorSpec(
-        mode, loss=loss, train_op=train_op)
+    loss = tf.reduce_mean(-log_likelihood, name='loss')
+  
+    correct = tf.equal(tf.to_int64(pred_ids), tags)
+    accuracy = tf.reduce_mean(tf.cast(correct, tf.float32), name='accuracy')
+  
+  with tf.name_scope('training'):
+    train_step = tf.train.AdamOptimizer(learning_rate=0.001).minimize(loss)
+  
+  with tf.name_scope('prediction'):
+    reverse_vocab_tags = tf.contrib.lookup.index_to_string_table_from_file(
+      params['tags'])
+    pred_strings = reverse_vocab_tags.lookup(tf.to_int64(pred_ids))  

@@ -94,7 +94,7 @@ class DL:
         for d in documents:
           yield self.parse_sentence(d)
       else:
-        sentences = [s for s in sentences if not s[0][0] == '-DOCSTART-']
+        # sentences = [s for s in sentences if not s[0][0] == '-DOCSTART-']
         for s in sentences:
           yield self.parse_sentence(s)
           
@@ -123,9 +123,10 @@ class DL:
       )
     
       if training:
-        dataset = dataset.shuffle(self.params['buffer']).repeat(self.params['epochs'])
-    
-      return dataset.padded_batch(self.params.get('batch_size', 20), shapes, defaults)
+        dataset = dataset.shuffle(self.params['buffer'])
+   
+      batch_size = self.params.get('batch_size', 20)
+      return dataset.padded_batch(batch_size, shapes, defaults)
 
     def set_params(self, params=None):
       params = params if params is not None else {}
