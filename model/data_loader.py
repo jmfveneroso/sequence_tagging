@@ -41,22 +41,11 @@ class DL:
     def __init__(self):
       datadir = 'data/conll2003'
       self.params = {
-        'dim_chars': 100,
-        'dim': 300,
-        'dropout': 0.5,
-        'num_oov_buckets': 1,
         'epochs': 25,
         'label_col': 3,
         'batch_size': 20,
         'buffer': 15000,
-        'filters': 50,
-        'kernel_size': 3,
-        'lstm_size': 100,
         'datadir': datadir,
-        'words': str(Path(datadir, 'vocab.words.txt')),
-        'chars': str(Path(datadir, 'vocab.chars.txt')),
-        'tags': str(Path(datadir, 'vocab.tags.txt')),
-        'glove': str(Path(datadir, 'glove.npz')),
         'fulldoc': True
       }
 
@@ -91,10 +80,9 @@ class DL:
         documents = split_array(sentences, separator_fn)
         documents = [join_arrays(d, eos) for d in documents]
 
-        for d in documents:
+        for i, d in enumerate(documents):
           yield self.parse_sentence(d)
       else:
-        # sentences = [s for s in sentences if not s[0][0] == '-DOCSTART-']
         for s in sentences:
           yield self.parse_sentence(s)
           
@@ -127,6 +115,19 @@ class DL:
    
       batch_size = self.params.get('batch_size', 20)
       return dataset.padded_batch(batch_size, shapes, defaults)
+
+    def get_doc(self, filename, i):
+      with Path(self.params['datadir'], filename).open('r', encoding="utf-8") as f:
+        sentences = get_sentences(f)
+
+      separator_fn = lambda el : el[0][0] == '-DOCSTART-'
+      eos = ['EOS', '-X-', '-X-', 'O']
+
+      documents = split_array(sentences, separator_fn)
+      documents = [join_arrays(d, eos) for d in documents]
+
+      d = documents[i]
+      return self.parse_sentence(d)
 
     def set_params(self, params=None):
       params = params if params is not None else {}

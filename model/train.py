@@ -10,6 +10,7 @@ import time
 from model.data_loader import DL
 from model.metrics import evaluate
 from model.model import create_model
+import subprocess
 
 MAX_TOKEN_LENGTH = 10
 DATADIR = 'data/conll2003'
@@ -17,26 +18,18 @@ LABEL_COL = 3
 
 # Params
 params = {
-  'dim_chars': 100,
-  'dim': 300,
-  'dropout': 0.5,
-  'num_oov_buckets': 1,
-  'epochs': 25,
+  'epochs': 50,
   'batch_size': 1,
   'buffer': 15000,
-  'filters': 50,
-  'kernel_size': 3,
-  'lstm_size': 100,
-  'words': str(Path(DATADIR, 'vocab.words.txt')),
-  'chars': str(Path(DATADIR, 'vocab.chars.txt')),
-  'tags': str(Path(DATADIR, 'vocab.tags.txt')),
-  'glove': str(Path(DATADIR, 'glove.npz')),
   'fulldoc': True
 }
 
+import numpy
+numpy.set_printoptions(threshold=numpy.nan)
+
 DL().set_params(params)
 
-def process_one_epoch(sess, filename, train=False):  
+def process_one_epoch(sess, filename, train=False, show_alphas=False):  
   start_time = time.time()
     
   iterator = DL().input_fn(filename, training=train).make_initializable_iterator()
@@ -51,10 +44,12 @@ def process_one_epoch(sess, filename, train=False):
       (words_, nwords_), (chars_, nchars_) = features
       
       target = ['loss/loss:0', 'loss/accuracy:0', 'prediction/index_to_string_Lookup:0']
-      # target.append('lstm/alphas:0')
+      if show_alphas:
+        target.append('lstm/alphas:0')
+        target.append('lstm/lstm_states:0')
+        target.append('lstm/weighted_lstm_states:0')
       if train:
         target.append('training/Adam')
-    
       
       result = sess.run(target, feed_dict={
         'inputs/words:0': words_,
@@ -68,8 +63,13 @@ def process_one_epoch(sess, filename, train=False):
       acc = result[1]
       preds_ = result[2]
 
-      # alphas = result[3]
-      # print(alphas)
+      if show_alphas:
+        alphas = result[3]
+        states = result[4]
+        w_states = result[5]
+        print(states.tolist())
+        print(w_states.tolist())
+        print(alphas.tolist())
       
       all_words += words_.tolist()        
       all_tags += labels_.tolist()        
@@ -102,37 +102,14 @@ def write_predictions(name):
     Path('results/score').mkdir(parents=True, exist_ok=True)
     with Path('results/score/{}.preds.txt'.format(name)).open('wb') as f:
       for words, preds, tags in zip(w, p, t):
+        f.write(b'-DOCSTART- O O\n\n')
         for word, pred, tag in zip(words, preds, tags):
-          f.write(b' '.join([word, tag, pred]) + b'\n')
-        f.write(b'\n')
+          if not word.decode("utf-8") == 'EOS':
+            f.write(b' '.join([word, tag, pred]) + b'\n')
+          else:
+            f.write(b'\n')
 
-def train(restore=False):
-  if not restore:
-    create_model()
-
-  best_f1 = 0
-  
-  with tf.Session() as sess:  
-    if restore:
-      saver = tf.train.import_meta_graph('./checkpoints/model.ckpt.meta')
-      saver.restore(sess, "./checkpoints/model.ckpt")
-    else:
-      saver = tf.train.Saver()
-    sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
-
-    epochs = 20
-    for epoch in range(epochs):
-      m, _ = process_one_epoch(sess, 'train', train=True)
-      print('TRAIN - Epoch %d, Precision: %.4f, Recall: %.4f, F1: %.4f' % (epoch, m['precision'], m['recall'], m['f1']))
-
-      m, _ = process_one_epoch(sess, 'valid')
-      print('VALID - Epoch %d, Precision: %.4f, Recall: %.4f, F1: %.4f' % (epoch, m['precision'], m['recall'], m['f1']))
-      
-      if m['f1'] > best_f1:
-        best_f1 = m['f1']
-        save_path = saver.save(sess, "./checkpoints/model.ckpt")
-        print("Model saved in path: %s" % save_path)
-  
+def test():
   with tf.Session() as sess:
     print('Restoring best model...')
     saver = tf.train.import_meta_graph('./checkpoints/model.ckpt.meta')
@@ -147,6 +124,134 @@ def train(restore=False):
 
   for name in ['train', 'valid', 'test']:
     write_predictions(name)
+  result = subprocess.check_output(['sh', './eval.sh'])
+  # print(result)
 
-if __name__ == '__main__':
-  train(restore=False)
+def train(restore=False):
+  if not restore:
+    create_model()
+
+  best_f1 = 0
+  with tf.Session() as sess:  
+    if restore:
+      saver = tf.train.import_meta_graph('./checkpoints/model.ckpt.meta')
+      saver.restore(sess, "./checkpoints/model.ckpt")
+    else:
+      saver = tf.train.Saver()
+    sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
+
+    epochs = params['epochs']
+    for epoch in range(epochs):
+      m, _ = process_one_epoch(sess, 'train', train=True)
+      print('TRAIN - Epoch %d, Precision: %.4f, Recall: %.4f, F1: %.4f' % (epoch, m['precision'], m['recall'], m['f1']))
+
+      m, _ = process_one_epoch(sess, 'valid')
+      print('VALID - Epoch %d, Precision: %.4f, Recall: %.4f, F1: %.4f' % (epoch, m['precision'], m['recall'], m['f1']))
+      
+      if m['f1'] > best_f1:
+        best_f1 = m['f1']
+        save_path = saver.save(sess, "./checkpoints/model.ckpt")
+        print("Model saved in path: %s" % save_path) 
+  test()
+
+def quick_train(filename, docs):
+  if not isinstance(docs, list):
+    docs = [docs] 
+
+  create_model()
+
+  with tf.Session() as sess:  
+    saver = tf.train.Saver()
+    sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
+
+    f1 = 0
+    epochs = 150
+    for epoch in range(epochs):
+      start_time = time.time()
+      for doc in docs:
+        features, labels_ = [(f, l) for (f, l) in DL().generator_fn(filename)][doc]
+        (words_, nwords_), (chars_, nchars_) = features
+    
+        target = [
+          'loss/loss:0', 'loss/accuracy:0', 
+          'prediction/index_to_string_Lookup:0', 
+          'training/Adam'
+        ]
+        
+        result = sess.run(target, feed_dict={
+          'inputs/words:0':  [words_],
+          'inputs/nwords:0': [nwords_],
+          'inputs/chars:0':  [chars_],
+          'inputs/nchars:0': [nchars_],
+          'inputs/labels:0': [labels_],
+          'inputs/training:0': False
+        })
+        l = result[0]
+        acc = result[1]
+        preds_ = result[2]
+
+        cur_time = time.time() - start_time
+
+        all_words = words_
+        all_tags = labels_
+        all_preds = preds_.tolist()
+        all_seqlens = nwords_
+
+        all_tags  = [all_tags[:nwords_]]
+        all_preds[0] = all_preds[0][:nwords_]
+        all_words = all_words[:nwords_]   
+
+        m = evaluate(all_preds, all_tags, [], verbose=False)
+        f1 = m['f1']
+        msg = 'Loss: %.4f, Accuracy: %.4f, F1: %.4f, Time: %.4f, Step: %d       ' % (l, acc, f1, cur_time, epoch)
+        print('\r', msg, end='')
+
+        if f1 > 0.9:
+          break
+      if f1 > 0.9:
+        break
+    save_path = saver.save(sess, "./checkpoints/model2.ckpt")
+    print("Model saved in path: %s" % save_path)
+
+def plot_attention(filename, doc, checkpoint=''):
+  with tf.Session() as sess:
+    saver = tf.train.import_meta_graph('./checkpoints/model' + checkpoint + '.ckpt.meta')
+    sess.run([tf.tables_initializer()])
+    saver.restore(sess, './checkpoints/model' + checkpoint + '.ckpt')
+
+    features, labels_ = [(f, l) for (f, l) in DL().generator_fn(filename)][doc]
+    (words_, nwords_), (chars_, nchars_) = features
+    
+    target = [
+      'lstm/alphas0:0', 
+      'embeddings/string_to_index_Lookup:0',
+      'embeddings/embedding_lookup_1/Identity:0',
+      'prediction/index_to_string_Lookup:0',
+      'loss/loss:0', 'loss/accuracy:0', 
+      # 'lstm/alphas1:0', 
+      # 'lstm/alphas2:0', 
+      # 'lstm/alphas3:0', 
+    ]
+     
+    result = sess.run(target, feed_dict={
+      'inputs/words:0':  [words_],
+      'inputs/nwords:0': [nwords_],
+      'inputs/chars:0':  [chars_],
+      'inputs/nchars:0': [nchars_],
+      'inputs/labels:0': [labels_],
+      'inputs/training:0': False
+    })
+    alphas = result[0][0]
+    word_emb_ids = result[1]
+    word_embs = result[2]
+    preds_ = result[3]
+    loss = result[4]
+    acc = result[5]
+    # alphas1 = result[6][0]
+    # alphas2 = result[7][0]
+    # alphas3 = result[8][0]
+    print('Loss: %f, Accuracy: %f' % (loss, acc))
+
+    alphas = (alphas + alphas1 + alphas2 + alphas3) / 4.0
+
+    return words_, alphas, word_emb_ids, word_embs, preds_[0], labels_

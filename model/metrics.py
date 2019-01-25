@@ -3,22 +3,28 @@ import tensorflow as tf
 import numpy as np 
 
 def get_named_entities(tags):
+  try:
+    tags = [t.decode("utf-8") for t in tags]
+  except AttributeError:
+    pass
+
   r = []
   i = 0
   while i < len(tags):
-    if tags[i].decode("utf-8") == 'O':
+    if tags[i] == 'O':
       i += 1
     else:
-      expected_tag = 'I-' + tags[i].decode("utf-8")[2:]
+      tag_type = tags[i][2:]
+      expected_tag = 'I-' + tag_type
       start, end = i, i
       i += 1
       while i < len(tags):
-        if tags[i].decode("utf-8") == expected_tag:
+        if tags[i] == expected_tag:
           end = i
         else:
           break
         i += 1
-      r.append((start, end))
+      r.append((start, end, tag_type))
   return r
 
 def evaluate(val_predict, val_target, tokens, verbose=False):
@@ -51,6 +57,9 @@ def evaluate(val_predict, val_target, tokens, verbose=False):
   correct = num_correct
   incorrect = num_predicted - num_correct
   missed = num_expected - num_correct
+  # print('num_correct: %d' % (num_correct))
+  # print('num_expected: %d' % (num_expected))
+  # print('num_expected: %d' % (num_expected))
 
   return {
     'accuracy': accuracy,
