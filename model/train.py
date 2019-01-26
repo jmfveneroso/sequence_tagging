@@ -228,7 +228,7 @@ def plot_attention(filename, doc, checkpoint=''):
       'embeddings/embedding_lookup_1/Identity:0',
       'prediction/index_to_string_Lookup:0',
       'loss/loss:0', 'loss/accuracy:0', 
-      # 'lstm/alphas1:0', 
+      'lstm/alphas1:0', 
       # 'lstm/alphas2:0', 
       # 'lstm/alphas3:0', 
     ]
@@ -247,11 +247,12 @@ def plot_attention(filename, doc, checkpoint=''):
     preds_ = result[3]
     loss = result[4]
     acc = result[5]
-    # alphas1 = result[6][0]
+    alphas1 = result[6][0]
     # alphas2 = result[7][0]
     # alphas3 = result[8][0]
     print('Loss: %f, Accuracy: %f' % (loss, acc))
 
-    alphas = (alphas + alphas1 + alphas2 + alphas3) / 4.0
+    # alphas = (alphas + alphas1 + alphas2 + alphas3) / 4.0
+    alphas = (alphas + alphas1) / 2.0
 
     return words_, alphas, word_emb_ids, word_embs, preds_[0], labels_

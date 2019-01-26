@@ -19,7 +19,7 @@ params = {
     'num_oov_buckets': 1,
     'filters': 50,
     'kernel_size': 3,
-    'lstm_size': 400,
+    'lstm_size': 200,
     'attention_size': 150,
     'learning_rate': 0.001,
     'words': str(Path(DATADIR, 'vocab.words.txt')),
@@ -91,12 +91,12 @@ def bahdanau(x, attention_size=100, name='bahdanau'):
   z = tf.map_fn(fn, v)
   return tf.transpose(z, [2, 1, 0], name=name) 
 
-def single_head_self_attention(inputs, name='shsa'):
+def single_head_self_attention(inputs, outputs, name='shsa'):
   hidden_size = inputs.shape[2].value
 
   queries = tf.layers.dense(inputs, hidden_size)
   keys    = queries
-  values  = tf.layers.dense(inputs, hidden_size)
+  values  = tf.layers.dense(outputs, hidden_size)
 
   dot = tf.matmul(queries, tf.transpose(keys, [0, 2, 1]))
   scaled_dot = tf.divide(dot, math.sqrt(hidden_size))
@@ -107,15 +107,15 @@ def single_head_self_attention(inputs, name='shsa'):
 def multi_head_self_attention(inputs, outputs):
   hidden_size = inputs.shape[2].value
 
-  num_heads = 4
+  num_heads = 2
   att_layers = []
   for i in range(num_heads):
-    att_layers.append(single_head_self_attention(inputs, name='alphas' + str(i)))
+    att_layers.append(single_head_self_attention(inputs, outputs, name='alphas' + str(i)))
 
   return tf.layers.dense(tf.concat(att_layers, axis=-1), hidden_size)
 
-def attention(input1, input2, attention_size, training=False):
-  return multi_head_self_attention(input1, input1)
+def attention(inputs, outputs, attention_size, training=False):
+  return multi_head_self_attention(inputs, outputs)
   # return self_attention(input1, input2, training=training)
 
   # hidden_size = input1.shape[2].value
@@ -190,8 +190,8 @@ def create_model():
   
     # Char 1d convolution
     weights = tf.sequence_mask(nchars)
-    char_embeddings = masked_conv1d_and_max(char_embeddings_pre, weights, params['filters'], params['kernel_size']) 
-    # char_embeddings = lstm_char_representations(char_embeddings, nchars)
+    # char_embeddings = masked_conv1d_and_max(char_embeddings_pre, weights, params['filters'], params['kernel_size']) 
+    char_embeddings = lstm_char_representations(char_embeddings, nchars)
 
     # Word Embeddings
     word_ids = vocab_words.lookup(words)
@@ -220,10 +220,10 @@ def create_model():
     output = tf.add(output_fw, output_bw, name='lstm_states')
     output = tf.layers.dropout(output, rate=dropout, training=training)
 
-    output2 = attention(output, output, params['attention_size'], training=training)
+    output2 = attention(t, output, params['attention_size'], training=training)
     
     # output = tf.nn.relu(output + output2)
-    output = output + output2
+    output = tf.concat([output, output2], axis=-1)
 
     # output = tf.concat([output, output2], axis=-1)
     logits = tf.layers.dense(output, num_tags)
