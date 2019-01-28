@@ -8,3 +8,4 @@ logs
 checkpoints
 MNIST_tflearn_checkpoints
 imdb.pkl
+**/*.swp

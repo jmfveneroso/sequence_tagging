@@ -19,9 +19,11 @@ LABEL_COL = 3
 # Params
 params = {
   'epochs': 50,
-  'batch_size': 1,
+  # 'batch_size': 1,
+  'batch_size': 20,
   'buffer': 15000,
   'fulldoc': True
+  # 'fulldoc': False
 }
 
 import numpy
@@ -147,6 +149,9 @@ def train(restore=False):
 
       m, _ = process_one_epoch(sess, 'valid')
       print('VALID - Epoch %d, Precision: %.4f, Recall: %.4f, F1: %.4f' % (epoch, m['precision'], m['recall'], m['f1']))
+
+      m, _ = process_one_epoch(sess, 'test')
+      print('TEST - Epoch %d, Precision: %.4f, Recall: %.4f, F1: %.4f' % (epoch, m['precision'], m['recall'], m['f1']))
       
       if m['f1'] > best_f1:
         best_f1 = m['f1']
@@ -228,7 +233,7 @@ def plot_attention(filename, doc, checkpoint=''):
       'embeddings/embedding_lookup_1/Identity:0',
       'prediction/index_to_string_Lookup:0',
       'loss/loss:0', 'loss/accuracy:0', 
-      'lstm/alphas1:0', 
+      # 'lstm/alphas1:0', 
       # 'lstm/alphas2:0', 
       # 'lstm/alphas3:0', 
     ]
@@ -247,12 +252,12 @@ def plot_attention(filename, doc, checkpoint=''):
     preds_ = result[3]
     loss = result[4]
     acc = result[5]
-    alphas1 = result[6][0]
+    # alphas1 = result[6][0]
     # alphas2 = result[7][0]
     # alphas3 = result[8][0]
     print('Loss: %f, Accuracy: %f' % (loss, acc))
 
     # alphas = (alphas + alphas1 + alphas2 + alphas3) / 4.0
-    alphas = (alphas + alphas1) / 2.0
+    # alphas = (alphas + alphas1) / 2.0
 
     return words_, alphas, word_emb_ids, word_embs, preds_[0], labels_

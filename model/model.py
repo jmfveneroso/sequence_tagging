@@ -11,22 +11,24 @@ LABEL_COL = 3
 
 # Params
 params = {
-    # 'dim_chars': 100,
-    'dim_chars': 300,
+    'dim_chars': 100,
+    # 'dim_chars': 300,
     'char_lstm_size': 25,
     'dim': 300,
     'dropout': 0.5,
     'num_oov_buckets': 1,
     'filters': 50,
     'kernel_size': 3,
-    'lstm_size': 200,
-    'attention_size': 150,
+    'lstm_size': 400,
     'learning_rate': 0.001,
     'words': str(Path(DATADIR, 'vocab.words.txt')),
     'chars': str(Path(DATADIR, 'vocab.chars.txt')),
     'tags': str(Path(DATADIR, 'vocab.tags.txt')),
     'glove': str(Path(DATADIR, 'glove.npz')),
-    'char_embeddings': str(Path(DATADIR, 'char_embeddings.npz'))
+    'char_embeddings': str(Path(DATADIR, 'char_embeddings.npz')),
+    'similarity_fn': 'scaled_dot',
+    'regularization_fn': 'softmax',
+    'use_attention': True
 }
 
 def lstm_char_representations(char_embeddings, nchars):
@@ -49,110 +51,96 @@ def lstm_char_representations(char_embeddings, nchars):
     char_embeddings = tf.reshape(output, [-1, dim_words, 50])
   return char_embeddings
 
-def dot_product(x, name='dot'):
-  return tf.matmul(x, tf.transpose(x, [0, 2, 1]), name=name)
+def rbf_kernel(Q, K, gamma=0.5):
+  Q = tf.transpose(Q, [1, 0, 2]) # Time major.
+  K = tf.transpose(K, [1, 0, 2])
+  return tf.transpose(tf.map_fn(
+    lambda k: tf.exp(-gamma * tf.reduce_sum(tf.square(Q - k), axis=-1)),
+    K
+  ), [2, 1, 0])
 
-def norm_dot_product(x, name='norm_dot'):
-  alphas = dot_product(x)
-  l = tf.sqrt(tf.reduce_sum(tf.square(x), axis=-1, keepdims=True))
-  l = tf.matmul(l, tf.transpose(l, [0, 2, 1]))
-  alphas = tf.divide(alphas, l)
-  alphas = tf.abs(alphas, name=name)
-  return alphas
+def bahdanau(Q, K):
+  Q = tf.transpose(Q, [1, 0, 2]) # Time major.
+  K = tf.transpose(K, [1, 0, 2])
+  attention = tf.map_fn(
+    lambda k: tf.layers.dense(tf.tanh(Q + k), 1), 
+    K
+  )
+  return tf.transpose(tf.squeeze(attention, axis=-1), [2, 1, 0]) 
 
-def rbf_kernel(x, sigma=0.5, name='rbf'):
-  def fn(xi):
-    return tf.exp(-tf.reduce_sum(tf.square(x - xi), axis=-1) * sigma)
-  
-  x = tf.transpose(x, [1, 0, 2]) # Time major.
-  z = tf.map_fn(fn, x)
-  return tf.transpose(z, [2, 1, 0], name=name) 
+def dot_product(Q, K, scaled=False, cosine=False):
+  attention = tf.matmul(Q, K, transpose_b=True)
 
-def bahdanau(x, attention_size=100, name='bahdanau'):
-  hidden_size = x.shape[2].value
+  if scaled:
+    attention = tf.divide(attention, math.sqrt(Q.shape[2].value))
 
-  w_v = tf.Variable(tf.random_normal([hidden_size, attention_size], stddev=0.1))
-  b_v = tf.Variable(tf.random_normal([attention_size], stddev=0.1))
+  if cosine:
+    norm_q = tf.sqrt(tf.reduce_sum(tf.square(Q), axis=-1, keepdims=True))
+    norm_k = tf.sqrt(tf.reduce_sum(tf.square(K), axis=-1, keepdims=True))
+    norm = tf.matmul(norm_q, norm_k, transpose_b=True)
+    attention = tf.abs(tf.divide(alphas, norm))
 
-  w_u = tf.Variable(tf.random_normal([hidden_size, attention_size], stddev=0.1))
-  b_u = tf.Variable(tf.random_normal([attention_size], stddev=0.1))
+  return attention
 
-  w_z = tf.Variable(tf.random_normal([attention_size], stddev=0.1))
-  b_z = tf.Variable(tf.random_normal([], stddev=0.1))
+def self_attention(inputs, outputs, name='shsa'):
+  attention_size = inputs.shape[2].value
+  output_size = outputs.shape[2].value
 
-  u = tf.tensordot(x, w_u, axes=1) + b_u
-  v = tf.tensordot(x, w_v, axes=1) + b_v
-  def fn(vi):
-    aux = tf.tanh(u + vi)
-    return tf.tensordot(aux, w_z, axes=1) + b_z
-  
-  u = tf.transpose(u, [1, 0, 2]) # Time major.
-  v = tf.transpose(v, [1, 0, 2]) # Time major.
-  z = tf.map_fn(fn, v)
-  return tf.transpose(z, [2, 1, 0], name=name) 
+  # Q = tf.layers.dense(inputs, attention_size)
+  # K = tf.layers.dense(inputs, attention_size)
+  # V = tf.layers.dense(inputs, output_size)
+  Q = inputs
+  K = inputs
+  V = inputs
 
-def single_head_self_attention(inputs, outputs, name='shsa'):
-  hidden_size = inputs.shape[2].value
+  # Similarity function.
+  if   params['similarity_fn'] == 'rbf':
+    attention = rbf_kernel(Q, K)
+  elif params['similarity_fn'] == 'dot':
+    attention = dot_product(Q, K)
+  elif params['similarity_fn'] == 'scaled_dot':
+    attention = dot_product(Q, K, scaled=True)
+  elif params['similarity_fn'] == 'cosine':
+    attention = dot_product(Q, K, cosine=True)
+  elif params['similarity_fn'] == 'bahdanau':
+    attention = bahdanau(Q, K)
 
-  queries = tf.layers.dense(inputs, hidden_size)
-  keys    = queries
-  values  = tf.layers.dense(outputs, hidden_size)
+  # Regularization.
+  if   params['regularization_fn'] == 'softmax':
+    alphas = tf.nn.softmax(attention, name=name)
+  elif params['regularization_fn'] == 'tanh':
+    alphas = tf.tanh(attention, name=name)
+  elif params['regularization_fn'] == 'linear':
+    regularizer = tf.reduce_sum(attention, keepdims=True, axis=-1)
+    alphas = tf.divide(attention, regularizer, name=name)
 
-  dot = tf.matmul(queries, tf.transpose(keys, [0, 2, 1]))
-  scaled_dot = tf.divide(dot, math.sqrt(hidden_size))
-
-  alphas = tf.nn.softmax(scaled_dot, name=name)
-  return tf.matmul(alphas, values)
+  return tf.matmul(alphas, V)
 
 def multi_head_self_attention(inputs, outputs):
   hidden_size = inputs.shape[2].value
+  output_size = outputs.shape[2].value
 
-  num_heads = 2
+  num_heads = 8
   att_layers = []
   for i in range(num_heads):
     att_layers.append(single_head_self_attention(inputs, outputs, name='alphas' + str(i)))
 
-  return tf.layers.dense(tf.concat(att_layers, axis=-1), hidden_size)
+  return tf.layers.dense(tf.concat(att_layers, axis=-1), output_size)
 
-def attention(inputs, outputs, attention_size, training=False):
-  return multi_head_self_attention(inputs, outputs)
-  # return self_attention(input1, input2, training=training)
+def attention(inputs, outputs, training=False):
+  return self_attention(inputs, outputs, name='alphas0')
 
-  # hidden_size = input1.shape[2].value
+def position_embeddings(max_length, emb_dim):
+  position_emb = np.array([
+      [(pos+1) / np.power(10000, 2 * (j // 2) / emb_dim) for j in range(emb_dim)]
+      for pos in range(max_length)
+  ])
+  
+  position_emb[:,0::2] = np.sin(position_emb[:,0::2]) # dim 2i
+  position_emb[:,1::2] = np.cos(position_emb[:,1::2]) # dim 2i+1
 
-  # w1 = tf.Variable(tf.random_normal([hidden_size, attention_size], stddev=0.1))
-  # b1 = tf.Variable(tf.random_normal([attention_size], stddev=0.1))
-  # u = tf.tensordot(input1, w1, axes=1) + b1
- 
-  # 
-
-  # # u = tf.layers.dropout(u, rate=params['dropout'], training=training)
-  # # u = input1
-
-  # # Second feed forward layer.
-  # # w2 = tf.Variable(tf.random_normal([attention_size, attention_size], stddev=0.1))
-  # # b2 = tf.Variable(tf.random_normal([attention_size], stddev=0.1))
-  # # u = tf.tensordot(u, w2, axes=1) + b2
-
-  # # sigma = 1.0 / (math.sqrt(attention_size))
-  # # sigma = 1.0
-  # # alphas = rbf_kernel(u, sigma=sigma, name='palphas')
-  # alphas = norm_dot_product(u, name='palphas')
-  # # alphas = dot_product(u, name='palphas')
-  # # alphas = bahdanau(u)
-
-  # # Regularization
-  # alphas = tf.nn.softmax(alphas, name='alphas')
-  # # alphas = tf.divide(alphas, tf.reduce_sum(alphas, keepdims=True, axis=-1) , name='alphas')
-  # # alphas = tf.tanh(m, name='alphas')
-
-  # # w = tf.Variable(tf.random_normal([hidden_size, hidden_size], stddev=0.1))
-  # # b = tf.Variable(tf.random_normal([hidden_size], stddev=0.1))
-
-  # # alphas = tf.nn.softmax(alphas, name='alphas')
-  # output = tf.matmul(alphas, input2, name='weighted_lstm_states')
- 
-  # return output 
+  variable = np.vstack([position_emb, [[0.] * emb_dim]])
+  return tf.Variable(variable, dtype=tf.float32, trainable=False)
 
 def create_model():
   with Path(params['tags']).open() as f:
@@ -181,10 +169,10 @@ def create_model():
   
     # Char Embeddings
     char_ids = vocab_chars.lookup(chars)
-    pretrained_chars = np.load(params['char_embeddings'])['embeddings']  # np.array
-    variable = np.vstack([pretrained_chars, [[0.] * params['dim_chars']]])
-    variable = tf.Variable(variable, dtype=tf.float32, trainable=True)
-    # variable = tf.get_variable('chars_embeddings', [num_chars + 1, params['dim_chars']], tf.float32)
+    # pretrained_chars = np.load(params['char_embeddings'])['embeddings']  # np.array
+    # variable = np.vstack([pretrained_chars, [[0.] * params['dim_chars']]])
+    # variable = tf.Variable(variable, dtype=tf.float32, trainable=True)
+    variable = tf.get_variable('chars_embeddings', [num_chars + 1, params['dim_chars']], tf.float32)
     char_embeddings = tf.nn.embedding_lookup(variable, char_ids)
     char_embeddings_pre = tf.layers.dropout(char_embeddings, rate=dropout, training=training)
   
@@ -218,15 +206,14 @@ def create_model():
 
     # output = tf.concat([output_fw, output_bw], axis=-1, name='lstm_states')
     output = tf.add(output_fw, output_bw, name='lstm_states')
-    output = tf.layers.dropout(output, rate=dropout, training=training)
+    output = tf.layers.dropout(output, rate=0.5, training=training)
 
-    output2 = attention(t, output, params['attention_size'], training=training)
-    
-    # output = tf.nn.relu(output + output2)
-    output = tf.concat([output, output2], axis=-1)
-
-    # output = tf.concat([output, output2], axis=-1)
+    output = attention(output, output, training=training)
     logits = tf.layers.dense(output, num_tags)
+    # logits = logits + att_output
+
+    # logits = tf.nn.relu(logits + output2)
+    # output = tf.concat([output, output2], axis=-1)
   
   with tf.name_scope('output'):
     crf_params = tf.get_variable("crf", [num_tags, num_tags], dtype=tf.float32)
