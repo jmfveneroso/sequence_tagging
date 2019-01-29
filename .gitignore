@@ -1,5 +1,6 @@
 data
 results
+figures
 model/__pycache__
 old_models
 cifar-10-batches-py

@@ -1,6 +1,6 @@
 import matplotlib
 matplotlib.use('Agg')
-from model.train import train, plot_attention, quick_train, write_predictions, test
+from model.train import train, get_alphas, quick_train, test
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -10,7 +10,7 @@ import tensorflow as tf
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # Disable debug logs Tensorflow.
 tf.logging.set_verbosity(tf.logging.ERROR)
 
-cfg = [
+gcfg = [
   ('ASHES'     , 'valid', 2  , 3  , 14 , 719  , 730  ),
   ('KENT'      , 'valid', 113, 4  , 18 , 31781, 31795),
   ('Ireland'   , 'test' , 230, 22 , 52 , 50248, 50275),
@@ -22,10 +22,10 @@ cfg = [
 ]
 
 def matrix(checkpoint, example, print_all=False):
-  global cfg
-  cfg = cfg[example]
+  global gcfg
+  cfg = gcfg[example]
 
-  words, alphas_, emb_ids, embs, preds, labs = plot_attention(cfg[1], cfg[2], checkpoint=checkpoint)
+  words, alphas_, preds, labs = get_alphas(cfg[1], cfg[2], checkpoint=checkpoint)
   words = [w.decode("utf-8") for w in words]
 
   padding = 5
@@ -40,20 +40,17 @@ def matrix(checkpoint, example, print_all=False):
     start = 0
     end = len(words)
 
-  for i, (w, p, l, a, e) in enumerate(zip(words, labs, preds, alphas, emb_ids[0])):
+  for i, (w, p, l, a) in enumerate(zip(words, labs, preds, alphas)):
     if i >= start and i <= end:
       prefix = '>>>' if i == cfg[3] or i == cfg[4] else ''
-      print(prefix, i, w, p, l, a, e)
-
-  mean = np.sum(alphas) / float(len(alphas))
-  print('Mean: %f' % (mean))
+      print(prefix, i, w, p, l, a)
   
   fig = plt.figure(figsize=(10.0, 10.0), dpi=600)
   plt.xticks(range(0,end), words[start:end], rotation='vertical') 
   plt.yticks(range(0,end), words[start:end])
       
   plt.imshow(alphas_[start:end,start:end])
-  plt.savefig('foo.png', dpi=600)
+  plt.savefig('figures/' + str(example) + '.png', dpi=600)
 
 def test_pairs():
   valid, test = [], []
@@ -88,3 +85,7 @@ elif sys.argv[1] == 'test':
 
 elif sys.argv[1] == 'pairs':
   test_pairs()
+
+elif sys.argv[1] == 'allmatrices':
+  for i in range(len(gcfg)):
+    matrix('2', i)

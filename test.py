@@ -136,3 +136,21 @@ with tf.Session() as sess:
   res = sess.run(x)
   print(res)
 
+def position_embeddings(self, max_length, emb_dim):
+  position_emb = np.array([
+      [(pos+1) / np.power(10000, 2 * (j // 2) / emb_dim) for j in range(emb_dim)]
+      for pos in range(max_length)
+  ])
+  
+  position_emb[:,0::2] = np.sin(position_emb[:,0::2]) # dim 2i
+  position_emb[:,1::2] = np.cos(position_emb[:,1::2]) # dim 2i+1
+
+  variable = np.vstack([position_emb, [[0.] * emb_dim]])
+  variable = tf.Variable(variable, dtype=tf.float32, trainable=False)
+
+  seq = tf.constant(np.arange(1600), dtype=tf.int32)
+  seq = tf.nn.embedding_lookup(variable, seq)
+  pos_embeddings = tf.slice(seq, [0], [tf.shape(inputs)[1]])
+  return inputs + pos_embeddings
+
+

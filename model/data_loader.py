@@ -41,12 +41,12 @@ class DL:
     def __init__(self):
       datadir = 'data/conll2003'
       self.params = {
-        'epochs': 25,
+        'epochs': 50,
         'label_col': 3,
         'batch_size': 20,
         'buffer': 15000,
         'datadir': datadir,
-        'fulldoc': True
+        'fulldoc': False
       }
 
     def __str__(self):
@@ -116,19 +116,15 @@ class DL:
       batch_size = self.params.get('batch_size', 20)
       return dataset.padded_batch(batch_size, shapes, defaults)
 
-    def get_doc(self, filename, i):
-      with Path(self.params['datadir'], filename).open('r', encoding="utf-8") as f:
-        sentences = get_sentences(f)
-
-      separator_fn = lambda el : el[0][0] == '-DOCSTART-'
-      eos = ['EOS', '-X-', '-X-', 'O']
-
-      documents = split_array(sentences, separator_fn)
-      documents = [join_arrays(d, eos) for d in documents]
-
-      d = documents[i]
-      return self.parse_sentence(d)
+    def get_doc(self, filename, doc):
+      features, labels = [(f, l) for (f, l) in DL().generator_fn(filename)][doc]
+      (words, nwords), (chars, nchars) = features
+      features = ([words], [nwords]), ([chars], [nchars])
+      return features, [labels]
 
     def set_params(self, params=None):
       params = params if params is not None else {}
       self.params.update(params)
+
+      if params['fulldoc']:
+        params['batch_size'] = 1
