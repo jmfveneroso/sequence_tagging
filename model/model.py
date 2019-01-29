@@ -130,7 +130,7 @@ def multi_head_self_attention(inputs, outputs):
 def attention(inputs, outputs, training=False):
   return self_attention(inputs, outputs, name='alphas0')
 
-def position_embeddings(max_length, emb_dim):
+def position_embeddings(max_length, emb_dim, inputs):
   position_emb = np.array([
       [(pos+1) / np.power(10000, 2 * (j // 2) / emb_dim) for j in range(emb_dim)]
       for pos in range(max_length)
@@ -140,7 +140,12 @@ def position_embeddings(max_length, emb_dim):
   position_emb[:,1::2] = np.cos(position_emb[:,1::2]) # dim 2i+1
 
   variable = np.vstack([position_emb, [[0.] * emb_dim]])
-  return tf.Variable(variable, dtype=tf.float32, trainable=False)
+  variable = tf.Variable(variable, dtype=tf.float32, trainable=False)
+
+  # variable = position_embeddings(5000, params['lstm_size'])
+  pos = tf.slice(tf.constant(np.arange(100000), dtype=tf.int32), [0], [tf.shape(inputs)[1]])
+  pos_embeddings = tf.nn.embedding_lookup(variable, pos)
+  return inputs + pos_embeddings
 
 def create_model():
   with Path(params['tags']).open() as f:
@@ -187,6 +192,7 @@ def create_model():
     variable = np.vstack([glove, [[0.] * params['dim']]])
     variable = tf.Variable(variable, dtype=tf.float32, trainable=False)
     word_embeddings = tf.nn.embedding_lookup(variable, word_ids)
+    word_embeddings = position_embeddings(5000, params['dim'], word_embeddings)
   
     # Concatenate Word and Char Embeddings
     embeddings = tf.concat([word_embeddings, char_embeddings], axis=-1)
@@ -194,7 +200,7 @@ def create_model():
   
   with tf.name_scope('lstm'):
     t = embeddings
-  
+
     lstm_cell_fw = tf.nn.rnn_cell.LSTMCell(params['lstm_size'])
     lstm_cell_bw = tf.nn.rnn_cell.LSTMCell(params['lstm_size'])
   
@@ -208,7 +214,11 @@ def create_model():
     output = tf.add(output_fw, output_bw, name='lstm_states')
     output = tf.layers.dropout(output, rate=0.5, training=training)
 
-    output = attention(output, output, training=training)
+    # Position embeddings.
+    # output = position_embeddings(5000, params['lstm_size'], output)
+  
+    output2 = attention(output, output, training=training)
+    output = output + output2
     logits = tf.layers.dense(output, num_tags)
     # logits = logits + att_output
 

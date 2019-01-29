@@ -75,13 +75,13 @@ from model.metrics import evaluate
 # y = tf.reshape(y, [4, 4])
 # x = tf.concat([x, y], axis=-1)
 
-x = tf.constant([-1, 0, 2, 3], dtype=tf.float64)
-x = tf.nn.relu(x)
-
-with tf.Session() as sess:
-  sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
-  res = sess.run(x)
-  print(res)
+# x = tf.constant([-1, 0, 2, 3], dtype=tf.float64)
+# x = tf.nn.relu(x)
+# 
+# with tf.Session() as sess:
+#   sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
+#   res = sess.run(x)
+#   print(res)
 
 # ===================================
 # ===================================
@@ -97,3 +97,42 @@ with tf.Session() as sess:
 #       words.append(l[0])
 # 
 #   print(evaluate([preds], [labels], words, verbose=False))
+
+def position_embeddings(max_length, emb_dim):
+  position_emb = np.array([
+      [(pos+1) / np.power(10000, 2 * (j // 2) / emb_dim) for j in range(emb_dim)]
+      for pos in range(max_length)
+  ])
+  
+  position_emb[:,0::2] = np.sin(position_emb[:,0::2]) # dim 2i
+  position_emb[:,1::2] = np.cos(position_emb[:,1::2]) # dim 2i+1
+
+  variable = np.vstack([position_emb, [[0.] * emb_dim]])
+  return tf.Variable(variable, dtype=tf.float64, trainable=False)
+
+x = tf.constant([
+  [
+    [ 1, 1, 1 ],
+    [ 2, 2, 2 ],
+    [ 3, 1, 3 ],
+    [ 0, 0, 0 ],
+  ],
+  [
+    [ 0, 0, 0 ],
+    [ 2, 2, 2 ],
+    [ 3, 1, 3 ],
+    [ 0, 0, 0 ],
+  ]
+], dtype=tf.float64)
+
+y = tf.slice(tf.constant([0, 1, 2, 3, 4, 5], dtype=tf.int32), [0], [4])
+variable = position_embeddings(4, 3)
+char_embeddings = tf.nn.embedding_lookup(variable, y)
+
+x = x + char_embeddings
+
+with tf.Session() as sess:
+  sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
+  res = sess.run(x)
+  print(res)
+

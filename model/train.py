@@ -19,8 +19,8 @@ LABEL_COL = 3
 # Params
 params = {
   'epochs': 50,
-  # 'batch_size': 1,
-  'batch_size': 20,
+  'batch_size': 1,
+  # 'batch_size': 20,
   'buffer': 15000,
   'fulldoc': True
   # 'fulldoc': False
