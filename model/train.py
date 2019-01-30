@@ -14,7 +14,10 @@ from model.model import SequenceModel
 import subprocess
 np.set_printoptions(threshold=np.nan)
 
+params = None
+
 def create_model(json_file=None):
+  global params
   params = {
     'lstm_size': 200,
     'char_representation': 'lstm',
@@ -50,17 +53,6 @@ def run_step(sess, features, labels, train=False, alphas=False):
     'output/loss:0', 
     'output/accuracy:0', 
     'output/index_to_string_Lookup:0',
-    # 'embeddings/lstm_chars/Shape_2:0',
-    # 'embeddings/lstm_chars/Shape_3:0',
-    # 'embeddings/lstm_chars/Shape_4:0',
-    # 'embeddings/lstm_chars/Shape_5:0',
-    # 'embeddings/lstm_chars/Shape_6:0',
-    # 'embeddings/lstm_chars/Shape_7:0',
-    # 'embeddings/lstm_chars/Shape_8:0',
-    # # 'embeddings/lstm_chars/strided_slice_2:0',
-    # # 'embeddings/lstm_chars/strided_slice_4:0',
-    # 'embeddings/lstm_chars/bidirectional_rnn/bw/bw/while/Exit_3:0',
-    # 'embeddings/lstm_chars/bidirectional_rnn/fw/fw/transpose_1:0'
   ]
 
   num_heads = 0
@@ -182,8 +174,8 @@ def train(restore=False, json_file=None):
       saver = tf.train.Saver()
     sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
 
-    global epochs
-    for epoch in range(epochs):
+    global params
+    for epoch in range(params['epochs']):
       m, _ = process_one_epoch(sess, 'train', train=True)
       print('TRAIN - Epoch %d, Precision: %.4f, Recall: %.4f, F1: %.4f' % (epoch, m['precision'], m['recall'], m['f1']))
 
