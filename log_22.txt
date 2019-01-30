@@ -1,1 +1,0 @@
-True	200	cnn	crf	True	scaled_dot	softmax	lstm	2

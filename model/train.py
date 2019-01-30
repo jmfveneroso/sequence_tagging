@@ -1,5 +1,6 @@
 import numpy as np
 import re
+import json
 import functools
 from pathlib import Path
 import tensorflow as tf
@@ -14,13 +15,14 @@ import subprocess
 np.set_printoptions(threshold=np.nan)
 
 fulldoc = True
+epochs = 10
 
 DL().set_params({
-  'epochs': 10,
+  'epochs': epochs,
   'fulldoc': fulldoc
 })
 
-def create_model():
+def create_model(json_file=None):
   params = {
     'lstm_size': 200,
     'char_representation': 'cnn',
@@ -31,6 +33,12 @@ def create_model():
     'regularization_fn': 'softmax',
     'pos_embeddings': 'lstm',
   }
+
+  if not json_file is None:
+    with Path(json_file).open('r') as f:
+      data = json.load(f)
+      params.update(data)
+
   SequenceModel(params).create()
   print('%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % (
     fulldoc, params['lstm_size'], params['char_representation'],
@@ -152,11 +160,11 @@ def test():
   for name in ['train', 'valid', 'test']:
     write_predictions(name)
 
-def train(restore=False):
+def train(restore=False, json_file=None):
   start_time = time.time()
 
   if not restore:
-    create_model()
+    create_model(json_file=json_file)
 
   best_f1 = 0
   with tf.Session() as sess:  
@@ -167,7 +175,7 @@ def train(restore=False):
       saver = tf.train.Saver()
     sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
 
-    epochs = params['epochs']
+    global epochs
     for epoch in range(epochs):
       m, _ = process_one_epoch(sess, 'train', train=True)
       print('TRAIN - Epoch %d, Precision: %.4f, Recall: %.4f, F1: %.4f' % (epoch, m['precision'], m['recall'], m['f1']))

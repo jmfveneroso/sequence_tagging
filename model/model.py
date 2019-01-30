@@ -63,22 +63,23 @@ class SequenceModel:
     return t_max
 
   def lstm_char_representations(self, char_embeddings, nchars):
-    dim_words = tf.shape(char_embeddings)[1]
-    dim_chars = tf.shape(char_embeddings)[2]
-    t = tf.reshape(char_embeddings, [-1, dim_chars, params['dim_chars']])
+    with tf.variable_scope('lstm_chars'):
+      dim_words = tf.shape(char_embeddings)[1]
+      dim_chars = tf.shape(char_embeddings)[2]
+      t = tf.reshape(char_embeddings, [-1, dim_chars, self.params['dim_chars']])
   
-    lstm_cell_fw_c = tf.nn.rnn_cell.LSTMCell(params['char_lstm_size'])
-    lstm_cell_bw_c = tf.nn.rnn_cell.LSTMCell(params['char_lstm_size'])
-    
-    (output_fw, output_bw), _ = tf.nn.bidirectional_dynamic_rnn(
-      lstm_cell_fw_c, lstm_cell_bw_c, t,
-      dtype=tf.float32,
-      sequence_length=tf.reshape(nchars, [-1]),
-    )
+      lstm_cell_fw_c = tf.nn.rnn_cell.LSTMCell(self.params['char_lstm_size'])
+      lstm_cell_bw_c = tf.nn.rnn_cell.LSTMCell(self.params['char_lstm_size'])
+      
+      (output_fw, output_bw), _ = tf.nn.bidirectional_dynamic_rnn(
+        lstm_cell_fw_c, lstm_cell_bw_c, t,
+        dtype=tf.float32,
+        sequence_length=tf.reshape(self.nchars, [-1]),
+      )
   
-    output = tf.concat([output_fw, output_bw], 2)
-    output = output[:, -1, :] 
-    return tf.reshape(output, [-1, dim_words, 50])
+      output = tf.concat([output_fw, output_bw], 2)
+      output = output[:, -1, :] 
+      return tf.reshape(output, [-1, dim_words, 50])
   
   def rbf_kernel(self, Q, K, gamma=0.5):
     Q = tf.transpose(Q, [1, 0, 2]) # Time major.
@@ -87,7 +88,7 @@ class SequenceModel:
       lambda k: tf.exp(-gamma * tf.reduce_sum(tf.square(Q - k), axis=-1)),
       K
     ), [2, 1, 0])
-  
+
   def bahdanau(self, Q, K):
     Q = tf.transpose(Q, [1, 0, 2]) # Time major.
     K = tf.transpose(K, [1, 0, 2])

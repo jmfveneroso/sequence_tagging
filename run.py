@@ -21,12 +21,20 @@ gcfg = [
   ('RIBALTA'   , 'test' , 225, 4  , 21 , 49392, 49409),
 ]
 
-def matrix(checkpoint, example, print_all=False):
+def matrix(checkpoint, example, print_all=False, verbose=True):
   global gcfg
   cfg = gcfg[example]
 
   words, alphas_, preds, labs = get_alphas(cfg[1], cfg[2], checkpoint=checkpoint)
   words = [w.decode("utf-8") for w in words]
+
+  first = cfg[3] 
+  second = cfg[4]
+  p1 = preds[first].decode("utf-8")
+  p2 = preds[second].decode("utf-8")
+  label = labs[first].decode("utf-8")
+  tick = 'Y' if p1 == p2 else 'N'
+  print('[%s] %s (%s) %s (%s) should be %s' % (tick, words[first], p1, words[second], p2, label))
 
   padding = 5
   num_words = 30
@@ -40,12 +48,14 @@ def matrix(checkpoint, example, print_all=False):
     start = 0
     end = len(words)
 
-  for i, (w, p, l, a) in enumerate(zip(words, labs, preds, alphas)):
-    if i >= start and i <= end:
-      prefix = '>>>' if i == cfg[3] or i == cfg[4] else ''
-      print(prefix, i, w, p, l, a)
+  if verbose:
+    for i, (w, p, l, a) in enumerate(zip(words, labs, preds, alphas)):
+      if i >= start and i <= end:
+        prefix = '>>>' if i == cfg[3] or i == cfg[4] else ''
+        print(prefix, i, w, p, l, a)
   
   fig = plt.figure(figsize=(10.0, 10.0), dpi=600)
+  plt.title()
   plt.xticks(range(0,end), words[start:end], rotation='vertical') 
   plt.yticks(range(0,end), words[start:end])
       
@@ -67,7 +77,8 @@ def test_pairs():
     print('==============')
 
 if sys.argv[1] == 'train':
-  train(restore=False)
+  json_file = sys.argv[2] if len(sys.argv) > 2 else None
+  train(restore=False, json_file=json_file)
 
 elif sys.argv[1] == 'matrix':
   print_all = sys.argv[3] == 'P' if len(sys.argv) > 3 else False
@@ -88,4 +99,4 @@ elif sys.argv[1] == 'pairs':
 
 elif sys.argv[1] == 'allmatrices':
   for i in range(len(gcfg)):
-    matrix('2', i)
+    matrix('', i, verbose=False)

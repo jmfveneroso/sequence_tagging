@@ -1,0 +1,10 @@
+{
+  "lstm_size": 200,
+  "char_representation": "lstm",
+  "use_attention": false,
+  "use_crf": true,
+  "num_heads": 1,
+  "similarity_fn": "scaled_dot",
+  "regularization_fn": "softmax",
+  "pos_embeddings": ""
+}
