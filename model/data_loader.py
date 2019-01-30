@@ -41,12 +41,12 @@ class DL:
     def __init__(self):
       datadir = 'data/conll2003'
       self.params = {
-        'epochs': 50,
+        'epochs': 10,
         'label_col': 3,
-        'batch_size': 20,
+        'batch_size': 1,
         'buffer': 15000,
         'datadir': datadir,
-        'fulldoc': False
+        'fulldoc': True
       }
 
     def __str__(self):

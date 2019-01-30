@@ -26,7 +26,7 @@ class SequenceModel:
       'use_crf': True,
       'char_representation': 'cnn',
       'num_heads': 1,
-      'similarity_fn': 'scaled_dot',
+      'similarity_fn': 'scaled_dot', # rbf, dot, scaled_dot, cosine, bahdanau
       'regularization_fn': 'softmax',
       'pos_embeddings': 'lstm',
     }
@@ -66,20 +66,21 @@ class SequenceModel:
     with tf.variable_scope('lstm_chars'):
       dim_words = tf.shape(char_embeddings)[1]
       dim_chars = tf.shape(char_embeddings)[2]
+
       t = tf.reshape(char_embeddings, [-1, dim_chars, self.params['dim_chars']])
   
       lstm_cell_fw_c = tf.nn.rnn_cell.LSTMCell(self.params['char_lstm_size'])
       lstm_cell_bw_c = tf.nn.rnn_cell.LSTMCell(self.params['char_lstm_size'])
       
-      (output_fw, output_bw), _ = tf.nn.bidirectional_dynamic_rnn(
+      (_, _), (output_fw, output_bw) = tf.nn.bidirectional_dynamic_rnn(
         lstm_cell_fw_c, lstm_cell_bw_c, t,
         dtype=tf.float32,
         sequence_length=tf.reshape(self.nchars, [-1]),
       )
-  
-      output = tf.concat([output_fw, output_bw], 2)
-      output = output[:, -1, :] 
-      return tf.reshape(output, [-1, dim_words, 50])
+
+      # output_fw[0] is the cell state and output_fw[1] is the hidden state.
+      output = tf.concat([output_fw[1], output_bw[1]], axis=-1)
+      return tf.reshape(output, [-1, dim_words, 2*self.params['char_lstm_size']])
   
   def rbf_kernel(self, Q, K, gamma=0.5):
     Q = tf.transpose(Q, [1, 0, 2]) # Time major.

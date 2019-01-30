@@ -33,34 +33,35 @@ def matrix(checkpoint, example, print_all=False, verbose=True):
   p1 = preds[first].decode("utf-8")
   p2 = preds[second].decode("utf-8")
   label = labs[first].decode("utf-8")
-  tick = 'Y' if p1 == p2 else 'N'
+  tick = 'Y' if p1 == p2 == label else 'N'
   print('[%s] %s (%s) %s (%s) should be %s' % (tick, words[first], p1, words[second], p2, label))
 
-  padding = 5
-  num_words = 30
-  alphas = alphas_[cfg[3]]
-  start = cfg[3] - padding
-  end = cfg[4] + padding
-  if start < 0: start = 0
-  if end > len(words): end = len(words)
-  
-  if print_all:
-    start = 0
-    end = len(words)
+  if len(alphas_) > 0:
+    padding = 5
+    num_words = 30
+    alphas = alphas_[cfg[3]]
+    start = cfg[3] - padding
+    end = cfg[4] + padding
+    if start < 0: start = 0
+    if end > len(words): end = len(words)
+    
+    if print_all:
+      start = 0
+      end = len(words)
 
-  if verbose:
-    for i, (w, p, l, a) in enumerate(zip(words, labs, preds, alphas)):
-      if i >= start and i <= end:
-        prefix = '>>>' if i == cfg[3] or i == cfg[4] else ''
-        print(prefix, i, w, p, l, a)
-  
-  fig = plt.figure(figsize=(10.0, 10.0), dpi=600)
-  plt.title()
-  plt.xticks(range(0,end), words[start:end], rotation='vertical') 
-  plt.yticks(range(0,end), words[start:end])
-      
-  plt.imshow(alphas_[start:end,start:end])
-  plt.savefig('figures/' + str(example) + '.png', dpi=600)
+    if verbose:
+      for i, (w, p, l, a) in enumerate(zip(words, labs, preds, alphas)):
+        if i >= start and i <= end:
+          prefix = '>>>' if i == cfg[3] or i == cfg[4] else ''
+          print(prefix, i, w, p, l, a)
+    
+    fig = plt.figure(figsize=(10.0, 10.0), dpi=600)
+    plt.title()
+    plt.xticks(range(0,end), words[start:end], rotation='vertical') 
+    plt.yticks(range(0,end), words[start:end])
+        
+    plt.imshow(alphas_[start:end,start:end])
+    plt.savefig('figures/' + str(example) + '.png', dpi=600)
 
 def test_pairs():
   valid, test = [], []
@@ -89,7 +90,7 @@ elif sys.argv[1] == 'qmatrix':
   matrix('2', int(sys.argv[2]), print_all=print_all)
 
 elif sys.argv[1] == 'quick':
-  quick_train('valid', 2)
+  quick_train('valid', 4)
 
 elif sys.argv[1] == 'test':
   test()

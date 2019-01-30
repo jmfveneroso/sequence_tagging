@@ -14,24 +14,18 @@ from model.model import SequenceModel
 import subprocess
 np.set_printoptions(threshold=np.nan)
 
-fulldoc = True
-epochs = 10
-
-DL().set_params({
-  'epochs': epochs,
-  'fulldoc': fulldoc
-})
-
 def create_model(json_file=None):
   params = {
     'lstm_size': 200,
-    'char_representation': 'cnn',
+    'char_representation': 'lstm',
     'use_attention': True,
     'use_crf': True,
     'num_heads': 2,
     'similarity_fn': 'scaled_dot',
     'regularization_fn': 'softmax',
     'pos_embeddings': 'lstm',
+    'fulldoc': True,
+    'epochs': 10,
   }
 
   if not json_file is None:
@@ -39,9 +33,11 @@ def create_model(json_file=None):
       data = json.load(f)
       params.update(data)
 
+  DL().set_params(params)
+
   SequenceModel(params).create()
   print('%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % (
-    fulldoc, params['lstm_size'], params['char_representation'],
+    params['fulldoc'], params['lstm_size'], params['char_representation'],
     'crf' if params['use_crf'] else 'argmax', params['use_attention'],
     params['similarity_fn'], params['regularization_fn'],
     params['pos_embeddings'], params['num_heads']
@@ -53,7 +49,18 @@ def run_step(sess, features, labels, train=False, alphas=False):
   target = [
     'output/loss:0', 
     'output/accuracy:0', 
-    'output/index_to_string_Lookup:0'
+    'output/index_to_string_Lookup:0',
+    # 'embeddings/lstm_chars/Shape_2:0',
+    # 'embeddings/lstm_chars/Shape_3:0',
+    # 'embeddings/lstm_chars/Shape_4:0',
+    # 'embeddings/lstm_chars/Shape_5:0',
+    # 'embeddings/lstm_chars/Shape_6:0',
+    # 'embeddings/lstm_chars/Shape_7:0',
+    # 'embeddings/lstm_chars/Shape_8:0',
+    # # 'embeddings/lstm_chars/strided_slice_2:0',
+    # # 'embeddings/lstm_chars/strided_slice_4:0',
+    # 'embeddings/lstm_chars/bidirectional_rnn/bw/bw/while/Exit_3:0',
+    # 'embeddings/lstm_chars/bidirectional_rnn/fw/fw/transpose_1:0'
   ]
 
   num_heads = 0
