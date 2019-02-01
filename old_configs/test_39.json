@@ -1,0 +1,12 @@
+{
+  "fulldoc": false,
+  "batch_size": 20,
+  "lstm_size": 200,
+  "char_representation": "cnn",
+  "use_attention": true,
+  "use_crf": true,
+  "num_heads": 1,
+  "similarity_fn": "scaled_dot",
+  "regularization_fn": "softmax",
+  "pos_embeddings": "lstm"
+}

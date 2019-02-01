@@ -24,6 +24,13 @@ def join_arrays(arr, separator):
     res += el + [separator]
   return res
 
+def group_by_n(doc, separator_fn, n):
+  arr = []
+  for i in range(0, len(doc), n):
+    eos = ['EOS', '-X-', '-X-', 'O']
+    arr.append(join_arrays(doc[i:i+n], eos))
+  return arr
+
 def pad_array(arr, padding, max_len):
   return arr + [padding] * (max_len - len(arr))
 
@@ -39,14 +46,14 @@ class DL:
 
   class __DataLoader:
     def __init__(self):
-      datadir = 'data/conll2003'
       self.params = {
         'epochs': 10,
         'label_col': 3,
         'batch_size': 1,
         'buffer': 15000,
-        'datadir': datadir,
-        'fulldoc': True
+        'datadir': 'data/conll2003',
+        'fulldoc': True,
+        'splitsentence': False,
       }
 
     def __str__(self):
@@ -78,7 +85,12 @@ class DL:
         eos = ['EOS', '-X-', '-X-', 'O']
 
         documents = split_array(sentences, separator_fn)
-        documents = [join_arrays(d, eos) for d in documents]
+ 
+        if self.params['splitsentence']:
+          documents = [group_by_n(d, lambda el : el[0] == 'EOS', 5) for d in documents]
+          documents = [s for d in documents for s in d]
+        else:
+          documents = [join_arrays(d, eos) for d in documents]
 
         for i, d in enumerate(documents):
           yield self.parse_sentence(d)
@@ -117,7 +129,13 @@ class DL:
       return dataset.padded_batch(batch_size, shapes, defaults)
 
     def get_doc(self, filename, doc):
+      old_param = self.params['fulldoc']
+      old_param2 = self.params['splitsentence']
+      self.params['fulldoc'] = True
+      self.params['splitsentence'] = False
       features, labels = [(f, l) for (f, l) in DL().generator_fn(filename)][doc]
+      self.params['fulldoc'] = old_param
+      self.params['splitsentence'] = old_param2
       (words, nwords), (chars, nchars) = features
       features = ([words], [nwords]), ([chars], [nchars])
       return features, [labels]

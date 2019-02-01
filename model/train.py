@@ -1,6 +1,6 @@
 import numpy as np
 import re
-import json
+import json 
 import functools
 from pathlib import Path
 import tensorflow as tf
@@ -16,19 +16,22 @@ np.set_printoptions(threshold=np.nan)
 
 params = None
 
-def create_model(json_file=None):
+def create_model(json_file=None, small_dataset=False):
   global params
   params = {
     'lstm_size': 200,
     'char_representation': 'lstm',
     'use_attention': True,
     'use_crf': True,
-    'num_heads': 2,
+    'num_heads': 1,
     'similarity_fn': 'scaled_dot',
     'regularization_fn': 'softmax',
     'pos_embeddings': 'lstm',
     'fulldoc': True,
+    'splitsentence': False,
     'epochs': 10,
+    'queries_eq_keys': True,
+    'residual': 'add',
   }
 
   if not json_file is None:
@@ -36,9 +39,14 @@ def create_model(json_file=None):
       data = json.load(f)
       params.update(data)
 
-  DL().set_params(params)
+  if small_dataset:
+    params['datadir'] = 'data/small_dataset'
 
+  print(json.dumps(params, indent=4, sort_keys=True))
+
+  DL().set_params(params)
   SequenceModel(params).create()
+
   print('%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s' % (
     params['fulldoc'], params['lstm_size'], params['char_representation'],
     'crf' if params['use_crf'] else 'argmax', params['use_attention'],
@@ -55,13 +63,10 @@ def run_step(sess, features, labels, train=False, alphas=False):
     'output/index_to_string_Lookup:0',
   ]
 
-  num_heads = 0
   if alphas:
     try: 
-      for i in range(0, 8):
-        tf.get_default_graph().get_tensor_by_name('lstm/alphas' + str(i) + ':0')
-        target.append('lstm/alphas' + str(i) + ':0')
-        num_heads += 1
+      tf.get_default_graph().get_tensor_by_name('lstm/alphas:0')
+      target.append('lstm/alphas:0')
     except:
       pass
 
@@ -76,14 +81,16 @@ def run_step(sess, features, labels, train=False, alphas=False):
     'inputs/labels:0': labels,
     'inputs/training:0': train
   })
-  return result[:3], result[3:3+num_heads]
+
+  return result[:3], result[3:]
 
 def print_stats(loss, accuracy, time, step, f1=None):
   if f1 is None:
     msg = 'Loss: %.4f, Accuracy: %.4f, Time: %.4f, Step: %d       ' % (loss, accuracy, time, step)
   else:
     msg = 'Loss: %.4f, Accuracy: %.4f, F1: %.4f, Time: %.4f, Step: %d       ' % (loss, accuracy, f1, time, step)
-  print('\r', msg, end='')
+  # print('\r', msg, end='')
+  print(msg)
 
 def restore(sess, checkpoint=''):
   saver = tf.train.import_meta_graph('./checkpoints/model' + checkpoint + '.ckpt.meta')
@@ -97,7 +104,9 @@ def process_one_epoch(sess, filename, train=False):
   iterator = DL().input_fn(filename, training=train).make_initializable_iterator()
   next_el = iterator.get_next()
   sess.run(iterator.initializer)
-  
+ 
+  l = []
+  a = []
   all_words, all_tags, all_preds, all_seqlens, step = [], [], [], [], 1
   while True:
     try:
@@ -110,10 +119,17 @@ def process_one_epoch(sess, filename, train=False):
       all_words += words.tolist()        
       all_tags += labels.tolist()        
       all_preds += r[2].tolist()
-      
-      print_stats(r[0], r[1], time.time() - start_time, step)
+     
+      l.append(r[0]) 
+      a.append(r[1])
+      loss = sum(l[-10:])/float(len(l[-10:]))
+      acc = sum(a[-10:])/float(len(a[-10:]))
+
+      if step % 50 == 0:
+        print_stats(loss, acc, time.time() - start_time, step)
       step += 1      
     except tf.errors.OutOfRangeError:
+      print_stats(loss, acc, time.time() - start_time, step)
       break
 
   for i in range(len(all_seqlens)):
@@ -159,11 +175,11 @@ def test():
   for name in ['train', 'valid', 'test']:
     write_predictions(name)
 
-def train(restore=False, json_file=None):
+def train(restore=False, json_file=None, small_dataset=False):
   start_time = time.time()
 
   if not restore:
-    create_model(json_file=json_file)
+    create_model(json_file=json_file, small_dataset=small_dataset)
 
   best_f1 = 0
   with tf.Session() as sess:  
@@ -226,9 +242,5 @@ def get_alphas(filename, doc, checkpoint=''):
     r, alphas = run_step(sess, features, labels, alphas=True)
     preds  = r[2][0]
  
-    num_heads = len(alphas)
-    if num_heads > 0:
-      alphas = [a[0] for a in alphas]
-      alphas = np.sum(alphas, axis=0) / num_heads
-
+    alphas = np.mean(alphas[0], axis=0)
     return words[0], alphas, preds, labels[0]

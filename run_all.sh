@@ -5,7 +5,7 @@ if [[ $user == "root" ]]; then
     f=${f:10}
     echo "Running $f..."
     mkdir -p results/$f
-    python run.py train $filename > results/$f/${f}.log
+    python run.py train -j $filename > results/$f/${f}.log
     ./eval.sh >> results/$f/${f}.log
     python run.py allmatrices >> results/$f/${f}.log
     if [ "$(ls -A figures)" ]; then

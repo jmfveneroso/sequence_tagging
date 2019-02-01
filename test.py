@@ -5,7 +5,7 @@ import tensorflow as tf
 import numpy as np
 from pathlib import Path
 from model.data_loader import DL
-from model.train import train, plot_attention
+from model.train import train, get_alphas
 from model.metrics import evaluate
  
 # def get_embeddings(w):
@@ -112,45 +112,22 @@ def position_embeddings(max_length, emb_dim):
 
 x = tf.constant([
   [
-    [ 1, 1, 1 ],
-    [ 2, 2, 2 ],
-    [ 3, 1, 3 ],
-    [ 0, 0, 0 ],
+    [ 1, 1, 1, 1 ],
+    [ 2, 2, 2, 1 ],
+    [ 3, 1, 3, 1 ],
+    [ 0, 0, 0, 1 ],
   ],
   [
-    [ 0, 0, 0 ],
-    [ 2, 2, 2 ],
-    [ 3, 1, 3 ],
-    [ 0, 0, 0 ],
+    [ 0, 0, 0, 1 ],
+    [ 2, 2, 2, 1 ],
+    [ 3, 1, 3, 1 ],
+    [ 0, 0, 0, 1 ],
   ]
 ], dtype=tf.float64)
 
-y = tf.slice(tf.constant([0, 1, 2, 3, 4, 5], dtype=tf.int32), [0], [4])
-variable = position_embeddings(4, 3)
-char_embeddings = tf.nn.embedding_lookup(variable, y)
-
-x = x + char_embeddings
+x = tf.concat(tf.split(x, 2, axis=-1), axis=0)
 
 with tf.Session() as sess:
   sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
   res = sess.run(x)
   print(res)
-
-def position_embeddings(self, max_length, emb_dim):
-  position_emb = np.array([
-      [(pos+1) / np.power(10000, 2 * (j // 2) / emb_dim) for j in range(emb_dim)]
-      for pos in range(max_length)
-  ])
-  
-  position_emb[:,0::2] = np.sin(position_emb[:,0::2]) # dim 2i
-  position_emb[:,1::2] = np.cos(position_emb[:,1::2]) # dim 2i+1
-
-  variable = np.vstack([position_emb, [[0.] * emb_dim]])
-  variable = tf.Variable(variable, dtype=tf.float32, trainable=False)
-
-  seq = tf.constant(np.arange(1600), dtype=tf.int32)
-  seq = tf.nn.embedding_lookup(variable, seq)
-  pos_embeddings = tf.slice(seq, [0], [tf.shape(inputs)[1]])
-  return inputs + pos_embeddings
-
-

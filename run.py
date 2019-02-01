@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import sys
 import os
 import tensorflow as tf
+from optparse import OptionParser
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # Disable debug logs Tensorflow.
 tf.logging.set_verbosity(tf.logging.ERROR)
@@ -34,7 +35,8 @@ def matrix(checkpoint, example, print_all=False, verbose=True):
   p2 = preds[second].decode("utf-8")
   label = labs[first].decode("utf-8")
   tick = 'Y' if p1 == p2 == label else 'N'
-  print('[%s] %s (%s) %s (%s) should be %s' % (tick, words[first], p1, words[second], p2, label))
+  msg = '[%s] %s (%s) %s (%s) should be %s' % (tick, words[first], p1, words[second], p2, label)
+  print(msg)
 
   if len(alphas_) > 0:
     padding = 5
@@ -56,7 +58,7 @@ def matrix(checkpoint, example, print_all=False, verbose=True):
           print(prefix, i, w, p, l, a)
     
     fig = plt.figure(figsize=(10.0, 10.0), dpi=600)
-    plt.title()
+    plt.title(msg)
     plt.xticks(range(0,end), words[start:end], rotation='vertical') 
     plt.yticks(range(0,end), words[start:end])
         
@@ -78,8 +80,15 @@ def test_pairs():
     print('==============')
 
 if sys.argv[1] == 'train':
-  json_file = sys.argv[2] if len(sys.argv) > 2 else None
-  train(restore=False, json_file=json_file)
+  parser = OptionParser()
+  parser.add_option("-j", "--json", dest="json_file")
+  parser.add_option("-s", "--small", dest="small", action="store_true")
+  (options, args) = parser.parse_args()
+  options = vars(options)
+  small = not options['small'] is None
+  json_file = options['json_file']
+
+  train(restore=False, json_file=json_file, small_dataset=small)
 
 elif sys.argv[1] == 'matrix':
   print_all = sys.argv[3] == 'P' if len(sys.argv) > 3 else False

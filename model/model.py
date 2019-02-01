@@ -25,10 +25,12 @@ class SequenceModel:
       'use_attention': True,
       'use_crf': True,
       'char_representation': 'cnn',
-      'num_heads': 1,
+      'num_heads': 2,
       'similarity_fn': 'scaled_dot', # rbf, dot, scaled_dot, cosine, bahdanau
       'regularization_fn': 'softmax',
       'pos_embeddings': 'lstm',
+      'queries_eq_keys': True,
+      'residual': True,
     }
     params = params if params is not None else {}
     self.params.update(params)
@@ -109,31 +111,58 @@ class SequenceModel:
       norm_q = tf.sqrt(tf.reduce_sum(tf.square(Q), axis=-1, keepdims=True))
       norm_k = tf.sqrt(tf.reduce_sum(tf.square(K), axis=-1, keepdims=True))
       norm = tf.matmul(norm_q, norm_k, transpose_b=True)
-      attention = tf.abs(tf.divide(alphas, norm))
+      attention = tf.abs(tf.divide(attention, norm))
   
     return attention
+
+  def normalize(self, inputs, epsilon = 1e-8):
+    inputs_shape = inputs.get_shape()
+    params_shape = inputs_shape[-1:]
+    
+    mean, variance = tf.nn.moments(inputs, [-1], keep_dims=True)
+    beta= tf.Variable(tf.zeros(params_shape))
+    gamma = tf.Variable(tf.ones(params_shape))
+    normalized = (inputs - mean) / ( (variance + epsilon) ** (.5) )
+    return gamma * normalized + beta
   
-  def self_attention(self, inputs, outputs, name='shsa'):
+  def attention(self, inputs, outputs):
     attention_size = inputs.shape[2].value
     output_size = outputs.shape[2].value
   
     Q = tf.layers.dense(inputs, attention_size)
-    K = tf.layers.dense(inputs, attention_size)
+    if self.params['queries_eq_keys']:
+      K = Q
+    else:
+      K = tf.layers.dense(inputs, attention_size)
     V = tf.layers.dense(inputs, output_size)
+
+    # Split and concat
+    num_heads = self.params['num_heads']
+    Q_ = tf.concat(tf.split(Q, num_heads, axis=2), axis=0) # (h*N, T, H/h) 
+    K_ = tf.concat(tf.split(K, num_heads, axis=2), axis=0) # (h*N, T, H/h) 
+    V_ = tf.concat(tf.split(V, num_heads, axis=2), axis=0) # (h*N, T, H/h) 
   
     # Similarity function.
     if   self.params['similarity_fn'] == 'rbf':
-      attention = self.rbf_kernel(Q, K)
+      attention = self.rbf_kernel(Q_, K_)
     elif self.params['similarity_fn'] == 'dot':
-      attention = self.dot_product(Q, K)
+      attention = self.dot_product(Q_, K_)
     elif self.params['similarity_fn'] == 'scaled_dot':
-      attention = self.dot_product(Q, K, scaled=True)
+      attention = self.dot_product(Q_, K_, scaled=True)
     elif self.params['similarity_fn'] == 'cosine':
-      attention = self.dot_product(Q, K, cosine=True)
+      attention = self.dot_product(Q_, K_, cosine=True)
     elif self.params['similarity_fn'] == 'bahdanau':
-      attention = self.bahdanau(Q, K)
+      attention = self.bahdanau(Q_, K_)
+
+    # Key Masking.
+    key_masks = tf.sign(tf.reduce_sum(tf.abs(K), axis=-1))
+    key_masks = tf.tile(key_masks, [num_heads, 1])
+    key_masks = tf.tile(tf.expand_dims(key_masks, 1), [1, tf.shape(Q)[1], 1])
+    paddings = tf.ones_like(attention)*(-2**32+1)
+    attention = tf.where(tf.equal(key_masks, 0), paddings, attention)
   
     # Regularization.
+    name = 'alphas'
     if   self.params['regularization_fn'] == 'softmax':
       alphas = tf.nn.softmax(attention, name=name)
     elif self.params['regularization_fn'] == 'tanh':
@@ -141,18 +170,24 @@ class SequenceModel:
     elif self.params['regularization_fn'] == 'linear':
       regularizer = tf.reduce_sum(attention, keepdims=True, axis=-1)
       alphas = tf.divide(attention, regularizer, name=name)
+
+    # Query Masking
+    query_masks = tf.sign(tf.reduce_sum(tf.abs(Q), axis=-1))
+    query_masks = tf.tile(query_masks, [num_heads, 1])
+    query_masks = tf.tile(tf.expand_dims(query_masks, -1), [1, 1, tf.shape(K)[1]])
+    outputs *= query_masks
   
-    return tf.matmul(alphas, V)
-  
-  def attention(self, inputs, outputs):
-    hidden_size = inputs.shape[2].value
-    output_size = outputs.shape[2].value
-  
-    att_layers = []
-    for i in range(self.params['num_heads']):
-      att_layers.append(self.self_attention(inputs, outputs, name='alphas' + str(i)))
-  
-    return tf.layers.dense(tf.concat(att_layers, axis=-1), output_size)
+    alphas = self.dropout(alphas)
+    outputs = tf.matmul(alphas, V_)
+    outputs = tf.concat(tf.split(outputs, num_heads, axis=0), axis=2)
+
+    if self.params['residual'] == 'add':
+      outputs += inputs
+    elif self.params['residual'] == 'concat':
+      outputs = tf.concat([outputs, inputs], axis=-1)
+
+    outputs = self.normalize(outputs)
+    return outputs
   
   def position_embeddings(self, max_length, emb_dim, inputs):
     position_emb = np.array([
@@ -163,15 +198,11 @@ class SequenceModel:
     position_emb[:,0::2] = np.sin(position_emb[:,0::2]) # dim 2i
     position_emb[:,1::2] = np.cos(position_emb[:,1::2]) # dim 2i+1
 
-    seq = tf.constant(position_emb, dtype=tf.float32)
-    pos_embeddings = tf.slice(seq, [0, 0], [tf.shape(inputs)[1], -1])
-  
-    # variable = np.vstack([position_emb, [[0.] * emb_dim]])
-    # variable = tf.Variable(variable, dtype=tf.float32, trainable=False)
- 
-    # seq = tf.constant(np.arange(1600), dtype=tf.int32)
-    # seq = tf.slice(seq, [0], [tf.shape(inputs)[1]])
-    # pos_embeddings = tf.nn.embedding_lookup(variable, seq)
+    N = tf.shape(inputs)[0]
+    T = tf.shape(inputs)[1]
+    lookup_table = tf.convert_to_tensor(position_emb, dtype=tf.float32)
+    position_ind = tf.tile(tf.expand_dims(tf.range(T), 0), [N, 1])
+    pos_embeddings = tf.nn.embedding_lookup(lookup_table, position_ind)
     return inputs + pos_embeddings
   
   def dropout(self, x):
@@ -266,9 +297,10 @@ class SequenceModel:
       loss = tf.reduce_mean(-log_likelihood, name='loss')
     else:
       pred_ids = tf.argmax(logits, axis=-1)
-      loss = tf.nn.softmax_cross_entropy_with_logits(
-        labels=tags, logits=logits, name='loss'
-      )
+      labels = tf.one_hot(tags, num_tags)
+      loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
+        labels=labels, logits=logits
+      ), name='loss')
 
     correct = tf.equal(tf.to_int64(pred_ids), tags)
     accuracy = tf.reduce_mean(tf.cast(correct, tf.float32), name='accuracy')
@@ -292,7 +324,7 @@ class SequenceModel:
       output = self.lstm(embeddings)
 
       if self.params['use_attention']:
-        output = output + self.attention(output, output)
+        output = self.attention(output, output)
 
     with tf.name_scope('output'):
       self.output_layer(output)
