@@ -98,17 +98,28 @@ from model.metrics import evaluate
 # 
 #   print(evaluate([preds], [labels], words, verbose=False))
 
-def position_embeddings(max_length, emb_dim):
-  position_emb = np.array([
-      [(pos+1) / np.power(10000, 2 * (j // 2) / emb_dim) for j in range(emb_dim)]
-      for pos in range(max_length)
-  ])
-  
-  position_emb[:,0::2] = np.sin(position_emb[:,0::2]) # dim 2i
-  position_emb[:,1::2] = np.cos(position_emb[:,1::2]) # dim 2i+1
+import tensorflow_hub as hub
 
-  variable = np.vstack([position_emb, [[0.] * emb_dim]])
-  return tf.Variable(variable, dtype=tf.float64, trainable=False)
+elmo = hub.Module("https://tfhub.dev/google/elmo/2", trainable=False)
+words = [
+  ["the", "cat", "is", "on", "the", "mat"], 
+  ["dogs", "are", "in", "the", "fog", ""]
+]
+tokens_length = [6, 5]
+
+embeddings = elmo(
+  inputs={
+    "tokens": words,
+    "sequence_len": tokens_length
+  },
+  signature="tokens",
+  as_dict=True
+)["elmo"]
+
+print(embeddings)
+
+
+
 
 x = tf.constant([
   [

@@ -1,0 +1,15 @@
+{
+  "fulldoc": true,
+  "lstm_size": 200,
+  "char_representation": "cnn",
+  "use_attention": true,
+  "use_crf": true,
+  "num_heads": 8,
+  "similarity_fn": "scaled_dot",
+  "regularization_fn": "softmax",
+  "pos_embeddings": "lstm",
+  "splitsentence": true,
+  "epochs": 10,
+  "queries_eq_keys": true,
+  "residual": "add"
+}

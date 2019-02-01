@@ -3,6 +3,7 @@ import numpy as np
 import tensorflow as tf
 from pathlib import Path
 from six.moves import reduce
+import tensorflow_hub as hub
 
 class SequenceModel:
   def __init__(self, params=None):
@@ -31,6 +32,7 @@ class SequenceModel:
       'pos_embeddings': 'lstm',
       'queries_eq_keys': True,
       'residual': True,
+      'elmo': True,
     }
     params = params if params is not None else {}
     self.params.update(params)
@@ -217,6 +219,27 @@ class SequenceModel:
       self.labels   = tf.placeholder(tf.string, shape=(None, None),       name='labels'  )
       self.training = tf.placeholder(tf.bool,   shape=(),                 name='training')
 
+  def elmo_embeddings(self):
+    elmo = hub.Module("https://tfhub.dev/google/elmo/2", trainable=False)
+    
+    word_embeddings = elmo(
+      inputs={
+        "tokens": self.words,
+        "sequence_len": self.nwords
+      },
+      signature="tokens",
+      as_dict=True
+    )["elmo"]
+
+    if self.params['pos_embeddings'] == 'word':
+      word_embeddings = self.position_embeddings(
+        1600, 
+        1024, 
+        word_embeddings
+      )
+
+    return word_embeddings
+
   def word_embeddings(self):
     vocab_words = tf.contrib.lookup.index_table_from_file(
       self.params['words'], num_oov_buckets=1
@@ -315,7 +338,10 @@ class SequenceModel:
     self.create_placeholders()
 
     with tf.name_scope('embeddings'):
-      word_embeddings = self.word_embeddings()
+      if self.params['elmo']:
+        word_embeddings = self.elmo_embeddings()
+      else:
+        word_embeddings = self.word_embeddings()
       char_embeddings = self.char_embeddings()
       embeddings = tf.concat([word_embeddings, char_embeddings], axis=-1)
       embeddings = self.dropout(embeddings)

@@ -32,6 +32,7 @@ def create_model(json_file=None, small_dataset=False):
     'epochs': 10,
     'queries_eq_keys': True,
     'residual': 'add',
+    'elmo': True,
   }
 
   if not json_file is None:
