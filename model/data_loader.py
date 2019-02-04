@@ -5,9 +5,25 @@ import math
 import tensorflow as tf
 from pathlib import Path
 
-def get_sentences(f):  
-  sentences = f.read().strip().split('\n\n')
-  return [[t.split() for t in s.split('\n')] for s in sentences if len(s) > 0] 
+def get_sentences(f): 
+  filename = f.parts[-1] 
+  with f.open('r', encoding="utf-8") as f:
+    uid_start = {
+      'train': 1,
+      'valid': 204568,
+      'test': 256146,
+    }
+    # 302812
+    uid = uid_start[filename] 
+
+    sentences = f.read().strip().split('\n\n')
+    sentences = [[t.split() for t in s.split('\n')] for s in sentences if len(s) > 0] 
+
+    for i, s in enumerate(sentences):
+      for j, t in enumerate(sentences[i]):
+        sentences[i][j].append(uid)
+        uid += 1
+    return sentences
 
 def split_array(arr, separator_fn):
   arrays = [[]]
@@ -47,12 +63,11 @@ class DL:
   class __DataLoader:
     def __init__(self):
       self.params = {
-        'epochs': 10,
         'label_col': 3,
         'batch_size': 1,
         'buffer': 15000,
         'datadir': 'data/conll2003',
-        'fulldoc': True,
+        'fulldoc': False,
         'splitsentence': False,
       }
 
@@ -66,6 +81,8 @@ class DL:
     def parse_sentence(self, sentence):
       # Encode in Bytes for Tensorflow.
       words = [s[0] for s in sentence]
+      uids = [s[4] for s in sentence]
+
       tags = [s[self.params['label_col']].encode() for s in sentence]
       
       # Chars.
@@ -74,15 +91,14 @@ class DL:
       chars = [pad_array(c, b'<pad>', max(lengths)) for c in chars]
       
       words = [s[0].encode() for s in sentence]    
-      return ((words, len(words)), (chars, lengths)), tags
+      return ((words, uids, len(words)), (chars, lengths)), tags
       
     def generator_fn(self, filename):
-      with Path(self.params['datadir'], filename).open('r', encoding="utf-8") as f:
-        sentences = get_sentences(f)
+      sentences = get_sentences(Path(self.params['datadir'], filename))
 
       if self.params['fulldoc']:
         separator_fn = lambda el : el[0][0] == '-DOCSTART-'
-        eos = ['EOS', '-X-', '-X-', 'O']
+        eos = ['EOS', '-X-', '-X-', 'O', 0]
 
         documents = split_array(sentences, separator_fn)
  
@@ -100,19 +116,19 @@ class DL:
           
     def input_fn(self, filename, training=False):
       shapes = (
-       (([None], ()),           # (words, nwords)
+       (([None], [None], ()),   # (words, uids, nwords)
        ([None, None], [None])), # (chars, nchars)  
        [None]                   # tags
       )
     
       types = (
-        ((tf.string, tf.int32),
+        ((tf.string, tf.int32, tf.int32),
         (tf.string, tf.int32)),  
         tf.string
       )
     
       defaults = (
-        (('<pad>', 0),
+        (('<pad>', 0, 0),
         ('<pad>', 0)), 
         'O'
       )
@@ -122,8 +138,8 @@ class DL:
         output_types=types, output_shapes=shapes
       )
     
-      if training:
-        dataset = dataset.shuffle(self.params['buffer'])
+      # if training:
+      #   dataset = dataset.shuffle(self.params['buffer'])
    
       batch_size = self.params.get('batch_size', 20)
       return dataset.padded_batch(batch_size, shapes, defaults)

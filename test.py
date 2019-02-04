@@ -101,44 +101,45 @@ from model.metrics import evaluate
 import tensorflow_hub as hub
 
 elmo = hub.Module("https://tfhub.dev/google/elmo/2", trainable=False)
-words = [
-  ["the", "cat", "is", "on", "the", "mat"], 
-  ["dogs", "are", "in", "the", "fog", ""]
-]
-tokens_length = [6, 5]
 
-embeddings = elmo(
-  inputs={
-    "tokens": words,
-    "sequence_len": tokens_length
-  },
-  signature="tokens",
-  as_dict=True
-)["elmo"]
-
-print(embeddings)
-
-
-
-
-x = tf.constant([
-  [
-    [ 1, 1, 1, 1 ],
-    [ 2, 2, 2, 1 ],
-    [ 3, 1, 3, 1 ],
-    [ 0, 0, 0, 1 ],
-  ],
-  [
-    [ 0, 0, 0, 1 ],
-    [ 2, 2, 2, 1 ],
-    [ 3, 1, 3, 1 ],
-    [ 0, 0, 0, 1 ],
-  ]
-], dtype=tf.float64)
-
-x = tf.concat(tf.split(x, 2, axis=-1), axis=0)
+embs= np.zeros((302812, 1024))
 
 with tf.Session() as sess:
   sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
-  res = sess.run(x)
-  print(res)
+
+  for f in ['train', 'valid', 'test']:
+    print(f)
+    iterator = DL().input_fn(f, training=train).make_initializable_iterator()
+    next_el = iterator.get_next()
+    sess.run(iterator.initializer)
+
+    z = 0
+    u_ = 0
+    while True:
+      try:
+        features, labels = sess.run(next_el)
+        (words, uids, nwords), (_, _) = features
+        print(words)
+    
+        embeddings = elmo(
+          inputs={
+            "tokens": words,
+            "sequence_len": nwords 
+          },
+          signature="tokens",
+          as_dict=True
+        )["elmo"]
+
+        e = sess.run(embeddings)
+        e = e[0]
+        for i, uid in enumerate(uids):
+          embs[uid,:] = e[i]
+          u_ = uid
+
+        z += 1 
+        print(z) 
+      except tf.errors.OutOfRangeError:
+        break
+    print(u_)
+
+  np.savez_compressed('data/elmo_embeddings.npz', embeddings=embs)

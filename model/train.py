@@ -27,7 +27,7 @@ def create_model(json_file=None, small_dataset=False):
     'similarity_fn': 'scaled_dot',
     'regularization_fn': 'softmax',
     'pos_embeddings': 'lstm',
-    'fulldoc': True,
+    'fulldoc': False,
     'splitsentence': False,
     'epochs': 10,
     'queries_eq_keys': True,
@@ -56,7 +56,9 @@ def create_model(json_file=None, small_dataset=False):
   ))
 
 def run_step(sess, features, labels, train=False, alphas=False):
-  (words, nwords), (chars, nchars) = features
+  (words, uids, nwords), (chars, nchars) = features
+  for w, i in zip(words[0], uids[0]):
+    print(w, i)
 
   target = [
     'output/loss:0', 
@@ -76,6 +78,7 @@ def run_step(sess, features, labels, train=False, alphas=False):
   
   result = sess.run(target, feed_dict={
     'inputs/words:0': words,
+    'inputs/uids:0': uids,
     'inputs/nwords:0': nwords,
     'inputs/chars:0': chars,
     'inputs/nchars:0': nchars,
@@ -112,7 +115,7 @@ def process_one_epoch(sess, filename, train=False):
   while True:
     try:
       features, labels = sess.run(next_el)
-      (words, nwords), (_, _) = features
+      (words, _, nwords), (_, _) = features
 
       r, _ = run_step(sess, features, labels, train)
 
@@ -238,7 +241,7 @@ def get_alphas(filename, doc, checkpoint=''):
     saver = restore(sess, checkpoint=checkpoint)
 
     features, labels = DL().get_doc(filename, doc)
-    (words, _), (_, _) = features
+    (words, _, _), (_, _) = features
 
     r, alphas = run_step(sess, features, labels, alphas=True)
     preds  = r[2][0]

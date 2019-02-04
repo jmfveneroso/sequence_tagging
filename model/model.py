@@ -32,7 +32,7 @@ class SequenceModel:
       'pos_embeddings': 'lstm',
       'queries_eq_keys': True,
       'residual': True,
-      'elmo': True,
+      'elmo': False,
     }
     params = params if params is not None else {}
     self.params.update(params)
@@ -214,6 +214,7 @@ class SequenceModel:
     with tf.name_scope('inputs'):
       self.words    = tf.placeholder(tf.string, shape=(None, None),       name='words'   )
       self.nwords   = tf.placeholder(tf.int32,  shape=(None,),            name='nwords'  )
+      self.uids     = tf.placeholder(tf.int32,  shape=(None,None),        name='uids'    )
       self.chars    = tf.placeholder(tf.string, shape=(None, None, None), name='chars'   )
       self.nchars   = tf.placeholder(tf.int32,  shape=(None, None),       name='nchars'  )
       self.labels   = tf.placeholder(tf.string, shape=(None, None),       name='labels'  )

@@ -2,6 +2,7 @@ data
 results
 figures
 configs
+old_configs
 model/__pycache__
 old_models
 cifar-10-batches-py
