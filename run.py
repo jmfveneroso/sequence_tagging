@@ -1,12 +1,14 @@
 import matplotlib
 matplotlib.use('Agg')
-from model.train import train, get_alphas, quick_train, test
+# from model.train import train, get_alphas, test
+from model.train import Estimator
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
 import os
 import tensorflow as tf
 from optparse import OptionParser
+from PIL import Image
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # Disable debug logs Tensorflow.
 tf.logging.set_verbosity(tf.logging.ERROR)
@@ -22,11 +24,18 @@ gcfg = [
   ('RIBALTA'   , 'test' , 225, 4  , 21 , 49392, 49409),
 ]
 
-def matrix(checkpoint, example, print_all=False, verbose=True):
+parser = OptionParser()
+parser.add_option("-j", "--json", dest="json_file")
+parser.add_option("-s", "--small", dest="small", action="store_true")
+(options, args) = parser.parse_args()
+options = vars(options)
+
+def matrix(example, print_all=False, verbose=True):
   global gcfg
   cfg = gcfg[example]
 
-  words, alphas_, preds, labs = get_alphas(cfg[1], cfg[2], checkpoint=checkpoint)
+  estimator = Estimator()
+  words, alphas_, preds, labs = estimator.get_alphas(cfg[1], cfg[2])
   words = [w.decode("utf-8") for w in words]
 
   first = cfg[3] 
@@ -57,13 +66,13 @@ def matrix(checkpoint, example, print_all=False, verbose=True):
           prefix = '>>>' if i == cfg[3] or i == cfg[4] else ''
           print(prefix, i, w, p, l, a)
     
-    fig = plt.figure(figsize=(10.0, 10.0), dpi=600)
+    fig = plt.figure(figsize=(10.0, 10.0), dpi=100)
     plt.title(msg)
     plt.xticks(range(0,end), words[start:end], rotation='vertical') 
     plt.yticks(range(0,end), words[start:end])
         
     plt.imshow(alphas_[start:end,start:end])
-    plt.savefig('figures/' + str(example) + '.png', dpi=600)
+    plt.savefig('figures/' + str(example) + '.png', dpi=100)
 
 def test_pairs():
   valid, test = [], []
@@ -80,26 +89,20 @@ def test_pairs():
     print('==============')
 
 if sys.argv[1] == 'train':
-  parser = OptionParser()
-  parser.add_option("-j", "--json", dest="json_file")
-  parser.add_option("-s", "--small", dest="small", action="store_true")
-  (options, args) = parser.parse_args()
-  options = vars(options)
   small = not options['small'] is None
   json_file = options['json_file']
 
-  train(restore=False, json_file=json_file, small_dataset=small)
+  estimator = Estimator()
 
-elif sys.argv[1] == 'matrix':
-  print_all = sys.argv[3] == 'P' if len(sys.argv) > 3 else False
-  matrix('', int(sys.argv[2]), print_all=print_all)
+  if not json_file is None:
+    estimator.load_params_from_file(json_file)
 
-elif sys.argv[1] == 'qmatrix':
-  print_all = sys.argv[3] == 'P' if len(sys.argv) > 3 else False
-  matrix('2', int(sys.argv[2]), print_all=print_all)
+  if small:
+    estimator.set_dataset_params({
+      'datadir': 'data/small_dataset'
+    })
 
-elif sys.argv[1] == 'quick':
-  quick_train('valid', 4)
+  estimator.train()
 
 elif sys.argv[1] == 'test':
   test()
@@ -107,6 +110,21 @@ elif sys.argv[1] == 'test':
 elif sys.argv[1] == 'pairs':
   test_pairs()
 
-elif sys.argv[1] == 'allmatrices':
+elif sys.argv[1] == 'print_matrices':
   for i in range(len(gcfg)):
-    matrix('', i, verbose=False)
+    matrix(i, verbose=False)
+
+  filenames = ['figures/' + str(i) + '.png' for i in range(len(gcfg))]
+  images = list(map(Image.open, filenames))
+
+  widths, heights = zip(*(i.size for i in images))
+  total_width = max(widths)
+  total_height = sum(heights)
+
+  new_im = Image.new('RGB', (total_width, total_height))
+  y_offset = 0
+  for im in images:
+    new_im.paste(im, (0, y_offset))
+    y_offset += im.size[1]
+
+  new_im.save('figures/all.png', 'PNG')

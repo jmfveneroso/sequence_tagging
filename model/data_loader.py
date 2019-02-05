@@ -152,8 +152,8 @@ class DL:
       features, labels = [(f, l) for (f, l) in DL().generator_fn(filename)][doc]
       self.params['fulldoc'] = old_param
       self.params['splitsentence'] = old_param2
-      (words, nwords), (chars, nchars) = features
-      features = ([words], [nwords]), ([chars], [nchars])
+      (words, uids, nwords), (chars, nchars) = features
+      features = ([words], [uids], [nwords]), ([chars], [nchars])
       return features, [labels]
 
     def set_params(self, params=None):

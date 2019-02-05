@@ -14,8 +14,7 @@ class SequenceModel:
       'tags': str(Path(DATADIR, 'vocab.tags.txt')),
       'glove': str(Path(DATADIR, 'glove.npz')),
       'char_embeddings': str(Path(DATADIR, 'char_embeddings.npz')),
-      'learning_rate': 0.001,
-      'dim_chars': 100,
+      'dim_chars': 50,
       'dim_words': 300,
       'dropout': 0.5,
       'lstm_size': 200,
@@ -23,19 +22,32 @@ class SequenceModel:
       'kernel_size': 3,
       'char_lstm_size': 25,
       'pretrained_chars': False,
-      'use_attention': True,
+      # Other configurations.
       'use_crf': True,
       'char_representation': 'cnn',
+      # Mid layer.
+      'num_mid_layers': 1,
+      # Attention.
+      'word_embeddings': 'glove',
+      'use_attention': True,
       'num_heads': 2,
+      'pos_embeddings': True,
       'similarity_fn': 'scaled_dot', # rbf, dot, scaled_dot, cosine, bahdanau
-      'regularization_fn': 'softmax',
-      'pos_embeddings': 'lstm',
+      'regularization_fn': 'softmax', # softmax, tanh, linear
+      'queries': 'mid_layer', # mid_layer
+      'keys': 'mid_layer', # mid_layer
+      'values': 'mid_layer', # mid_layer
       'queries_eq_keys': True,
-      'residual': True,
+      'mask': True,
+      'residual': 'add',
       'elmo': False,
     }
     params = params if params is not None else {}
     self.params.update(params)
+
+    with Path(self.params['tags']).open() as f:
+      indices = [idx for idx, tag in enumerate(f) if tag.strip() != 'O']
+      self.num_tags = len(indices) + 1
 
   def cnn(self, t, weights, filters, kernel_size):
     shape = tf.shape(t)
@@ -127,16 +139,16 @@ class SequenceModel:
     normalized = (inputs - mean) / ( (variance + epsilon) ** (.5) )
     return gamma * normalized + beta
   
-  def attention(self, inputs, outputs):
-    attention_size = inputs.shape[2].value
-    output_size = outputs.shape[2].value
+  def attention(self, queries, keys, values):
+    attention_size = keys.shape[2].value
+    output_size = values.shape[2].value
   
-    Q = tf.layers.dense(inputs, attention_size)
+    Q = tf.layers.dense(queries, attention_size)
     if self.params['queries_eq_keys']:
       K = Q
     else:
-      K = tf.layers.dense(inputs, attention_size)
-    V = tf.layers.dense(inputs, output_size)
+      K = tf.layers.dense(keys, attention_size)
+    V = tf.layers.dense(values, output_size)
 
     # Split and concat
     num_heads = self.params['num_heads']
@@ -212,14 +224,17 @@ class SequenceModel:
 
   def create_placeholders(self):
     with tf.name_scope('inputs'):
-      self.words    = tf.placeholder(tf.string, shape=(None, None),       name='words'   )
-      self.nwords   = tf.placeholder(tf.int32,  shape=(None,),            name='nwords'  )
-      self.uids     = tf.placeholder(tf.int32,  shape=(None,None),        name='uids'    )
-      self.chars    = tf.placeholder(tf.string, shape=(None, None, None), name='chars'   )
-      self.nchars   = tf.placeholder(tf.int32,  shape=(None, None),       name='nchars'  )
-      self.labels   = tf.placeholder(tf.string, shape=(None, None),       name='labels'  )
-      self.training = tf.placeholder(tf.bool,   shape=(),                 name='training')
-
+      self.words    = tf.placeholder(tf.string,  shape=(None, None),       name='words'   )
+      self.nwords   = tf.placeholder(tf.int32,   shape=(None,),            name='nwords'  )
+      self.uids     = tf.placeholder(tf.int32,   shape=(None,None),        name='uids'    )
+      self.chars    = tf.placeholder(tf.string,  shape=(None, None, None), name='chars'   )
+      self.nchars   = tf.placeholder(tf.int32,   shape=(None, None),       name='nchars'  )
+      self.labels   = tf.placeholder(tf.string,  shape=(None, None),       name='labels'  )
+      self.training = tf.placeholder(tf.bool,    shape=(),                 name='training')
+      self.learning_rate = tf.placeholder_with_default(
+        0.001, shape=(), name='learning_rate'      
+      )
+ 
   def elmo_embeddings(self):
     elmo = hub.Module("https://tfhub.dev/google/elmo/2", trainable=False)
     
@@ -231,13 +246,6 @@ class SequenceModel:
       signature="tokens",
       as_dict=True
     )["elmo"]
-
-    if self.params['pos_embeddings'] == 'word':
-      word_embeddings = self.position_embeddings(
-        1600, 
-        1024, 
-        word_embeddings
-      )
 
     return word_embeddings
 
@@ -251,13 +259,6 @@ class SequenceModel:
     variable = np.vstack([glove, [[0.] * self.params['dim_words']]])
     variable = tf.Variable(variable, dtype=tf.float32, trainable=False)
     word_embeddings = tf.nn.embedding_lookup(variable, word_ids)
-
-    if self.params['pos_embeddings'] == 'word':
-      word_embeddings = self.position_embeddings(
-        1600, 
-        self.params['dim_words'], 
-        word_embeddings
-      )
 
     return word_embeddings 
 
@@ -300,58 +301,68 @@ class SequenceModel:
   
     output = tf.concat([output_fw, output_bw], axis=-1)
     output = self.dropout(output)
-
-    if self.params['pos_embeddings'] == 'lstm':
-      output = self.position_embeddings(1600, 2 * self.params['lstm_size'], output)
     return output
 
-  def output_layer(self, x):
-    with Path(self.params['tags']).open() as f:
-      indices = [idx for idx, tag in enumerate(f) if tag.strip() != 'O']
-      num_tags = len(indices) + 1
-
-    logits = tf.layers.dense(x, num_tags)
-  
+  def output_layer(self, logits):
     vocab_tags = tf.contrib.lookup.index_table_from_file(self.params['tags'])
     tags = vocab_tags.lookup(self.labels)
     if self.params['use_crf']:
-      crf_params = tf.get_variable("crf", [num_tags, num_tags], dtype=tf.float32)
+      crf_params = tf.get_variable("crf", [self.num_tags, self.num_tags], dtype=tf.float32)
       pred_ids, _ = tf.contrib.crf.crf_decode(logits, crf_params, self.nwords)
       log_likelihood, _ = tf.contrib.crf.crf_log_likelihood(logits, tags, self.nwords, crf_params)
       loss = tf.reduce_mean(-log_likelihood, name='loss')
     else:
       pred_ids = tf.argmax(logits, axis=-1)
-      labels = tf.one_hot(tags, num_tags)
+      labels = tf.one_hot(tags, self.num_tags)
       loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(
         labels=labels, logits=logits
       ), name='loss')
 
     correct = tf.equal(tf.to_int64(pred_ids), tags)
     accuracy = tf.reduce_mean(tf.cast(correct, tf.float32), name='accuracy')
-    train_step = tf.train.AdamOptimizer(learning_rate=self.params['learning_rate']).minimize(loss)
+    train_step = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(loss)
 
     reverse_vocab_tags = tf.contrib.lookup.index_to_string_table_from_file(
       self.params['tags']
     )
     pred_strings = reverse_vocab_tags.lookup(tf.to_int64(pred_ids))  
 
+  def mid_layer(self, x):
+    return self.lstm(x)
+
   def create(self):
     self.create_placeholders()
 
     with tf.name_scope('embeddings'):
-      if self.params['elmo']:
+      if self.params['word_embeddings'] == 'elmo':
         word_embeddings = self.elmo_embeddings()
-      else:
+      elif self.params['word_embeddings'] == 'glove':
         word_embeddings = self.word_embeddings()
+
       char_embeddings = self.char_embeddings()
       embeddings = tf.concat([word_embeddings, char_embeddings], axis=-1)
       embeddings = self.dropout(embeddings)
     
     with tf.name_scope('lstm'):
-      output = self.lstm(embeddings)
+      mid_output = self.mid_layer(embeddings)
+
+      if self.params['pos_embeddings']:
+        mid_output = self.position_embeddings(1600, 2 * self.params['lstm_size'], mid_output)
+
+      inputs = {
+        'embeddings': embeddings,
+        'mid_layer': mid_output,
+        'logits': logits
+      }
+
+      queries = mid_output
+      keys = mid_output
+      values = mid_output
 
       if self.params['use_attention']:
-        output = self.attention(output, output)
+        output = self.attention(queries, keys, values)
+
+      logits = tf.layers.dense(output, self.num_tags)
 
     with tf.name_scope('output'):
-      self.output_layer(output)
+      self.output_layer(logits)
