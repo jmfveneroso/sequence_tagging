@@ -1,3 +1,4 @@
-from snippets.elmo import concat_pretrained
+from snippets.elmo import concat_pretrained, precalculate_elmo
 
-concat_pretrained()
+precalculate_elmo()
+# concat_pretrained()

@@ -7,6 +7,11 @@ if [[ $user == "root" ]]; then
     mkdir -p results/$f
     python run.py train -j $filename > results/$f/${f}.log
     ./eval.sh >> results/$f/${f}.log
+
+    if [ "$(ls -A checkpoints)" ]; then
+      cp checkpoints/* results/$f/
+    fi
+
     python run.py print_matrices >> results/$f/${f}.log
     if [ "$(ls -A figures)" ]; then
       mv figures/* results/$f/

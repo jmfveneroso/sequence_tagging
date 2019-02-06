@@ -67,7 +67,7 @@ class DL:
         'batch_size': 1,
         'buffer': 15000,
         'datadir': 'data/conll2003',
-        'fulldoc': False,
+        'fulldoc': True,
         'splitsentence': False,
       }
 

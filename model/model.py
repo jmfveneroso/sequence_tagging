@@ -9,38 +9,37 @@ class SequenceModel:
   def __init__(self, params=None):
     DATADIR = 'data/conll2003'
     self.params = {
+      # Unchangeable.
       'words': str(Path(DATADIR, 'vocab.words.txt')),
       'chars': str(Path(DATADIR, 'vocab.chars.txt')),
       'tags': str(Path(DATADIR, 'vocab.tags.txt')),
       'glove': str(Path(DATADIR, 'glove.npz')),
+      'elmo': str(Path(DATADIR, 'elmo.npz')),
       'char_embeddings': str(Path(DATADIR, 'char_embeddings.npz')),
       'dim_chars': 50,
-      'dim_words': 300,
       'dropout': 0.5,
-      'lstm_size': 200,
       'filters': 50,
       'kernel_size': 3,
       'char_lstm_size': 25,
       'pretrained_chars': False,
-      # Other configurations.
-      'use_crf': True,
+      # General configurations.
+      'lstm_size': 200,
+      'decoder': 'crf', # crf, logits.
       'char_representation': 'cnn',
-      # Mid layer.
-      'num_mid_layers': 1,
+      'word_embeddings': 'glove', # glove, elmo. TODO: bert.
       # Attention.
-      'word_embeddings': 'glove',
       'use_attention': True,
+      'num_blocks': 1,
       'num_heads': 2,
       'pos_embeddings': True,
       'similarity_fn': 'scaled_dot', # rbf, dot, scaled_dot, cosine, bahdanau
       'regularization_fn': 'softmax', # softmax, tanh, linear
-      'queries': 'mid_layer', # mid_layer
-      'keys': 'mid_layer', # mid_layer
-      'values': 'mid_layer', # mid_layer
-      'queries_eq_keys': True,
+      'queries': 'mid_layer', # embeddings, mid_layer
+      'keys': 'mid_layer', # embeddings, mid_layer
+      'queries_eq_keys': False,
       'mask': True,
-      'residual': 'add',
-      'elmo': False,
+      'residual': 'add', # add, concat.
+      'layer_normalization': True,
     }
     params = params if params is not None else {}
     self.params.update(params)
@@ -97,7 +96,7 @@ class SequenceModel:
       # output_fw[0] is the cell state and output_fw[1] is the hidden state.
       output = tf.concat([output_fw[1], output_bw[1]], axis=-1)
       return tf.reshape(output, [-1, dim_words, 2*self.params['char_lstm_size']])
-  
+
   def rbf_kernel(self, Q, K, gamma=0.5):
     Q = tf.transpose(Q, [1, 0, 2]) # Time major.
     K = tf.transpose(K, [1, 0, 2])
@@ -139,16 +138,16 @@ class SequenceModel:
     normalized = (inputs - mean) / ( (variance + epsilon) ** (.5) )
     return gamma * normalized + beta
   
-  def attention(self, queries, keys, values):
-    attention_size = keys.shape[2].value
-    output_size = values.shape[2].value
+  def attention(self, queries, keys):
+    attention_size = queries.shape[2].value
+    output_size = keys.shape[2].value
   
     Q = tf.layers.dense(queries, attention_size)
     if self.params['queries_eq_keys']:
       K = Q
     else:
       K = tf.layers.dense(keys, attention_size)
-    V = tf.layers.dense(values, output_size)
+    V = tf.layers.dense(keys, output_size)
 
     # Split and concat
     num_heads = self.params['num_heads']
@@ -169,11 +168,12 @@ class SequenceModel:
       attention = self.bahdanau(Q_, K_)
 
     # Key Masking.
-    key_masks = tf.sign(tf.reduce_sum(tf.abs(K), axis=-1))
-    key_masks = tf.tile(key_masks, [num_heads, 1])
-    key_masks = tf.tile(tf.expand_dims(key_masks, 1), [1, tf.shape(Q)[1], 1])
-    paddings = tf.ones_like(attention)*(-2**32+1)
-    attention = tf.where(tf.equal(key_masks, 0), paddings, attention)
+    if self.params['mask']:
+      key_masks = tf.sign(tf.reduce_sum(tf.abs(K), axis=-1))
+      key_masks = tf.tile(key_masks, [num_heads, 1])
+      key_masks = tf.tile(tf.expand_dims(key_masks, 1), [1, tf.shape(Q)[1], 1])
+      paddings = tf.ones_like(attention)*(-2**32+1)
+      attention = tf.where(tf.equal(key_masks, 0), paddings, attention)
   
     # Regularization.
     name = 'alphas'
@@ -186,24 +186,27 @@ class SequenceModel:
       alphas = tf.divide(attention, regularizer, name=name)
 
     # Query Masking
-    query_masks = tf.sign(tf.reduce_sum(tf.abs(Q), axis=-1))
-    query_masks = tf.tile(query_masks, [num_heads, 1])
-    query_masks = tf.tile(tf.expand_dims(query_masks, -1), [1, 1, tf.shape(K)[1]])
-    outputs *= query_masks
+    if self.params['mask']:
+      query_masks = tf.sign(tf.reduce_sum(tf.abs(Q), axis=-1))
+      query_masks = tf.tile(query_masks, [num_heads, 1])
+      query_masks = tf.tile(tf.expand_dims(query_masks, -1), [1, 1, tf.shape(K)[1]])
+      alphas *= query_masks
   
     alphas = self.dropout(alphas)
     outputs = tf.matmul(alphas, V_)
     outputs = tf.concat(tf.split(outputs, num_heads, axis=0), axis=2)
 
     if self.params['residual'] == 'add':
-      outputs += inputs
+      outputs += keys
     elif self.params['residual'] == 'concat':
-      outputs = tf.concat([outputs, inputs], axis=-1)
+      outputs = tf.concat([outputs, keys], axis=-1)
 
-    outputs = self.normalize(outputs)
+    # Layer normalization.
+    if self.params['layer_normalization']:
+      outputs = self.normalize(outputs)
     return outputs
   
-  def position_embeddings(self, max_length, emb_dim, inputs):
+  def pos_embeddings(self, inputs, emb_dim, max_length=1600):
     position_emb = np.array([
       [(pos+1) / np.power(10000, 2 * (j // 2) / emb_dim) for j in range(emb_dim)]
       for pos in range(max_length)
@@ -236,31 +239,24 @@ class SequenceModel:
       )
  
   def elmo_embeddings(self):
-    elmo = hub.Module("https://tfhub.dev/google/elmo/2", trainable=False)
-    
-    word_embeddings = elmo(
-      inputs={
-        "tokens": self.words,
-        "sequence_len": self.nwords
-      },
-      signature="tokens",
-      as_dict=True
-    )["elmo"]
+    elmo = np.load(self.params['elmo'])['embeddings']
+    variable = np.vstack([elmo, [[0.] * 1024]])
+    variable = tf.Variable(variable, dtype=tf.float32, trainable=False)
+    word_embeddings = tf.nn.embedding_lookup(variable, self.uids)
+    return word_embeddings, 1024
 
-    return word_embeddings
-
-  def word_embeddings(self):
+  def glove_embeddings(self):
     vocab_words = tf.contrib.lookup.index_table_from_file(
       self.params['words'], num_oov_buckets=1
     )
 
     word_ids = vocab_words.lookup(self.words)
     glove = np.load(self.params['glove'])['embeddings']
-    variable = np.vstack([glove, [[0.] * self.params['dim_words']]])
+    variable = np.vstack([glove, [[0.] * 300]])
     variable = tf.Variable(variable, dtype=tf.float32, trainable=False)
     word_embeddings = tf.nn.embedding_lookup(variable, word_ids)
 
-    return word_embeddings 
+    return word_embeddings, 300
 
   def char_embeddings(self):
     with Path(self.params['chars']).open() as f:
@@ -275,38 +271,57 @@ class SequenceModel:
     if self.params['pretrained_chars']:
       pretrained_chars = np.load(self.params['char_embeddings'])['embeddings']
       v = np.vstack([pretrained_chars, [[0.] * self.params['dim_chars']]])
-      v = tf.Variable(v, dtype=tf.float32, trainable=True)
+      v = tf.Variable(v, dtype=tf.float32, trainable=False)
     else:
       v = tf.get_variable('chars_embeddings', [num_chars + 1, self.params['dim_chars']], tf.float32)
     char_embeddings = tf.nn.embedding_lookup(v, char_ids)
     char_embeddings = self.dropout(char_embeddings)
-   
-    # Char representations. 
+  
+    emb_size = 0
     if self.params['char_representation'] == 'cnn':
       weights = tf.sequence_mask(self.nchars)
       char_embeddings = self.cnn(char_embeddings, weights, self.params['filters'], self.params['kernel_size']) 
+      emb_size = self.params['filters']
     elif self.params['char_representation'] == 'lstm':
       char_embeddings = self.lstm_char_representations(char_embeddings, self.nchars)
-    return char_embeddings
+      emb_size = self.params['char_lstm_size'] * 2
+    return char_embeddings, emb_size
 
-  def lstm(self, x):
-    lstm_cell_fw = tf.nn.rnn_cell.LSTMCell(self.params['lstm_size'])
-    lstm_cell_bw = tf.nn.rnn_cell.LSTMCell(self.params['lstm_size'])
-    
-    (output_fw, output_bw), (_, _) = tf.nn.bidirectional_dynamic_rnn(
-      lstm_cell_fw, lstm_cell_bw, x,
-      dtype=tf.float32,
-      sequence_length=self.nwords
-    )
+  def embeddings_layer(self):
+    word_emb_size = 0
+    if self.params['word_embeddings'] == 'elmo':
+      word_embs, word_emb_size = self.elmo_embeddings()
+    elif self.params['word_embeddings'] == 'glove':
+      word_embs, word_emb_size = self.glove_embeddings()
+    else:
+      raise Exception('No word embeddings were selected.')
+
+    char_embs, char_emb_size = self.char_embeddings()
+    embs = tf.concat([word_embs, char_embs], axis=-1)
+    embs = self.dropout(embs)
+    return embs, word_emb_size + char_emb_size
+
+  def lstm(self, x, lstm_size, var_scope='lstm'):
+    with tf.variable_scope(var_scope):
+      lstm_cell_fw = tf.nn.rnn_cell.LSTMCell(lstm_size)
+      lstm_cell_bw = tf.nn.rnn_cell.LSTMCell(lstm_size)
+      
+      (output_fw, output_bw), (_, _) = tf.nn.bidirectional_dynamic_rnn(
+        lstm_cell_fw, lstm_cell_bw, x,
+        dtype=tf.float32,
+        sequence_length=self.nwords
+      )
   
-    output = tf.concat([output_fw, output_bw], axis=-1)
-    output = self.dropout(output)
-    return output
+      output = tf.concat([output_fw, output_bw], axis=-1)
+      output = self.dropout(output)
+      return output
 
-  def output_layer(self, logits):
+  def output_layer(self, x):
+    logits = tf.layers.dense(x, self.num_tags)
+
     vocab_tags = tf.contrib.lookup.index_table_from_file(self.params['tags'])
     tags = vocab_tags.lookup(self.labels)
-    if self.params['use_crf']:
+    if self.params['decoder'] == 'crf':
       crf_params = tf.get_variable("crf", [self.num_tags, self.num_tags], dtype=tf.float32)
       pred_ids, _ = tf.contrib.crf.crf_decode(logits, crf_params, self.nwords)
       log_likelihood, _ = tf.contrib.crf.crf_log_likelihood(logits, tags, self.nwords, crf_params)
@@ -328,41 +343,56 @@ class SequenceModel:
     pred_strings = reverse_vocab_tags.lookup(tf.to_int64(pred_ids))  
 
   def mid_layer(self, x):
-    return self.lstm(x)
+    return self.lstm(x, self.params['lstm_size']), 2 * self.params['lstm_size']
+
+  def single_block_transformer(self, x, x_size):
+    if self.params['queries'] == self.params['keys'] == 'embeddings':
+      if self.params['pos_embeddings']:
+        x = self.pos_embeddings(x, x_size)
+      x = self.attention(x, x)
+      output, _ = self.mid_layer(x)
+      return output
+
+    else:
+      mid_output, mid_size = self.mid_layer(x)
+
+      pos_emb_size = 0
+      if self.params['queries'] == 'embeddings':
+        queries = x 
+        pos_emb_size = x_size
+      elif self.params['queries'] == 'mid_layer':
+        queries = mid_output
+        pos_emb_size = mid_size
+      else:
+        raise Exception('Invalid queries value')
+
+      if self.params['pos_embeddings']:
+        queries = self.pos_embeddings(queries, pos_emb_size)
+
+      return self.attention(queries, mid_output)
+
+  def transformer(self, x, x_size):
+    for i in range(self.params['num_blocks']):
+      if self.params['pos_embeddings']:
+        outputs = self.pos_embeddings(x, x_size)
+      outputs = self.attention(outputs, outputs)
+      x = self.lstm(x, x_size / 2, var_scope='transformer_' + str(i)) + x 
+    return x 
 
   def create(self):
     self.create_placeholders()
 
     with tf.name_scope('embeddings'):
-      if self.params['word_embeddings'] == 'elmo':
-        word_embeddings = self.elmo_embeddings()
-      elif self.params['word_embeddings'] == 'glove':
-        word_embeddings = self.word_embeddings()
-
-      char_embeddings = self.char_embeddings()
-      embeddings = tf.concat([word_embeddings, char_embeddings], axis=-1)
-      embeddings = self.dropout(embeddings)
-    
-    with tf.name_scope('lstm'):
-      mid_output = self.mid_layer(embeddings)
-
-      if self.params['pos_embeddings']:
-        mid_output = self.position_embeddings(1600, 2 * self.params['lstm_size'], mid_output)
-
-      inputs = {
-        'embeddings': embeddings,
-        'mid_layer': mid_output,
-        'logits': logits
-      }
-
-      queries = mid_output
-      keys = mid_output
-      values = mid_output
-
-      if self.params['use_attention']:
-        output = self.attention(queries, keys, values)
-
-      logits = tf.layers.dense(output, self.num_tags)
+      embs, emb_size = self.embeddings_layer()
+   
+    if self.params['use_attention']:
+      with tf.name_scope('transformer'):
+        if self.params['num_blocks'] == 1:
+            output = self.single_block_transformer(embs, emb_size) 
+        else:
+          output = self.transformer(embs, emb_size) 
+    else:
+      output, _ = self.mid_layer(embs)
 
     with tf.name_scope('output'):
-      self.output_layer(logits)
+      self.output_layer(output)

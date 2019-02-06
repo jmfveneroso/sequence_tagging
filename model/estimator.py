@@ -18,23 +18,11 @@ params = None
 class Estimator:
   def __init__(self):
     self.params = {
-      'datadir': 'data/small_dataset',
-      'lstm_size': 200,
-      'char_representation': 'lstm',
-      'use_attention': True,
-      'use_crf': True,
-      'num_heads': 1,
-      'similarity_fn': 'scaled_dot',
-      'regularization_fn': 'softmax',
-      'pos_embeddings': 'lstm',
-      'fulldoc': True,
-      'splitsentence': False,
       'epochs': 5,
-      'queries_eq_keys': True,
-      'residual': 'add',
-      'elmo': False,
       'current_epoch': 0,
+      'best_f1': 0,
     }
+    self.learning_rate = 0.001
 
   def set_dataset_params(self, new_params):
     self.params.update(new_params)
@@ -45,8 +33,9 @@ class Estimator:
       self.params.update(data)
   
     print('===Model parameters===')
-    print(json.dumps(params, indent=4, sort_keys=True))
-    print('\t'.join([p for p in self.params]))
+    print(json.dumps(self.params, indent=4, sort_keys=True))
+    print('\t'.join([str(p) for p in self.params]))
+    print('\t'.join([str(self.params[p]) for p in self.params]))
 
   def restore(self, sess):
     model_base = './checkpoints/model.ckpt'
@@ -79,6 +68,7 @@ class Estimator:
       'inputs/nchars:0': nchars,
       'inputs/labels:0': labels,
       'inputs/training:0': train,
+      'inputs/learning_rate:0': self.learning_rate,
     }
 
   def run_epoch(self, sess, filename, train=False, epoch_num=0):
@@ -124,32 +114,37 @@ class Estimator:
 
     return m, (preds, tags, words)
 
-  def train(self):
-    start_time = time.time()
-  
-    DL().set_params(self.params)
-    SequenceModel(self.params).create()
-  
-    best_f1 = 0
+  def train(self, fine_tune=False):
     with tf.Session() as sess:  
-      saver = tf.train.Saver()
-      sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
+      start_time = time.time()
+
+      if fine_tune:
+        saver = self.restore(sess)
+        self.learning_rate = 0.0001
+        self.params['epochs'] = self.params['current_epoch'] + 10
+      else:      
+        SequenceModel(self.params).create()
+        sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
+        saver = tf.train.Saver()
+      DL().set_params(self.params)
   
-      for epoch in range(self.params['epochs']):
+      for epoch in range(self.params['current_epoch'], self.params['epochs']):
         _, _ = self.run_epoch(sess, 'train', epoch_num=epoch, train=True)
         _, _ = self.run_epoch(sess, 'test', epoch_num=epoch)
         m, _ = self.run_epoch(sess, 'valid', epoch_num=epoch)
         
-        if m['f1'] > best_f1:
-          best_f1 = m['f1']
+        if m['f1'] > self.params['best_f1']:
+          self.params['best_f1'] = m['f1']
           self.save_model(sess, saver)
 
     print('Elapsed time: %.4f' % (time.time() - start_time))
-    self.test()
+    if not fine_tune:
+      self.train(fine_tune=True)
   
   def test(self):
     with tf.Session() as sess:
       _ = self.restore(sess)
+      DL().set_params(self.params)
       
       for name in ['train', 'valid', 'test']:
         _, (p, t, w) = self.run_epoch(sess, name)
@@ -173,8 +168,8 @@ class Estimator:
   
       target = ['output/index_to_string_Lookup:0']
       try:
-        tf.get_default_graph().get_tensor_by_name('lstm/alphas:0')
-        target.append('lstm/alphas:0')
+        tf.get_default_graph().get_tensor_by_name('transformer/alphas:0')
+        target.append('transformer/alphas:0')
       except:
         pass
      

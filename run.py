@@ -1,7 +1,6 @@
 import matplotlib
 matplotlib.use('Agg')
-# from model.train import train, get_alphas, test
-from model.train import Estimator
+from model.estimator import Estimator
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
@@ -103,9 +102,11 @@ if sys.argv[1] == 'train':
     })
 
   estimator.train()
+  estimator.test()
 
 elif sys.argv[1] == 'test':
-  test()
+  estimator = Estimator()
+  estimator.test()
 
 elif sys.argv[1] == 'pairs':
   test_pairs()
@@ -114,6 +115,7 @@ elif sys.argv[1] == 'print_matrices':
   for i in range(len(gcfg)):
     matrix(i, verbose=False)
 
+  # Concat images.
   filenames = ['figures/' + str(i) + '.png' for i in range(len(gcfg))]
   images = list(map(Image.open, filenames))
 
