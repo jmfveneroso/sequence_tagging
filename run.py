@@ -104,6 +104,12 @@ if sys.argv[1] == 'train':
   estimator.train()
   estimator.test()
 
+if sys.argv[1] == 'params':
+  json_file = options['json_file']
+  estimator = Estimator()
+  if not json_file is None:
+    estimator.load_params_from_file(json_file)
+
 elif sys.argv[1] == 'test':
   estimator = Estimator()
   estimator.test()

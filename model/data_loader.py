@@ -138,8 +138,8 @@ class DL:
         output_types=types, output_shapes=shapes
       )
     
-      # if training:
-      #   dataset = dataset.shuffle(self.params['buffer'])
+      if training:
+        dataset = dataset.shuffle(self.params['buffer'])
    
       batch_size = self.params.get('batch_size', 20)
       return dataset.padded_batch(batch_size, shapes, defaults)
