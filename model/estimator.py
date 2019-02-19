@@ -59,13 +59,15 @@ class Estimator:
     print("Model saved in path: %s" % save_path) 
 
   def get_dict(self, features, labels, train):
-    (words, uids, nwords), (chars, nchars) = features
+    (words, nwords), (chars, nchars), html, (css_chars, css_lengths) = features
     return {
       'inputs/words:0': words,
-      'inputs/uids:0': uids,
       'inputs/nwords:0': nwords,
       'inputs/chars:0': chars,
       'inputs/nchars:0': nchars,
+      'inputs/html:0': html,
+      'inputs/css_chars:0': css_chars,
+      'inputs/css_lengths:0': css_lengths,
       'inputs/labels:0': labels,
       'inputs/training:0': train,
       'inputs/learning_rate:0': self.learning_rate,
@@ -82,7 +84,7 @@ class Estimator:
     for step in range(1, 1000000):
       try:
         features, labels = sess.run(next_el)
-        (words_, uids, nwords_), (chars, nchars) = features
+        (words_, nwords_), (chars, nchars), html, (css_chars, css_lengths) = features
   
         target = [
           'output/loss:0', 
@@ -95,10 +97,10 @@ class Estimator:
         feed_dict = self.get_dict(features, labels, train)
         r = sess.run(target, feed_dict=feed_dict)
   
-        seqlen = nwords_.tolist()[0]
-        words += words_.tolist()[:seqlen]    
-        tags  += labels.tolist()[:seqlen]
-        preds += r[2].tolist()[:seqlen]
+        seqlens = nwords_.tolist()
+        words += [w[:seqlens[i]] for i, w in enumerate(words_.tolist())]
+        tags  += [l[:seqlens[i]] for i, l in enumerate(labels.tolist())]
+        preds += [p[:seqlens[i]] for i, p in enumerate(r[2].tolist())]
   
         if step % 50 == 0:
           print('Loss: %.4f, Acc: %.4f, Time: %.4f, Step: %d' % (r[0], r[1], time.time() - start_time, step))
@@ -138,8 +140,8 @@ class Estimator:
           self.save_model(sess, saver)
 
     print('Elapsed time: %.4f' % (time.time() - start_time))
-    if not fine_tune:
-      self.train(fine_tune=True)
+    # if not fine_tune:
+    #   self.train(fine_tune=True)
   
   def test(self):
     with tf.Session() as sess:
@@ -152,7 +154,8 @@ class Estimator:
         Path('results/score').mkdir(parents=True, exist_ok=True)
         with Path('results/score/{}.preds.txt'.format(name)).open('wb') as f:
           for words, preds, tags in zip(w, p, t):
-            f.write(b'-DOCSTART- O O\n\n')
+            # f.write(b'-DOCSTART- O O\n\n')
+            f.write(b'\n\n')
             for word, pred, tag in zip(words, preds, tags):
               if not word.decode("utf-8") == 'EOS':
                 f.write(b' '.join([word, tag, pred]) + b'\n')
@@ -164,7 +167,7 @@ class Estimator:
       _ = self.restore(sess)
   
       features, labels = DL().get_doc(filename, doc)
-      (words, uids, nwords), (chars, nchars) = features
+      (words, nwords), (chars, nchars), html, (css_chars, css_lengths) = features
   
       target = ['output/index_to_string_Lookup:0']
       try:

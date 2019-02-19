@@ -9,7 +9,9 @@ class SequenceModel:
   def __init__(self, params=None):
     DATADIR = 'data/conll2003'
     self.params = {
-      # Unchangeable.
+      # Static configurations.
+      'datadir': DATADIR,
+      'html_tags': str(Path(DATADIR, 'vocab.htmls.txt')),
       'words': str(Path(DATADIR, 'vocab.words.txt')),
       'chars': str(Path(DATADIR, 'vocab.chars.txt')),
       'tags': str(Path(DATADIR, 'vocab.tags.txt')),
@@ -40,9 +42,17 @@ class SequenceModel:
       'mask': True,
       'residual': 'add', # add, concat.
       'layer_normalization': True,
+      'html_embeddings': False,
+      'css_char_representation': 'cnn'
     }
     params = params if params is not None else {}
     self.params.update(params)
+
+    self.params['words'] = str(Path(self.params['datadir'], 'vocab.words.txt'))
+    self.params['chars'] = str(Path(self.params['datadir'], 'vocab.chars.txt'))
+    self.params['tags' ] = str(Path(self.params['datadir'], 'vocab.tags.txt'))
+    self.params['html_tags'] = str(Path(self.params['datadir'], 'vocab.htmls.txt'))
+    self.params['glove'] = str(Path(self.params['datadir'], 'glove.npz'))
 
     with Path(self.params['tags']).open() as f:
       indices = [idx for idx, tag in enumerate(f) if tag.strip() != 'O']
@@ -77,8 +87,8 @@ class SequenceModel:
     t_max = tf.reshape(t_max, shape=final_shape)
     return t_max
 
-  def lstm_char_representations(self, char_embeddings, nchars):
-    with tf.variable_scope('lstm_chars'):
+  def lstm_char_representations(self, char_embeddings, nchars, scope='lstm_chars'):
+    with tf.variable_scope(scope):
       dim_words = tf.shape(char_embeddings)[1]
       dim_chars = tf.shape(char_embeddings)[2]
 
@@ -90,7 +100,7 @@ class SequenceModel:
       (_, _), (output_fw, output_bw) = tf.nn.bidirectional_dynamic_rnn(
         lstm_cell_fw_c, lstm_cell_bw_c, t,
         dtype=tf.float32,
-        sequence_length=tf.reshape(self.nchars, [-1]),
+        sequence_length=tf.reshape(nchars, [-1]),
       )
 
       # output_fw[0] is the cell state and output_fw[1] is the hidden state.
@@ -229,9 +239,11 @@ class SequenceModel:
     with tf.name_scope('inputs'):
       self.words    = tf.placeholder(tf.string,  shape=(None, None),       name='words'   )
       self.nwords   = tf.placeholder(tf.int32,   shape=(None,),            name='nwords'  )
-      self.uids     = tf.placeholder(tf.int32,   shape=(None,None),        name='uids'    )
       self.chars    = tf.placeholder(tf.string,  shape=(None, None, None), name='chars'   )
       self.nchars   = tf.placeholder(tf.int32,   shape=(None, None),       name='nchars'  )
+      self.html     = tf.placeholder(tf.string,  shape=(None, None, None), name='html'    )
+      self.css_chars   = tf.placeholder(tf.string,  shape=(None, None, None), name='css_chars'   )
+      self.css_lengths = tf.placeholder(tf.int32,   shape=(None, None),       name='css_lengths'  )
       self.labels   = tf.placeholder(tf.string,  shape=(None, None),       name='labels'  )
       self.training = tf.placeholder(tf.bool,    shape=(),                 name='training')
       self.learning_rate = tf.placeholder_with_default(
@@ -239,11 +251,60 @@ class SequenceModel:
       )
  
   def elmo_embeddings(self):
-    elmo = np.load(self.params['elmo'])['embeddings']
-    variable = np.vstack([elmo, [[0.] * 1024]])
-    variable = tf.Variable(variable, dtype=tf.float32, trainable=False)
-    word_embeddings = tf.nn.embedding_lookup(variable, self.uids)
+    elmo = hub.Module("https://tfhub.dev/google/elmo/2", trainable=False)
+    
+    word_embeddings = elmo(
+      inputs={
+        "tokens": self.words,
+        "sequence_len": self.nwords
+      },
+      signature="tokens",
+      as_dict=True
+    )["elmo"]
+
     return word_embeddings, 1024
+
+  def html_embeddings(self):
+    with Path(self.params['html_tags']).open() as f:
+      num_html_tags = sum(1 for _ in f) + 1
+    
+    vocab_chars = tf.contrib.lookup.index_table_from_file(
+      self.params['chars'], num_oov_buckets=1
+    )
+ 
+    html_tags = tf.slice(self.html, [0, 0, 0], [-1, -1, 2])
+    html_tag_ids = vocab_chars.lookup(html_tags)
+
+    html_embedding_size = 32
+    v = tf.get_variable('html_embeddings', [num_html_tags + 1, html_embedding_size], tf.float32)
+    html_embeddings = tf.nn.embedding_lookup(v, html_tag_ids)
+    timesteps = tf.shape(html_tags)[1]
+    html_embeddings = tf.reshape(html_embeddings, [-1, timesteps, html_embedding_size*2])
+    return html_embeddings, html_embedding_size * 2
+
+  def css_embeddings(self):
+    with Path(self.params['chars']).open() as f:
+      num_chars = sum(1 for _ in f) + 1
+    
+    vocab_chars = tf.contrib.lookup.index_table_from_file(
+      self.params['chars'], num_oov_buckets=1
+    )
+    
+    char_ids = vocab_chars.lookup(self.css_chars)
+  
+    v = tf.get_variable('chars_embeddings2', [num_chars + 1, self.params['dim_chars']], tf.float32)
+    char_embeddings = tf.nn.embedding_lookup(v, char_ids)
+    char_embeddings = self.dropout(char_embeddings)
+  
+    emb_size = 0
+    if self.params['css_char_representation'] == 'cnn':
+      weights = tf.sequence_mask(self.css_lengths)
+      char_embeddings = self.cnn(char_embeddings, weights, self.params['filters'], self.params['kernel_size']) 
+      emb_size = self.params['filters']
+    elif self.params['css_char_representation'] == 'lstm':
+      char_embeddings = self.lstm_char_representations(char_embeddings, self.css_lengths, scope='css_lstm')
+      emb_size = self.params['char_lstm_size'] * 2
+    return char_embeddings, emb_size
 
   def glove_embeddings(self):
     vocab_words = tf.contrib.lookup.index_table_from_file(
@@ -296,10 +357,23 @@ class SequenceModel:
     else:
       raise Exception('No word embeddings were selected.')
 
-    char_embs, char_emb_size = self.char_embeddings()
-    embs = tf.concat([word_embs, char_embs], axis=-1)
+    embs = [word_embs]
+    emb_size = word_emb_size
+    if not self.params['char_representation'] == 'none':
+      char_embs, char_emb_size = self.char_embeddings()
+      embs.append(char_embs)
+      emb_size += char_emb_size
+
+    if self.params['html_embeddings']:
+      html_embs, html_embs_size = self.html_embeddings()
+      css_embs, css_embs_size = self.css_embeddings()
+      embs.append(html_embs)
+      embs.append(css_embs)
+      emb_size += html_embs_size + css_embs_size
+
+    embs = tf.concat(embs, axis=-1)
     embs = self.dropout(embs)
-    return embs, word_emb_size + char_emb_size
+    return embs, emb_size
 
   def lstm(self, x, lstm_size, var_scope='lstm'):
     with tf.variable_scope(var_scope):
@@ -376,6 +450,9 @@ class SequenceModel:
       if self.params['pos_embeddings']:
         outputs = self.pos_embeddings(x, x_size)
       outputs = self.attention(outputs, outputs)
+
+      # Bidirectional LSTM will output a tensor with a shape that is twice 
+      # the hidden layer size.
       x = self.lstm(x, x_size / 2, var_scope='transformer_' + str(i)) + x 
     return x 
 
