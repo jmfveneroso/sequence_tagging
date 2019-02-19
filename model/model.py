@@ -36,7 +36,7 @@ class SequenceModel:
       'pos_embeddings': True,
       'similarity_fn': 'scaled_dot', # rbf, dot, scaled_dot, cosine, bahdanau
       'regularization_fn': 'softmax', # softmax, tanh, linear
-      'queries': 'mid_layer', # embeddings, mid_layer
+      'queries': 'mid_layer', # embeddings, mid_layer, html
       'keys': 'mid_layer', # embeddings, mid_layer
       'queries_eq_keys': False,
       'mask': True,
@@ -367,13 +367,15 @@ class SequenceModel:
     if self.params['html_embeddings']:
       html_embs, html_embs_size = self.html_embeddings()
       css_embs, css_embs_size = self.css_embeddings()
+      html_embs = tf.concat([html_embs, css_embs], axis=-1)
+
       embs.append(html_embs)
-      embs.append(css_embs)
-      emb_size += html_embs_size + css_embs_size
+      html_embs_size = html_embs_size + css_embs_size
+      emb_size += html_embs_size
 
     embs = tf.concat(embs, axis=-1)
     embs = self.dropout(embs)
-    return embs, emb_size
+    return embs, html_embs, emb_size, html_embs_size
 
   def lstm(self, x, lstm_size, var_scope='lstm'):
     with tf.variable_scope(var_scope):
@@ -419,7 +421,7 @@ class SequenceModel:
   def mid_layer(self, x):
     return self.lstm(x, self.params['lstm_size']), 2 * self.params['lstm_size']
 
-  def single_block_transformer(self, x, x_size):
+  def single_block_transformer(self, x, x_size, html_embs, html_embs_size):
     if self.params['queries'] == self.params['keys'] == 'embeddings':
       if self.params['pos_embeddings']:
         x = self.pos_embeddings(x, x_size)
@@ -437,6 +439,9 @@ class SequenceModel:
       elif self.params['queries'] == 'mid_layer':
         queries = mid_output
         pos_emb_size = mid_size
+      elif self.params['queries'] == 'html':
+        queries = html 
+        pos_emb_size = html_embs_size
       else:
         raise Exception('Invalid queries value')
 
@@ -460,12 +465,12 @@ class SequenceModel:
     self.create_placeholders()
 
     with tf.name_scope('embeddings'):
-      embs, emb_size = self.embeddings_layer()
+      embs, html_embs, emb_size, html_embs_size = self.embeddings_layer()
    
     if self.params['use_attention']:
       with tf.name_scope('transformer'):
         if self.params['num_blocks'] == 1:
-            output = self.single_block_transformer(embs, emb_size) 
+            output = self.single_block_transformer(embs, emb_size, html_embs, html_embs_size) 
         else:
           output = self.transformer(embs, emb_size) 
     else:
