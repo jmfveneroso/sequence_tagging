@@ -12,17 +12,17 @@ if [[ $user == "root" ]]; then
     f=${f:10}
     echo "Running $filename ($f)..."
     mkdir -p results/$f
-    python run.py train -j $filename > results/$f/${f}.log
-    ./eval.sh >> results/$f/${f}.log
+    python run.py train -j $filename > results/$f/log.txt
+    ./eval.sh >> results/$f/log.txt
 
     if [ "$(ls -A checkpoints)" ]; then
       cp checkpoints/* results/$f/
     fi
 
-    python run.py print_matrices >> results/$f/${f}.log
-    if [ "$(ls -A figures)" ]; then
-      mv figures/* results/$f/
-    fi
+    # python run.py print_matrices >> results/$f/${f}.log
+    # if [ "$(ls -A figures)" ]; then
+    #   mv figures/* results/$f/
+    # fi
     if [ "$(ls -A results/score)" ]; then
       mv results/score/* results/$f/
     fi

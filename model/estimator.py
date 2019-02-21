@@ -11,7 +11,6 @@ import time
 from model.data_loader import DL
 from model.metrics import evaluate
 from model.model import SequenceModel
-np.set_printoptions(threshold=np.nan)
 
 params = None
 
@@ -37,15 +36,17 @@ class Estimator:
     print('\t'.join([str(p) for p in self.params]))
     print('\t'.join([str(self.params[p]) for p in self.params]))
 
-  def restore(self, sess):
+  def restore(self, sess, restore_params=False):
     model_base = './checkpoints/model.ckpt'
     saver = tf.train.import_meta_graph(model_base + '.meta')
     sess.run([tf.tables_initializer()])
     saver.restore(sess, model_base)
 
-    with Path(model_base + '.params.json').open('r') as f:
-      self.params = json.load(f)
-    print('Restoring best model from epoch %s' % (self.params['current_epoch']))
+    if restore_params:
+      with Path(model_base + '.params.json').open('r') as f:
+        self.params = json.load(f)
+      print('Restoring best model from epoch %s' % (self.params['current_epoch']))
+    print('Restoring model...')
 
     return saver
   
@@ -116,14 +117,12 @@ class Estimator:
 
     return m, (preds, tags, words)
 
-  def train(self, fine_tune=False):
+  def train(self, restore=False):
     with tf.Session() as sess:  
       start_time = time.time()
 
-      if fine_tune:
+      if restore:
         saver = self.restore(sess)
-        self.learning_rate = 0.0001
-        self.params['epochs'] = self.params['current_epoch'] + 10
       else:      
         SequenceModel(self.params).create()
         sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
@@ -140,8 +139,6 @@ class Estimator:
           self.save_model(sess, saver)
 
     print('Elapsed time: %.4f' % (time.time() - start_time))
-    # if not fine_tune:
-    #   self.train(fine_tune=True)
   
   def test(self):
     with tf.Session() as sess:

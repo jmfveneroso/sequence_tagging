@@ -101,7 +101,18 @@ if sys.argv[1] == 'train':
       'datadir': 'data/small_dataset'
     })
 
+  # Pre train. 
+  estimator.set_dataset_params({
+    'fulldoc': False,
+    'batch_size': 1,
+    'epochs': 1
+  })
   estimator.train()
+
+  if not json_file is None:
+    estimator.load_params_from_file(json_file)
+  estimator.train(restore=True)
+
   estimator.test()
 
 if sys.argv[1] == 'params':

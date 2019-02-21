@@ -194,5 +194,10 @@ class DL:
       params = params if params is not None else {}
       self.params.update(params)
 
+      if self.params['datadir'] == 'data/conll2003':
+        self.params['label_col'] = 3
+      elif self.params['datadir'] == 'data/ner_on_html':
+        self.params['label_col'] = 1
+
       if self.params['fulldoc']:
         self.params['batch_size'] = 1
