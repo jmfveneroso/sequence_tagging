@@ -1,4 +1,7 @@
+set -e
+
 user="$(whoami)"
+
 if [[ $user == "root" ]]; then
   # for filename in ./configs/*.json; do
   while true; do
@@ -26,6 +29,7 @@ if [[ $user == "root" ]]; then
     if [ "$(ls -A results/score)" ]; then
       mv results/score/* results/$f/
     fi
+
     mv ./configs/$f.json ./configs/$f.json.done
   done
   echo 'Done!!!'

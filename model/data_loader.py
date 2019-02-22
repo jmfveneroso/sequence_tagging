@@ -54,7 +54,7 @@ def prepare_dataset(sentences, mode='sentences', label_col=3, feature_cols=[], t
     separator_fn = lambda el : el[0][0] == '-DOCSTART-'
     documents = split_array(sentences, separator_fn)
 
-    # Shuffle sentences in document.
+    # Shuffle sentences inside document.
     if training:
       for i, d in enumerate(documents):
         random.shuffle(documents[i])
@@ -66,9 +66,12 @@ def prepare_dataset(sentences, mode='sentences', label_col=3, feature_cols=[], t
       return documents
 
     elif mode == 'batch_sentences':
-      documents = [group_by_n(d, lambda el : el[0] == 'EOS', 5, eos) for d in documents]
-      batches = [s for d in documents for s in d]
-      return batches
+      n = 120
+      sentences = []
+      for d in documents:
+        for i in range(0, len(d), n):
+          sentences.append(d[i:i+n])
+      return sentences
 
     else: 
       raise Exception('Invalid mode.') 
@@ -139,7 +142,7 @@ class DL:
 
       if self.params['fulldoc']:
         mode = 'documents'
-      elif self.params['splitsentence']:
+      if self.params['splitsentence']:
         mode = 'batch_sentences'
       sentences = prepare_dataset(sentences, mode=mode, label_col=label_col, feature_cols=feature_cols, training=training)
 

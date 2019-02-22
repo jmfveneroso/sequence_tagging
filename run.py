@@ -104,7 +104,8 @@ if sys.argv[1] == 'train':
   # Pre train. 
   estimator.set_dataset_params({
     'fulldoc': False,
-    'batch_size': 1,
+    'splitsentence': False,
+    'batch_size': 10,
     'epochs': 1
   })
   estimator.train()

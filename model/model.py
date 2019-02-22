@@ -4,7 +4,7 @@ import tensorflow as tf
 from pathlib import Path
 import tensorflow_hub as hub
 from model.char_representations import get_char_representations, get_char_embeddings
-from model.attention import attention
+from model.attention import attention, exact_attention
 from model.word_embeddings import glove, elmo
 from model.html_embeddings import get_html_representations
 
@@ -113,7 +113,7 @@ class SequenceModel:
     embs = self.dropout(embs)
     return self.lstm(embs, self.params['lstm_size'])
 
-  def self_attention(self, num_heads=5, residual='add', queries_eq_keys=False):
+  def self_attention(self, num_heads=2, residual='add', queries_eq_keys=False):
     word_embs = glove(self.words, self.params['words'], self.params['glove'])
     char_embs = get_char_representations(
       self.chars, self.nchars, 
@@ -126,7 +126,8 @@ class SequenceModel:
       self.params['chars'], training=self.training
     )
 
-    embs = tf.concat([word_embs, char_embs, html_embs], axis=-1)
+    # embs = tf.concat([word_embs, char_embs, html_embs], axis=-1)
+    embs = tf.concat([word_embs, html_embs], axis=-1)
     embs = self.dropout(embs)
     output = self.lstm(embs, self.params['lstm_size'])
 
@@ -136,7 +137,7 @@ class SequenceModel:
       training=self.training
     )
 
-  def html_attention(self, num_heads=5, residual='concat'):
+  def html_attention(self, num_heads=2, residual='add'):
     word_embs = glove(self.words, self.params['words'], self.params['glove'])
     char_embs = get_char_representations(
       self.chars, self.nchars, 
@@ -147,29 +148,37 @@ class SequenceModel:
     embs = tf.concat([word_embs, char_embs], axis=-1)
     embs = self.dropout(embs)
     output = self.lstm(embs, self.params['lstm_size'])
+    output = self.dropout(output)
 
     html_embs = get_html_representations(
       self.html, self.params['html_tags'],
       self.css_chars, self.css_lengths,
       self.params['chars'], training=self.training
     )
-    html_embs = self.dropout(html_embs)
+    # html_embs = self.dropout(html_embs)
 
-    return attention(
-      html_embs, output, num_heads,
-      residual=residual, queries_eq_keys=False,
-      training=self.training
-    )
+    return exact_attention(html_embs, html_embs, output, residual=residual, training=self.training)
 
-  def transformer(self, num_blocks=2, num_heads=5, mid_layer='lstm'):
+    # return attention(
+    #   html_embs, html_embs, num_heads, values=output,
+    #   residual=residual, queries_eq_keys=True,
+    #   training=self.training
+    # )
+
+  def transformer(self, num_blocks=2, num_heads=2, mid_layer='feed_forward'):
     word_embs = glove(self.words, self.params['words'], self.params['glove'])
     char_embs = get_char_representations(
       self.chars, self.nchars, 
       self.params['chars'], mode='lstm',
       training=self.training
     )
+    html_embs = get_html_representations(
+      self.html, self.params['html_tags'],
+      self.css_chars, self.css_lengths,
+      self.params['chars'], training=self.training
+    )
 
-    embs = tf.concat([word_embs, char_embs], axis=-1)
+    embs = tf.concat([word_embs, html_embs, char_embs], axis=-1)
     x = self.dropout(embs)
 
     for i in range(num_blocks):
@@ -181,7 +190,8 @@ class SequenceModel:
       # Bidirectional LSTM will output a tensor with a shape that is twice 
       # the hidden layer size.
       if mid_layer == 'feed_forward':
-        x = tf.layers.dense(tf.layers.dense(x, 200), 200)
+        x = tf.layers.dense(x, 200)
+        x = tf.layers.dense(x, 200)
       elif mid_layer == 'lstm':
         x = self.lstm(x, x.shape[2].value / 2, var_scope='transformer_' + str(i)) + x 
     return x 

@@ -1,0 +1,14 @@
+{
+    "batch_size": 1,
+    "best_f1": 0.692779888921368,
+    "char_representation": "cnn",
+    "current_epoch": 0,
+    "datadir": "data/ner_on_html",
+    "decoder": "crf",
+    "epochs": 1,
+    "fulldoc": false,
+    "lstm_size": 100,
+    "model": "html_attention",
+    "splitsentence": false,
+    "word_embeddings": "glove"
+}

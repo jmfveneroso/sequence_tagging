@@ -12,15 +12,29 @@ def get_html_embeddings(html, html_vocab_file):
 
   html_tags = tf.slice(html, [0, 0, 0], [-1, -1, 2])
   html_tag_ids = vocab_html.lookup(html_tags)
+  return html_tag_ids 
 
   html_embedding_size = 50
   v = tf.get_variable('html_embeddings', [num_html_tags + 1, html_embedding_size], tf.float32)
   html_embeddings = tf.nn.embedding_lookup(v, html_tag_ids)
-  timesteps = tf.shape(html_tags)[1]
-  html_embeddings = tf.reshape(html_embeddings, [-1, timesteps, html_embedding_size*2])
+  # timesteps = tf.shape(html_tags)[1]
+  # html_embeddings = tf.reshape(html_embeddings, [-1, timesteps, html_embedding_size*2])
+  html_embeddings = tf.reduce_sum(html_embeddings, axis=-2)
   return html_embeddings
 
-def get_css_embeddings(css_chars, css_lengths, char_vocab_file, training=False):
+def get_css_embeddings(html, css_chars, css_lengths, char_vocab_file, training=False):
+  with Path('data/ner_on_html/vocab.css.txt').open() as f:
+    num_css_classes = sum(1 for _ in f) + 1
+  
+  vocab_css = tf.contrib.lookup.index_table_from_file(
+    'data/ner_on_html/vocab.css.txt', num_oov_buckets=1
+  )
+
+  css_class = tf.slice(html, [0, 0, 2], [-1, -1, 1])
+  css_class_ids = vocab_css.lookup(css_class)
+  return css_class_ids
+
+
   lstm_size = 25
   char_embedding_size = 50
 
@@ -31,7 +45,7 @@ def get_css_embeddings(css_chars, css_lengths, char_vocab_file, training=False):
 def get_html_representations(html, html_vocab_file, css_chars, css_lengths, char_vocab_file, training=False):
   html_embs = get_html_embeddings(html, html_vocab_file)
   css_embs = get_css_embeddings(
-    css_chars, css_lengths,
+    html, css_chars, css_lengths,
     char_vocab_file, training=training
   )
 
