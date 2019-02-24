@@ -113,23 +113,18 @@ class SequenceModel:
     embs = self.dropout(embs)
     return self.lstm(embs, self.params['lstm_size'])
 
-  def self_attention(self, num_heads=2, residual='add', queries_eq_keys=False):
+  def self_attention(self, num_heads=1, residual='concat', queries_eq_keys=False):
     word_embs = glove(self.words, self.params['words'], self.params['glove'])
     char_embs = get_char_representations(
       self.chars, self.nchars, 
       self.params['chars'], mode='lstm',
       training=self.training
     )
-    html_embs = get_html_representations(
-      self.html, self.params['html_tags'],
-      self.css_chars, self.css_lengths,
-      self.params['chars'], training=self.training
-    )
 
-    # embs = tf.concat([word_embs, char_embs, html_embs], axis=-1)
-    embs = tf.concat([word_embs, html_embs], axis=-1)
+    embs = tf.concat([word_embs, char_embs], axis=-1)
     embs = self.dropout(embs)
     output = self.lstm(embs, self.params['lstm_size'])
+    output = self.dropout(output)
 
     return attention(
       output, output, num_heads,
@@ -165,20 +160,15 @@ class SequenceModel:
     #   training=self.training
     # )
 
-  def transformer(self, num_blocks=2, num_heads=2, mid_layer='feed_forward'):
+  def transformer(self, num_blocks=2, num_heads=1, mid_layer='feed_forward'):
     word_embs = glove(self.words, self.params['words'], self.params['glove'])
     char_embs = get_char_representations(
       self.chars, self.nchars, 
       self.params['chars'], mode='lstm',
       training=self.training
     )
-    html_embs = get_html_representations(
-      self.html, self.params['html_tags'],
-      self.css_chars, self.css_lengths,
-      self.params['chars'], training=self.training
-    )
 
-    embs = tf.concat([word_embs, html_embs, char_embs], axis=-1)
+    embs = tf.concat([word_embs, char_embs], axis=-1)
     x = self.dropout(embs)
 
     for i in range(num_blocks):
@@ -187,12 +177,12 @@ class SequenceModel:
         training=self.training
       )
 
-      # Bidirectional LSTM will output a tensor with a shape that is twice 
-      # the hidden layer size.
       if mid_layer == 'feed_forward':
         x = tf.layers.dense(x, 200)
         x = tf.layers.dense(x, 200)
       elif mid_layer == 'lstm':
+        # Bidirectional LSTM will output a tensor with a shape that is twice 
+        # the hidden layer size.
         x = self.lstm(x, x.shape[2].value / 2, var_scope='transformer_' + str(i)) + x 
     return x 
 
