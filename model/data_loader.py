@@ -28,12 +28,6 @@ def join_arrays(arr, separator):
     res += el + [separator]
   return res
 
-def group_by_n(doc, separator_fn, n, eos):
-  arr = []
-  for i in range(0, len(doc), n):
-    arr.append(join_arrays(doc[i:i+n], eos))
-  return arr
-
 def pad_array(arr, padding, max_len):
   return arr + [padding] * (max_len - len(arr))
 
@@ -65,12 +59,25 @@ def prepare_dataset(sentences, mode='sentences', label_col=3, feature_cols=[], t
     if mode == 'documents':
       return documents
 
-    elif mode == 'batch_sentences':
-      n = 120
+    elif mode == 'batch':
+      n = 10
       sentences = []
       for d in documents:
-        for i in range(0, len(d), n):
-          sentences.append(d[i:i+n])
+        cur_sentence = []
+        eos_count = 0 
+        for t in d:
+          if t[0] == 'EOS':
+            eos_count += 1
+
+          if eos_count > n:
+            eos_count = 0
+            sentences.append(cur_sentence)
+            cur_sentence = []
+          else:
+            cur_sentence.append(t)
+
+        if len(cur_sentence) > 0:
+          sentences.append(cur_sentence)
       return sentences
 
     else: 
@@ -143,7 +150,7 @@ class DL:
       if self.params['fulldoc']:
         mode = 'documents'
       if self.params['splitsentence']:
-        mode = 'batch_sentences'
+        mode = 'batch'
       sentences = prepare_dataset(sentences, mode=mode, label_col=label_col, feature_cols=feature_cols, training=training)
 
       for s in sentences:
@@ -204,3 +211,121 @@ class DL:
 
       if self.params['fulldoc']:
         self.params['batch_size'] = 1
+
+class NerOnHtml:
+  def __init__(self, params=None):
+    self.params = {
+      'batch_size': 1,
+      'datadir': 'data/ner_on_html',
+      'dataset_mode': ('sentences', 'document', 'batch')[0]
+    }
+    self.set_params(params)
+
+  def set_params(self, params=None):
+    params = params if params is not None else {}
+    self.params.update(params)
+
+  def parse_sentence(self, sentence):
+    # Encode in Bytes for Tensorflow.
+    words = [s[0] for s in sentence]
+    tags = [s[1].encode() for s in sentence]
+
+    # Chars.
+    chars = [[c.encode() for c in w] for w in words]
+    lengths = [len(c) for c in chars]
+    chars = [pad_array(c, b'<pad>', max(lengths)) for c in chars]
+    
+    # Feature vector. 
+    features = [[float(f) for f in s[2][:9]] for s in sentence]
+
+    # HTML features.
+    html_features = [[f.encode() for f in s[2][9:]] for s in sentence]
+    html_features = [pad_array(f, b'<pad>', 3) for f in html_features]
+
+    # CSS Chars.
+    css_chars = [[c.encode() for c in f[2].decode()] for f in html_features]
+    css_lengths = [len(c) for c in css_chars]
+    css_chars = [pad_array(c, b'<pad>', max(css_lengths)) for c in css_chars]
+    
+    words = [s[0].encode() for s in sentence]    
+    return (
+      (
+        ( (words, len(words)), (chars, lengths) ),
+        ( features, html_features, (css_chars, css_lengths) ), 
+      ),
+      tags
+    )
+    
+  def generator_fn(self, filename, training=False):
+    sentences = get_sentences(Path(self.params['datadir'], filename))
+
+    # Split HTML tag feature.
+    for i, s in enumerate(sentences):
+      for j, t in enumerate(s):
+        if t[0] != '-DOCSTART-':
+          sentences[i][j] = t[:13] + t[13].split('.') + t[14:]
+
+    sentences = prepare_dataset(
+      sentences, mode=self.params['dataset_mode'], 
+      label_col=1, feature_cols=range(3, 15), 
+      training=training
+    )
+
+    for s in sentences:
+      yield self.parse_sentence(s)
+        
+  def input_fn(self, filename, training=False):
+    shapes = (
+      (
+        (
+          ([None], ()), # (words, nwords)
+          ([None, None], [None]), # (chars, nchars)  
+        ),
+        (
+          [None, None], # features
+          [None, None], # html_features
+          ([None, None], [None]), # (css_chars, css_lengths)  
+        )
+      ),
+      [None] # tags
+    )
+  
+    types = (
+      (
+        (
+          (tf.string, tf.int32),
+          (tf.string, tf.int32),  
+        ),
+        (
+          tf.float32,
+          tf.string,
+          (tf.string, tf.int32)
+        )
+      ),  
+      tf.string
+    )
+  
+    defaults = (
+      (
+        (
+          ('<pad>', 0),
+          ('<pad>', 0), 
+        ),
+        (
+          0.0,
+          '<pad>',
+          ('<pad>', 0)
+        )
+      ), 
+      'O'
+    )
+  
+    dataset = tf.data.Dataset.from_generator(
+      functools.partial(self.generator_fn, filename, training=training),
+      output_types=types, output_shapes=shapes
+    )
+  
+    if training:
+      dataset = dataset.shuffle(15000)
+ 
+    return dataset.padded_batch(self.params['batch_size'], shapes, defaults)

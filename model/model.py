@@ -18,7 +18,8 @@ class SequenceModel:
       'decoder': 'crf', # crf, logits.
       'char_representation': 'cnn',
       'word_embeddings': 'glove', # glove, elmo. TODO: bert.
-      'model': 'lstm_crf', # lstm_crf, html_attention, self_attention, transformer
+      'model': 'lstm_crf', # lstm_crf, html_attention, self_attention, transformer, crf
+      'use_features': False, 
     }
     params = params if params is not None else {}
     self.params.update(params)
@@ -42,6 +43,7 @@ class SequenceModel:
       self.nwords        = tf.placeholder(tf.int32,   shape=(None,),            name='nwords'      )
       self.chars         = tf.placeholder(tf.string,  shape=(None, None, None), name='chars'       )
       self.nchars        = tf.placeholder(tf.int32,   shape=(None, None),       name='nchars'      )
+      self.features      = tf.placeholder(tf.float32, shape=(None, None, None), name='features'    )
       self.html          = tf.placeholder(tf.string,  shape=(None, None, None), name='html'        )
       self.css_chars     = tf.placeholder(tf.string,  shape=(None, None, None), name='css_chars'   )
       self.css_lengths   = tf.placeholder(tf.int32,   shape=(None, None),       name='css_lengths' )
@@ -93,6 +95,30 @@ class SequenceModel:
       )
       pred_strings = reverse_vocab_tags.lookup(tf.to_int64(pred_ids))  
 
+  def crf(self, word_embs='glove', char_embs='cnn', use_features=False):
+    if word_embs == 'elmo':
+      word_embs = elmo(self.words, self.nwords)
+    elif word_embs == 'glove':
+      word_embs = glove(self.words, self.params['words'], self.params['glove'])
+    else:
+      raise Exception('No word embeddings were selected.')
+
+    embs = [word_embs]
+    if char_embs in ['cnn', 'lstm']:
+      char_embs = get_char_representations(
+        self.chars, self.nchars, 
+        self.params['chars'], mode=char_embs,
+        training=self.training
+      )
+      embs.append(char_embs)
+
+    if use_features:
+      embs.append(self.features)
+
+    embs = tf.concat(embs, axis=-1)
+    embs = self.dropout(embs)
+    return embs
+
   def lstm_crf(self, word_embs='glove', char_embs='cnn'):
     if word_embs == 'elmo':
       word_embs = elmo(self.words, self.nwords)
@@ -132,11 +158,11 @@ class SequenceModel:
       training=self.training
     )
 
-  def html_attention(self, num_heads=2, residual='add'):
+  def html_attention(self, char_embs='cnn', num_heads=2, residual='add'):
     word_embs = glove(self.words, self.params['words'], self.params['glove'])
     char_embs = get_char_representations(
       self.chars, self.nchars, 
-      self.params['chars'], mode='lstm',
+      self.params['chars'], mode=char_embs,
       training=self.training
     )
 
@@ -178,8 +204,8 @@ class SequenceModel:
       )
 
       if mid_layer == 'feed_forward':
-        x = tf.layers.dense(x, 200)
-        x = tf.layers.dense(x, 200)
+        x = tf.nn.relu(tf.layers.dense(x, 100))
+        x = tf.layers.dense(x, 100)
       elif mid_layer == 'lstm':
         # Bidirectional LSTM will output a tensor with a shape that is twice 
         # the hidden layer size.
@@ -193,11 +219,13 @@ class SequenceModel:
     if model == 'lstm_crf':
       output = self.lstm_crf(char_embs=self.params['char_representation'])
     elif model == 'html_attention':
-      output = self.html_attention()
+      output = self.html_attention(char_embs=self.params['char_representation'])
     elif model == 'self_attention':
       output = self.self_attention()
     elif model == 'transformer':
       output = self.transformer()
+    elif model == 'crf':
+      output = self.crf(char_embs=self.params['char_representation'], use_features=self.params['use_features'])
     else:
       raise Exception('Model does not exist.')
 

@@ -8,7 +8,7 @@ from model.cnn import masked_conv1d_and_max
 import numpy as np
 from IPython.display import clear_output, display
 import time
-from model.data_loader import DL
+from model.data_loader import DL, NerOnHtml
 from model.metrics import evaluate
 from model.model import SequenceModel
 
@@ -22,6 +22,7 @@ class Estimator:
       'best_f1': 0,
     }
     self.learning_rate = 0.001
+    self.dataset = None
 
   def set_dataset_params(self, new_params):
     self.params.update(new_params)
@@ -60,12 +61,13 @@ class Estimator:
     print("Model saved in path: %s" % save_path) 
 
   def get_dict(self, features, labels, train):
-    (words, nwords), (chars, nchars), html, (css_chars, css_lengths) = features
+    ((words, nwords), (chars, nchars)), (f_vector, html, (css_chars, css_lengths)) = features
     return {
       'inputs/words:0': words,
       'inputs/nwords:0': nwords,
       'inputs/chars:0': chars,
       'inputs/nchars:0': nchars,
+      'inputs/features:0': f_vector,
       'inputs/html:0': html,
       'inputs/css_chars:0': css_chars,
       'inputs/css_lengths:0': css_lengths,
@@ -77,7 +79,7 @@ class Estimator:
   def run_epoch(self, sess, filename, train=False, epoch_num=0):
     start_time = time.time()
       
-    iterator = DL().input_fn(filename, training=train).make_initializable_iterator()
+    iterator = self.dataset.input_fn(filename, training=train).make_initializable_iterator()
     next_el = iterator.get_next()
     sess.run(iterator.initializer)
    
@@ -85,7 +87,7 @@ class Estimator:
     for step in range(1, 1000000):
       try:
         features, labels = sess.run(next_el)
-        (words_, nwords_), (chars, nchars), html, (css_chars, css_lengths) = features
+        ((words_, nwords_), (chars, nchars)), _ = features
   
         target = [
           'output/loss:0', 
@@ -127,7 +129,7 @@ class Estimator:
         SequenceModel(self.params).create()
         sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
         saver = tf.train.Saver()
-      DL().set_params(self.params)
+      self.dataset = NerOnHtml(self.params)
   
       for epoch in range(self.params['current_epoch'], self.params['epochs']):
         _, _ = self.run_epoch(sess, 'train', epoch_num=epoch, train=True)
@@ -143,7 +145,7 @@ class Estimator:
   def test(self):
     with tf.Session() as sess:
       _ = self.restore(sess)
-      DL().set_params(self.params)
+      self.dataset = NerOnHtml(self.params)
       
       for name in ['train', 'valid', 'test']:
         _, (p, t, w) = self.run_epoch(sess, name)
@@ -160,25 +162,26 @@ class Estimator:
                 f.write(b'\n')
   
   def get_alphas(self, filename, doc):
-    with tf.Session() as sess:
-      _ = self.restore(sess)
+    pass
+    # with tf.Session() as sess:
+    #   _ = self.restore(sess)
   
-      features, labels = DL().get_doc(filename, doc)
-      (words, nwords), (chars, nchars), html, (css_chars, css_lengths) = features
+    #   features, labels = DL().get_doc(filename, doc)
+    #   (words, nwords), (chars, nchars), html, (css_chars, css_lengths) = features
   
-      target = ['output/index_to_string_Lookup:0']
-      try:
-        tf.get_default_graph().get_tensor_by_name('transformer/alphas:0')
-        target.append('transformer/alphas:0')
-      except:
-        pass
-     
-      feed_dict = self.get_dict(features, labels, False)
-      r = sess.run(target, feed_dict=feed_dict)
+    #   target = ['output/index_to_string_Lookup:0']
+    #   try:
+    #     tf.get_default_graph().get_tensor_by_name('transformer/alphas:0')
+    #     target.append('transformer/alphas:0')
+    #   except:
+    #     pass
+    #  
+    #   feed_dict = self.get_dict(features, labels, False)
+    #   r = sess.run(target, feed_dict=feed_dict)
  
-      words = words[0] 
-      preds  = r[0][0]
-      labels = labels[0]
-      alphas = np.mean(r[1], axis=0) if len(r) > 1 else []
-      
-      return words, alphas, preds, labels
+    #   words = words[0] 
+    #   preds  = r[0][0]
+    #   labels = labels[0]
+    #   alphas = np.mean(r[1], axis=0) if len(r) > 1 else []
+    #   
+    #   return words, alphas, preds, labels

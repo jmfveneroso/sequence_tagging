@@ -100,20 +100,20 @@ def attention(queries, keys, num_heads, values=None, residual='add', use_pos_emb
   attention = dot_product(Q_, K_, scaled=True)
 
   # Key Masking.
-  # key_masks = tf.sign(tf.reduce_sum(tf.abs(K), axis=-1))
-  # key_masks = tf.tile(key_masks, [num_heads, 1])
-  # key_masks = tf.tile(tf.expand_dims(key_masks, 1), [1, tf.shape(Q)[1], 1])
-  # paddings = tf.ones_like(attention)*(-2**32+1)
-  # attention = tf.where(tf.equal(key_masks, 0), paddings, attention)
+  key_masks = tf.sign(tf.reduce_sum(tf.abs(K), axis=-1))
+  key_masks = tf.tile(key_masks, [num_heads, 1])
+  key_masks = tf.tile(tf.expand_dims(key_masks, 1), [1, tf.shape(Q)[1], 1])
+  paddings = tf.ones_like(attention)*(-2**32+1)
+  attention = tf.where(tf.equal(key_masks, 0), paddings, attention)
 
   # Regularization.
   alphas = tf.nn.softmax(attention, name='alphas')
 
   # Query Masking
-  # query_masks = tf.sign(tf.reduce_sum(tf.abs(Q), axis=-1))
-  # query_masks = tf.tile(query_masks, [num_heads, 1])
-  # query_masks = tf.tile(tf.expand_dims(query_masks, -1), [1, 1, tf.shape(K)[1]])
-  # alphas *= query_masks
+  query_masks = tf.sign(tf.reduce_sum(tf.abs(Q), axis=-1))
+  query_masks = tf.tile(query_masks, [num_heads, 1])
+  query_masks = tf.tile(tf.expand_dims(query_masks, -1), [1, 1, tf.shape(K)[1]])
+  alphas *= query_masks
 
   alphas = tf.layers.dropout(alphas, rate=0.5, training=training)
   outputs = tf.matmul(alphas, V_)
@@ -125,7 +125,7 @@ def attention(queries, keys, num_heads, values=None, residual='add', use_pos_emb
     outputs = tf.concat([outputs, values], axis=-1)
 
   # Layer normalization.
-  # outputs = normalize(outputs)
+  outputs = normalize(outputs)
   return outputs
 
 def exact_attention(queries, keys, values, residual='add', training=False):
