@@ -166,7 +166,7 @@ if sys.argv[1] == 'hmm':
     naive_bayes= naive_bayes,
     use_gazetteer=True,
     use_features=True,
-    self_train=True
+    self_train=False
   )
   hmm.fit(X, Y)
 

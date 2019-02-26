@@ -96,9 +96,9 @@ class SequenceModel:
           m_pos_tilde = tf.squeeze(tf.slice(probs, [0, 0, 1], [-1, -1, 1]), axis=-1)
           m_pos_tilde = tf.reduce_sum(m_pos_tilde, axis=-1, name='m_pos_tilde') 
 
-          alpha = 0.2
+          alpha = 0.8
           divisor = alpha * n_pos + (1 - alpha) * m_pos_tilde
-          loss = tf.divide(a_tilde + 0.01, divisor + 0.01)
+          loss = tf.divide(a_tilde, divisor)
           loss = tf.reduce_mean(-loss, name='loss')
 
         else:

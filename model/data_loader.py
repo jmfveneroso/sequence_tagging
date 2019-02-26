@@ -60,7 +60,7 @@ def prepare_dataset(sentences, mode='sentences', label_col=3, feature_cols=[], t
       return documents
 
     elif mode == 'batch':
-      n = 30
+      n = 10
       sentences = []
       for d in documents:
         cur_sentence = []

@@ -93,12 +93,12 @@ class Estimator:
           'output/loss:0', 
           'output/accuracy:0', 
           'output/index_to_string_Lookup:0',
-          'output/m_pos_tilde:0',
-          'output/n_pos:0',
-          'output/a_tilde:0',
-          'output/a_tilde_prev:0',
-          'output/masked_a:0',
-          'output/mask:0',
+          # 'output/m_pos_tilde:0',
+          # 'output/n_pos:0',
+          # 'output/a_tilde:0',
+          # 'output/a_tilde_prev:0',
+          # 'output/masked_a:0',
+          # 'output/mask:0',
         ]
         if train:
           target.append('output/Adam')

@@ -1,4 +1,3 @@
-root@77b22e87d5c3:/code# python run.py train -j configs/test_139.json
 ===Model parameters===
 {
     "batch_size": 1,
@@ -344,3 +343,71 @@ Loss: -0.3097, Acc: 0.9238, Time: 9.7337, Step: 250
 Loss: -1.0000, Acc: 1.0000, Time: 11.2832, Step: 300
 valid - Epoch 8, Precision: 0.7938, Recall: 0.9066, F1: 0.8465
 Model saved in path: ./checkpoints/model.ckpt
+Loss: -0.8049, Acc: 0.9801, Time: 20.2080, Step: 50
+Loss: -0.8328, Acc: 1.0000, Time: 36.1422, Step: 100
+Loss: -0.7237, Acc: 0.9262, Time: 50.9441, Step: 150
+Loss: -0.6646, Acc: 0.9333, Time: 68.5814, Step: 200
+Loss: -0.8275, Acc: 1.0000, Time: 85.9683, Step: 250
+Loss: -0.7574, Acc: 0.9836, Time: 103.3096, Step: 300
+Loss: -0.7484, Acc: 0.9818, Time: 118.8642, Step: 350
+Loss: -0.8260, Acc: 1.0000, Time: 135.3536, Step: 400
+Loss: -0.8334, Acc: 1.0000, Time: 154.1885, Step: 450
+Loss: -0.7454, Acc: 0.9672, Time: 174.3612, Step: 500
+Loss: -0.8333, Acc: 1.0000, Time: 191.5399, Step: 550
+Loss: -0.8051, Acc: 0.9800, Time: 209.4740, Step: 600
+Loss: -0.8335, Acc: 1.0000, Time: 224.6411, Step: 650
+Loss: -0.8259, Acc: 0.9948, Time: 241.0555, Step: 700
+Loss: -0.8334, Acc: 1.0000, Time: 257.3218, Step: 750
+Loss: -1.0000, Acc: 1.0000, Time: 273.7908, Step: 800
+Loss: -0.8253, Acc: 1.0000, Time: 287.1249, Step: 841
+train - Epoch 9, Precision: 0.7976, Recall: 0.8571, F1: 0.8263
+Loss: -0.7767, Acc: 0.9882, Time: 2.3907, Step: 50
+Loss: -0.6058, Acc: 0.9762, Time: 4.3320, Step: 100
+Loss: -1.0000, Acc: 1.0000, Time: 5.6696, Step: 150
+Loss: -0.8335, Acc: 1.0000, Time: 7.1288, Step: 200
+Loss: -0.8334, Acc: 1.0000, Time: 8.5070, Step: 250
+Loss: -1.0000, Acc: 1.0000, Time: 9.9494, Step: 300
+Loss: -0.7034, Acc: 1.0000, Time: 11.4549, Step: 350
+Loss: -0.9999, Acc: 1.0000, Time: 11.4696, Step: 352
+test - Epoch 9, Precision: 0.7596, Recall: 0.8032, F1: 0.7808
+Loss: -0.8332, Acc: 1.0000, Time: 2.0588, Step: 50
+Loss: -0.8107, Acc: 0.9928, Time: 3.8481, Step: 100
+Loss: -0.7883, Acc: 0.9894, Time: 5.1185, Step: 150
+Loss: -0.8217, Acc: 0.9821, Time: 7.1995, Step: 200
+Loss: -0.3170, Acc: 0.9429, Time: 8.3097, Step: 250
+Loss: -1.0000, Acc: 1.0000, Time: 9.8969, Step: 300
+valid - Epoch 9, Precision: 0.7922, Recall: 0.8954, F1: 0.8406
+Loss: -0.7594, Acc: 0.9853, Time: 18.2508, Step: 50
+Loss: -0.7969, Acc: 0.9949, Time: 33.5267, Step: 100
+Loss: -0.8333, Acc: 1.0000, Time: 52.3896, Step: 150
+Loss: -0.7724, Acc: 0.9844, Time: 70.3847, Step: 200
+Loss: -0.8167, Acc: 0.9943, Time: 89.7061, Step: 250
+Loss: -0.7617, Acc: 0.9444, Time: 107.3703, Step: 300
+Loss: -0.8231, Acc: 0.9943, Time: 125.6132, Step: 350
+Loss: -0.8334, Acc: 1.0000, Time: 141.4258, Step: 400
+Loss: -0.7213, Acc: 0.9763, Time: 157.1476, Step: 450
+Loss: -0.6281, Acc: 0.9474, Time: 173.0347, Step: 500
+Loss: -0.8315, Acc: 1.0000, Time: 188.1769, Step: 550
+Loss: -0.7271, Acc: 0.9658, Time: 204.8750, Step: 600
+Loss: -0.8335, Acc: 1.0000, Time: 221.7609, Step: 650
+Loss: -0.8302, Acc: 1.0000, Time: 239.5730, Step: 700
+Loss: -0.8334, Acc: 1.0000, Time: 258.7285, Step: 750
+Loss: -0.0005, Acc: 0.7748, Time: 273.8102, Step: 800
+Loss: -0.8017, Acc: 0.9947, Time: 285.0483, Step: 841
+train - Epoch 10, Precision: 0.8046, Recall: 0.8578, F1: 0.8303
+Loss: -0.8264, Acc: 1.0000, Time: 2.4529, Step: 50
+Loss: -0.5635, Acc: 0.9762, Time: 4.4433, Step: 100
+Loss: -1.0000, Acc: 1.0000, Time: 5.8166, Step: 150
+Loss: -0.8318, Acc: 1.0000, Time: 7.2873, Step: 200
+Loss: -0.8295, Acc: 1.0000, Time: 8.8705, Step: 250
+Loss: -1.0000, Acc: 1.0000, Time: 10.5389, Step: 300
+Loss: -0.8693, Acc: 1.0000, Time: 12.1318, Step: 350
+Loss: -0.9997, Acc: 1.0000, Time: 12.1473, Step: 352
+test - Epoch 10, Precision: 0.7680, Recall: 0.7815, F1: 0.7747
+Loss: -0.7376, Acc: 0.9924, Time: 2.3707, Step: 50
+Loss: -0.8112, Acc: 0.9928, Time: 4.3238, Step: 100
+Loss: -0.7893, Acc: 0.9894, Time: 5.5890, Step: 150
+Loss: -0.8217, Acc: 0.9821, Time: 7.4147, Step: 200
+Loss: -0.2966, Acc: 0.9238, Time: 8.4722, Step: 250
+Loss: -1.0000, Acc: 1.0000, Time: 9.9916, Step: 300
+valid - Epoch 10, Precision: 0.7724, Recall: 0.8770, F1: 0.8214
