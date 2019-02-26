@@ -70,34 +70,36 @@ class SequenceModel:
 
   def output_layer(self, x):
     with tf.name_scope('output'):
-      logits = tf.layers.dense(x, self.num_tags)
-
       vocab_tags = tf.contrib.lookup.index_table_from_file(self.params['tags'])
       tags = vocab_tags.lookup(self.labels)
       if self.params['decoder'] == 'crf':
+        logits = tf.layers.dense(x, self.num_tags)
+
         transition_matrix = tf.get_variable("crf", [self.num_tags, self.num_tags], dtype=tf.float32)
         pred_ids, _ = tf.contrib.crf.crf_decode(logits, transition_matrix, self.nwords)
         log_likelihood, _ = tf.contrib.crf.crf_log_likelihood(logits, tags, self.nwords, transition_matrix)
         loss = tf.reduce_mean(-log_likelihood, name='loss')
       else:
-        pred_ids = tf.argmax(logits, axis=-1)
+        logits = tf.layers.dense(x, 2)
+
+        pred_ids = tf.argmax(logits, axis=-1)*2
 
         if self.params['loss'] == 'f1':
           probs = tf.nn.softmax(logits)
           
-          a_tilde = tf.squeeze(tf.slice(probs, [0, 0, 2], [-1, -1, 1]), axis=-1, name='a_tilde_prev')
+          a_tilde = tf.squeeze(tf.slice(probs, [0, 0, 1], [-1, -1, 1]), axis=-1, name='a_tilde_prev')
           mask = tf.cast(tf.equal(tags, 2), dtype=tf.float32, name='mask')
           masked_a = tf.multiply(a_tilde, mask, name='masked_a')
           a_tilde = tf.reduce_sum(masked_a, axis=-1, name='a_tilde')
 
-          n_pos = tf.divide(tf.reduce_sum(tf.cast(tags, dtype=tf.float32), axis=-1), 2.0, name='n_pos')
-          m_pos_tilde = tf.squeeze(tf.slice(probs, [0, 0, 2], [-1, -1, 1]), axis=-1)
+          n_pos = tf.reduce_sum(tf.cast(tags, dtype=tf.float32), axis=-1, name='n_pos')
+          m_pos_tilde = tf.squeeze(tf.slice(probs, [0, 0, 1], [-1, -1, 1]), axis=-1)
           m_pos_tilde = tf.reduce_sum(m_pos_tilde, axis=-1, name='m_pos_tilde') 
 
           alpha = 0.1
           divisor = alpha * n_pos + (1 - alpha) * m_pos_tilde
           loss = tf.divide(a_tilde + 0.001, divisor + 0.001)
-          loss = tf.reduce_mean(loss, name='loss')
+          loss = tf.reduce_mean(-loss, name='loss')
 
         else:
           labels = tf.one_hot(tags, self.num_tags)

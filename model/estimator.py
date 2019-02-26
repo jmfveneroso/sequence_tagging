@@ -116,8 +116,8 @@ class Estimator:
         print('mask:', r[8])
         print(words_)
  
-        for w, m in zip(words_[0], r[8][0]):
-          print(w, m)
+        for w, m, p in zip(words_[0], r[8][0], r[2][0]):
+          print(w, m, p)
   
         seqlens = nwords_.tolist()
         words += [w[:seqlens[i]] for i, w in enumerate(words_.tolist())]
