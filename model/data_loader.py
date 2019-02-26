@@ -53,14 +53,15 @@ def prepare_dataset(sentences, mode='sentences', label_col=3, feature_cols=[], t
       for i, d in enumerate(documents):
         random.shuffle(documents[i])
  
-    eos = ['EOS', 'O', ['-X-'] * len(feature_cols)]
+    eos = ['EOS', 'O', ['0'] * len(feature_cols)]
     documents = [join_arrays(d, eos) for d in documents]
+    documents = documents[:5]
 
     if mode == 'documents':
       return documents
 
     elif mode == 'batch':
-      n = 10
+      n = 50
       sentences = []
       for d in documents:
         cur_sentence = []
@@ -211,6 +212,102 @@ class DL:
 
       if self.params['fulldoc']:
         self.params['batch_size'] = 1
+
+class Conll2003:
+  def __init__(self, params=None):
+    self.params = {
+      'label_col': 3,
+      'batch_size': 1,
+      'buffer': 15000,
+      'datadir': 'data/conll2003',
+      'fulldoc': True,
+      'splitsentence': False,
+    }
+    self.set_params(params)
+
+  def set_params(self, params=None):
+    params = params if params is not None else {}
+    self.params.update(params)
+
+  def parse_sentence(self, sentence):
+    # Encode in Bytes for Tensorflow.
+    words = [s[0] for s in sentence]
+    tags = [s[1].encode() for s in sentence]
+
+    # Chars.
+    chars = [[c.encode() for c in w] for w in words]
+    lengths = [len(c) for c in chars]
+    chars = [pad_array(c, b'<pad>', max(lengths)) for c in chars]
+    
+    words = [s[0].encode() for s in sentence]    
+    return ((words, len(words)), (chars, lengths)), (), tags
+    
+  def generator_fn(self, filename, training=False):
+    sentences = get_sentences(Path(self.params['datadir'], filename))
+
+    mode = 'sentences'
+    label_col = 3
+    feature_cols = []
+    if self.params['datadir'] == 'data/ner_on_html':
+      label_col = 1
+      feature_cols = [13, 14, 15]
+      for i, s in enumerate(sentences):
+        for j, t in enumerate(s):
+          if t[0] != '-DOCSTART-':
+            sentences[i][j] = t[:13] + t[13].split('.') + t[14:]
+
+    if self.params['fulldoc']:
+      mode = 'documents'
+    if self.params['splitsentence']:
+      mode = 'batch'
+    sentences = prepare_dataset(sentences, mode=mode, label_col=label_col, feature_cols=feature_cols, training=training)
+
+    for s in sentences:
+      yield self.parse_sentence(s)
+        
+  def input_fn(self, filename, training=False):
+    shapes = (
+     (([None], ()),           # (words, nwords)
+     ([None, None], [None]),  # (chars, nchars)  
+     [None, None],            # html_features
+     ([None, None], [None])), # (css_chars, css_lengths)  
+     [None]                   # tags
+    )
+  
+    types = (
+      ((tf.string, tf.int32),
+      (tf.string, tf.int32),  
+      tf.string,
+      (tf.string, tf.int32)),  
+      tf.string
+    )
+  
+    defaults = (
+      (('<pad>', 0),
+      ('<pad>', 0), 
+      '<pad>',
+      ('<pad>', 0)), 
+      'O'
+    )
+  
+    dataset = tf.data.Dataset.from_generator(
+      functools.partial(self.generator_fn, filename, training=training),
+      output_types=types, output_shapes=shapes
+    )
+  
+    if training:
+      dataset = dataset.shuffle(self.params['buffer'])
+ 
+    return dataset.padded_batch(self.params['batch_size'], shapes, defaults)
+
+  def get_doc(self, filename, doc):
+    p1, p2 = self.params['fulldoc'], self.params['splitsentence']
+    self.params['fulldoc'], self.params['splitsentence'] = True, False
+    features, labels = [(f, l) for (f, l) in DL().generator_fn(filename)][doc]
+    self.params['fulldoc'], self.params['splitsentence'] = p1, p2
+    (words, nwords), (chars, nchars), html, (css_chars, css_lengths) = features
+    features = ([words], [nwords]), ([chars], [nchars])
+    return features, [labels]
 
 class NerOnHtml:
   def __init__(self, params=None):

@@ -6,7 +6,7 @@ import tensorflow_hub as hub
 from model.char_representations import get_char_representations, get_char_embeddings
 from model.attention import attention, exact_attention
 from model.word_embeddings import glove, elmo
-from model.html_embeddings import get_html_representations
+from model.html_embeddings import get_html_representations, get_soft_html_representations
 
 class SequenceModel:
   def __init__(self, params=None):
@@ -50,7 +50,7 @@ class SequenceModel:
       self.labels        = tf.placeholder(tf.string,  shape=(None, None),       name='labels'      )
       self.training      = tf.placeholder(tf.bool,    shape=(),                 name='training'    )
       self.learning_rate = tf.placeholder_with_default(
-        0.001, shape=(), name='learning_rate'      
+        0.00001, shape=(), name='learning_rate'      
       )
  
   def lstm(self, x, lstm_size, var_scope='lstm'):
@@ -75,20 +75,40 @@ class SequenceModel:
       vocab_tags = tf.contrib.lookup.index_table_from_file(self.params['tags'])
       tags = vocab_tags.lookup(self.labels)
       if self.params['decoder'] == 'crf':
-        crf_params = tf.get_variable("crf", [self.num_tags, self.num_tags], dtype=tf.float32)
-        pred_ids, _ = tf.contrib.crf.crf_decode(logits, crf_params, self.nwords)
-        log_likelihood, _ = tf.contrib.crf.crf_log_likelihood(logits, tags, self.nwords, crf_params)
+        transition_matrix = tf.get_variable("crf", [self.num_tags, self.num_tags], dtype=tf.float32)
+        pred_ids, _ = tf.contrib.crf.crf_decode(logits, transition_matrix, self.nwords)
+        log_likelihood, _ = tf.contrib.crf.crf_log_likelihood(logits, tags, self.nwords, transition_matrix)
         loss = tf.reduce_mean(-log_likelihood, name='loss')
       else:
         pred_ids = tf.argmax(logits, axis=-1)
-        labels = tf.one_hot(tags, self.num_tags)
-        loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
-          labels=labels, logits=logits
-        ), name='loss')
+
+        if self.params['loss'] == 'f1':
+          probs = tf.nn.softmax(logits)
+          
+          a_tilde = tf.squeeze(tf.slice(probs, [0, 0, 2], [-1, -1, 1]), axis=-1, name='a_tilde_prev')
+          mask = tf.cast(tf.equal(tags, 2), dtype=tf.float32, name='mask')
+          masked_a = tf.multiply(a_tilde, mask, name='masked_a')
+          a_tilde = tf.reduce_sum(masked_a, axis=-1, name='a_tilde')
+
+          n_pos = tf.divide(tf.reduce_sum(tf.cast(tags, dtype=tf.float32), axis=-1), 2.0, name='n_pos')
+          m_pos_tilde = tf.squeeze(tf.slice(probs, [0, 0, 2], [-1, -1, 1]), axis=-1)
+          m_pos_tilde = tf.reduce_sum(m_pos_tilde, axis=-1, name='m_pos_tilde') 
+
+          alpha = 0.1
+          divisor = alpha * n_pos + (1 - alpha) * m_pos_tilde
+          loss = tf.divide(a_tilde + 0.001, divisor + 0.001)
+          loss = tf.reduce_mean(loss, name='loss')
+
+        else:
+          labels = tf.one_hot(tags, self.num_tags)
+          loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
+            labels=labels, logits=logits
+          ), name='loss')
 
       correct = tf.equal(tf.to_int64(pred_ids), tags)
       accuracy = tf.reduce_mean(tf.cast(correct, tf.float32), name='accuracy')
-      train_step = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(loss)
+      # train_step = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(loss)
+      train_step = tf.train.GradientDescentOptimizer(learning_rate=self.learning_rate).minimize(loss)
 
       reverse_vocab_tags = tf.contrib.lookup.index_to_string_table_from_file(
         self.params['tags']
@@ -146,8 +166,13 @@ class SequenceModel:
       self.params['chars'], mode='lstm',
       training=self.training
     )
+    html_embs = get_soft_html_representations(
+      self.html, self.params['html_tags'],
+      self.css_chars, self.css_lengths,
+      self.params['chars'], training=self.training
+    )
 
-    embs = tf.concat([word_embs, char_embs], axis=-1)
+    embs = tf.concat([word_embs, char_embs, html_embs], axis=-1)
     embs = self.dropout(embs)
     output = self.lstm(embs, self.params['lstm_size'])
     output = self.dropout(output)

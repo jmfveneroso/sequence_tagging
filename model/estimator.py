@@ -8,7 +8,7 @@ from model.cnn import masked_conv1d_and_max
 import numpy as np
 from IPython.display import clear_output, display
 import time
-from model.data_loader import DL, NerOnHtml
+from model.data_loader import DL, NerOnHtml, Conll2003
 from model.metrics import evaluate
 from model.model import SequenceModel
 
@@ -93,18 +93,37 @@ class Estimator:
           'output/loss:0', 
           'output/accuracy:0', 
           'output/index_to_string_Lookup:0',
+          'output/m_pos_tilde:0',
+          'output/n_pos:0',
+          'output/a_tilde:0',
+          'output/a_tilde_prev:0',
+          'output/masked_a:0',
+          'output/mask:0',
         ]
         if train:
-          target.append('output/Adam')
+          # target.append('output/Adam')
+          target.append('output/GradientDescent')
 
         feed_dict = self.get_dict(features, labels, train)
         r = sess.run(target, feed_dict=feed_dict)
+        print('=============')
+        print('loss:', r[0])
+        print('mpos_tilde:', r[3])
+        print('n_pos:', r[4])
+        print('a_tilde:', r[5])
+        print('a_tilde_prev:', r[6])
+        print('masked_a:', r[7])
+        print('mask:', r[8])
+        print(words_)
+ 
+        for w, m in zip(words_[0], r[8][0]):
+          print(w, m)
   
         seqlens = nwords_.tolist()
         words += [w[:seqlens[i]] for i, w in enumerate(words_.tolist())]
         tags  += [l[:seqlens[i]] for i, l in enumerate(labels.tolist())]
         preds += [p[:seqlens[i]] for i, p in enumerate(r[2].tolist())]
-  
+
         if step % 50 == 0:
           print('Loss: %.4f, Acc: %.4f, Time: %.4f, Step: %d' % (r[0], r[1], time.time() - start_time, step))
       except tf.errors.OutOfRangeError:
@@ -130,6 +149,7 @@ class Estimator:
         sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
         saver = tf.train.Saver()
       self.dataset = NerOnHtml(self.params)
+      # self.dataset = Conll2003(self.params)
   
       for epoch in range(self.params['current_epoch'], self.params['epochs']):
         _, _ = self.run_epoch(sess, 'train', epoch_num=epoch, train=True)
@@ -146,6 +166,7 @@ class Estimator:
     with tf.Session() as sess:
       _ = self.restore(sess)
       self.dataset = NerOnHtml(self.params)
+      # self.dataset = Conll2003(self.params)
       
       for name in ['train', 'valid', 'test']:
         _, (p, t, w) = self.run_epoch(sess, name)
