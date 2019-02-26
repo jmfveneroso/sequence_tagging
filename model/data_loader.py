@@ -55,13 +55,12 @@ def prepare_dataset(sentences, mode='sentences', label_col=3, feature_cols=[], t
  
     eos = ['EOS', 'O', ['0'] * len(feature_cols)]
     documents = [join_arrays(d, eos) for d in documents]
-    documents = documents[:5]
 
     if mode == 'documents':
       return documents
 
     elif mode == 'batch':
-      n = 50
+      n = 30
       sentences = []
       for d in documents:
         cur_sentence = []

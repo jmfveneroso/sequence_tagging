@@ -50,7 +50,7 @@ class SequenceModel:
       self.labels        = tf.placeholder(tf.string,  shape=(None, None),       name='labels'      )
       self.training      = tf.placeholder(tf.bool,    shape=(),                 name='training'    )
       self.learning_rate = tf.placeholder_with_default(
-        0.00001, shape=(), name='learning_rate'      
+        0.001, shape=(), name='learning_rate'      
       )
  
   def lstm(self, x, lstm_size, var_scope='lstm'):
@@ -96,9 +96,9 @@ class SequenceModel:
           m_pos_tilde = tf.squeeze(tf.slice(probs, [0, 0, 1], [-1, -1, 1]), axis=-1)
           m_pos_tilde = tf.reduce_sum(m_pos_tilde, axis=-1, name='m_pos_tilde') 
 
-          alpha = 0.1
+          alpha = 0.2
           divisor = alpha * n_pos + (1 - alpha) * m_pos_tilde
-          loss = tf.divide(a_tilde + 0.001, divisor + 0.001)
+          loss = tf.divide(a_tilde + 0.01, divisor + 0.01)
           loss = tf.reduce_mean(-loss, name='loss')
 
         else:
@@ -109,8 +109,8 @@ class SequenceModel:
 
       correct = tf.equal(tf.to_int64(pred_ids), tags)
       accuracy = tf.reduce_mean(tf.cast(correct, tf.float32), name='accuracy')
-      # train_step = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(loss)
-      train_step = tf.train.GradientDescentOptimizer(learning_rate=self.learning_rate).minimize(loss)
+      train_step = tf.train.AdamOptimizer(learning_rate=self.learning_rate).minimize(loss)
+      # train_step = tf.train.GradientDescentOptimizer(learning_rate=self.learning_rate).minimize(loss)
 
       reverse_vocab_tags = tf.contrib.lookup.index_to_string_table_from_file(
         self.params['tags']

@@ -101,23 +101,23 @@ class Estimator:
           'output/mask:0',
         ]
         if train:
-          # target.append('output/Adam')
-          target.append('output/GradientDescent')
+          target.append('output/Adam')
+          # target.append('output/GradientDescent')
 
         feed_dict = self.get_dict(features, labels, train)
         r = sess.run(target, feed_dict=feed_dict)
-        print('=============')
-        print('loss:', r[0])
-        print('mpos_tilde:', r[3])
-        print('n_pos:', r[4])
-        print('a_tilde:', r[5])
-        print('a_tilde_prev:', r[6])
-        print('masked_a:', r[7])
-        print('mask:', r[8])
-        print(words_)
+        # print('=============')
+        # print('loss:', r[0])
+        # print('mpos_tilde:', r[3])
+        # print('n_pos:', r[4])
+        # print('a_tilde:', r[5])
+        # print('a_tilde_prev:', r[6])
+        # print('masked_a:', r[7])
+        # print('mask:', r[8])
+        # print(words_)
  
-        for w, m, p in zip(words_[0], r[8][0], r[2][0]):
-          print(w, m, p)
+        # for w, m, p in zip(words_[0], r[8][0], r[2][0]):
+        #   print(w, m, p)
   
         seqlens = nwords_.tolist()
         words += [w[:seqlens[i]] for i, w in enumerate(words_.tolist())]
