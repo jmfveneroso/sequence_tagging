@@ -1,3 +1,4 @@
 pathlib
 ipympl
 tensorflow-hub
+gensim

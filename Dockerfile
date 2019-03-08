@@ -21,7 +21,6 @@ RUN pip install --pre jupyter-tensorboard
 USER jovyan
 
 ADD requirements.txt /code/
-ADD entrypoint.sh /code/
 RUN pip install -r requirements.txt
 
 # Set password to jupyter notebook. Default is "latin".

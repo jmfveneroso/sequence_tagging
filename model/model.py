@@ -2,10 +2,9 @@ import math
 import numpy as np 
 import tensorflow as tf
 from pathlib import Path
-import tensorflow_hub as hub
 from model.char_representations import get_char_representations, get_char_embeddings
-from model.attention import attention, exact_attention
-from model.word_embeddings import glove, elmo
+from model.attention import attention, exact_attention, pos_embeddings, normalize, multihead_attention
+from model.word_embeddings import glove, elmo, word2vec
 from model.html_embeddings import get_html_representations, get_soft_html_representations
 
 class SequenceModel:
@@ -29,6 +28,7 @@ class SequenceModel:
     self.params['tags' ]     = str(Path(self.params['datadir'], 'vocab.tags.txt'))
     self.params['html_tags'] = str(Path(self.params['datadir'], 'vocab.htmls.txt'))
     self.params['glove']     = str(Path(self.params['datadir'], 'glove.npz'))
+    self.params['word2vec']  = str(Path(self.params['datadir'], 'word2vec.npz'))
 
     with Path(self.params['tags']).open() as f:
       indices = [idx for idx, tag in enumerate(f) if tag.strip() != 'O']
@@ -43,14 +43,14 @@ class SequenceModel:
       self.nwords        = tf.placeholder(tf.int32,   shape=(None,),            name='nwords'      )
       self.chars         = tf.placeholder(tf.string,  shape=(None, None, None), name='chars'       )
       self.nchars        = tf.placeholder(tf.int32,   shape=(None, None),       name='nchars'      )
-      self.features      = tf.placeholder(tf.float32, shape=(None, None, None), name='features'    )
+      self.features      = tf.placeholder(tf.float32, shape=(None, None, 9),    name='features'    )
       self.html          = tf.placeholder(tf.string,  shape=(None, None, None), name='html'        )
       self.css_chars     = tf.placeholder(tf.string,  shape=(None, None, None), name='css_chars'   )
       self.css_lengths   = tf.placeholder(tf.int32,   shape=(None, None),       name='css_lengths' )
       self.labels        = tf.placeholder(tf.string,  shape=(None, None),       name='labels'      )
       self.training      = tf.placeholder(tf.bool,    shape=(),                 name='training'    )
       self.learning_rate = tf.placeholder_with_default(
-        0.001, shape=(), name='learning_rate'      
+        0.00001, shape=(), name='learning_rate'      
       )
  
   def lstm(self, x, lstm_size, var_scope='lstm'):
@@ -80,11 +80,10 @@ class SequenceModel:
         log_likelihood, _ = tf.contrib.crf.crf_log_likelihood(logits, tags, self.nwords, transition_matrix)
         loss = tf.reduce_mean(-log_likelihood, name='loss')
       else:
-        logits = tf.layers.dense(x, 2)
-
-        pred_ids = tf.argmax(logits, axis=-1)*2
-
         if self.params['loss'] == 'f1':
+          logits = tf.layers.dense(x, 2)
+          pred_ids = tf.argmax(logits, axis=-1)*2
+
           probs = tf.nn.softmax(logits)
           
           a_tilde = tf.squeeze(tf.slice(probs, [0, 0, 1], [-1, -1, 1]), axis=-1, name='a_tilde_prev')
@@ -96,12 +95,15 @@ class SequenceModel:
           m_pos_tilde = tf.squeeze(tf.slice(probs, [0, 0, 1], [-1, -1, 1]), axis=-1)
           m_pos_tilde = tf.reduce_sum(m_pos_tilde, axis=-1, name='m_pos_tilde') 
 
-          alpha = 0.8
+          alpha = 0.5
           divisor = alpha * n_pos + (1 - alpha) * m_pos_tilde
           loss = tf.divide(a_tilde, divisor)
           loss = tf.reduce_mean(-loss, name='loss')
 
         else:
+          logits = tf.layers.dense(x, self.num_tags)
+          pred_ids = tf.argmax(logits, axis=-1)
+
           labels = tf.one_hot(tags, self.num_tags)
           loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits_v2(
             labels=labels, logits=logits
@@ -122,6 +124,8 @@ class SequenceModel:
       word_embs = elmo(self.words, self.nwords)
     elif word_embs == 'glove':
       word_embs = glove(self.words, self.params['words'], self.params['glove'])
+    elif word_embs == 'word2vec':
+      word_embs = word2vec(self.words, self.params['words'], self.params['word2vec'])
     else:
       raise Exception('No word embeddings were selected.')
 
@@ -134,18 +138,20 @@ class SequenceModel:
       )
       embs.append(char_embs)
 
-    if use_features:
+    if use_features: 
       embs.append(self.features)
 
     embs = tf.concat(embs, axis=-1)
     embs = self.dropout(embs)
     return embs
 
-  def lstm_crf(self, word_embs='glove', char_embs='cnn'):
+  def lstm_crf(self, word_embs='glove', char_embs='cnn', use_features=False):
     if word_embs == 'elmo':
       word_embs = elmo(self.words, self.nwords)
     elif word_embs == 'glove':
       word_embs = glove(self.words, self.params['words'], self.params['glove'])
+    elif word_embs == 'word2vec':
+      word_embs = word2vec(self.words, self.params['words'], self.params['word2vec'])
     else:
       raise Exception('No word embeddings were selected.')
 
@@ -157,6 +163,10 @@ class SequenceModel:
         training=self.training
       )
       embs.append(char_embs)
+
+    if use_features: 
+      embs.append(self.features)
+
     embs = tf.concat(embs, axis=-1)
     embs = self.dropout(embs)
     return self.lstm(embs, self.params['lstm_size'])
@@ -213,26 +223,46 @@ class SequenceModel:
     #   training=self.training
     # )
 
-  def transformer(self, num_blocks=2, num_heads=1, mid_layer='feed_forward'):
+  def transformer(self, num_blocks=2, num_heads=5, mid_layer='feed_forward'):
     word_embs = glove(self.words, self.params['words'], self.params['glove'])
     char_embs = get_char_representations(
       self.chars, self.nchars, 
       self.params['chars'], mode='lstm',
       training=self.training
     )
+    html_embs = get_soft_html_representations(
+      self.html, self.params['html_tags'],
+      self.css_chars, self.css_lengths,
+      self.params['chars'], training=self.training
+    )
 
-    embs = tf.concat([word_embs, char_embs], axis=-1)
+    embs = tf.concat([word_embs, char_embs, html_embs], axis=-1)
+    # embs = word_embs
+    # embs += pos_embeddings(embs, 1000)
+
     x = self.dropout(embs)
 
     for i in range(num_blocks):
-      x = attention(
-        x, x, num_heads, residual='add', queries_eq_keys=False,
-        training=self.training
+      output = multihead_attention(
+        queries=x,
+        keys=x,
+        values=x,
+        num_heads=num_heads,
+        dropout_rate=0.5,
+        training=self.training,
+        causality=False
       )
 
       if mid_layer == 'feed_forward':
-        x = tf.nn.relu(tf.layers.dense(x, 100))
-        x = tf.layers.dense(x, 100)
+        output = tf.layers.dense(output, 450, activation=tf.nn.relu)
+        output = tf.layers.dense(output, 450)
+
+        # Residual connection
+        output += x 
+        
+        # Normalize
+        x = normalize(output)
+
       elif mid_layer == 'lstm':
         # Bidirectional LSTM will output a tensor with a shape that is twice 
         # the hidden layer size.
@@ -244,7 +274,7 @@ class SequenceModel:
 
     model = self.params['model']
     if model == 'lstm_crf':
-      output = self.lstm_crf(char_embs=self.params['char_representation'])
+      output = self.lstm_crf(word_embs=self.params['word_embeddings'], char_embs=self.params['char_representation'], use_features=self.params['use_features'])
     elif model == 'html_attention':
       output = self.html_attention(char_embs=self.params['char_representation'])
     elif model == 'self_attention':

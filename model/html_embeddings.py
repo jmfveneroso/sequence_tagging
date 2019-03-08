@@ -55,7 +55,7 @@ def get_soft_html_representations(html, html_vocab_file, css_chars, css_lengths,
   html_tags = tf.slice(html, [0, 0, 0], [-1, -1, 2])
   html_tag_ids = vocab_html.lookup(html_tags)
 
-  html_embedding_size = 50
+  html_embedding_size = 25
   v = tf.get_variable('html_embeddings', [num_html_tags + 1, html_embedding_size], tf.float32)
   html_embeddings = tf.nn.embedding_lookup(v, html_tag_ids)
   timesteps = tf.shape(html_tags)[1]
@@ -68,5 +68,5 @@ def get_soft_html_representations(html, html_vocab_file, css_chars, css_lengths,
   char_embeddings = get_char_embeddings(css_chars, char_vocab_file, char_embedding_size, training=training)
   css_embeddings = tf.reduce_mean(char_embeddings, axis=-2)
 
-  # return tf.concat([html_embeddings, css_embeddings], axis=-1)
-  return html_embeddings
+  return tf.concat([html_embeddings, css_embeddings], axis=-1)
+  # return html_embeddings

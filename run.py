@@ -10,6 +10,7 @@ from optparse import OptionParser
 from PIL import Image
 from models.hmm import HiddenMarkov, load_raw_dataset
 from pathlib import Path
+from hmmlearn import hmm
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # Disable debug logs Tensorflow.
 tf.logging.set_verbosity(tf.logging.ERROR)
@@ -127,7 +128,12 @@ if sys.argv[1] == 'params':
     estimator.load_params_from_file(json_file)
 
 elif sys.argv[1] == 'test':
+  json_file = options['json_file']
+
   estimator = Estimator()
+
+  if not json_file is None:
+    estimator.load_params_from_file(json_file)
   estimator.test()
 
 elif sys.argv[1] == 'pairs':
@@ -163,9 +169,9 @@ if sys.argv[1] == 'hmm':
   X, Y, _ = load_raw_dataset('data/ner_on_html/train')
   hmm = HiddenMarkov(
     timesteps, 
-    naive_bayes= naive_bayes,
-    use_gazetteer=True,
-    use_features=True,
+    naive_bayes=naive_bayes,
+    use_gazetteer=False,
+    use_features=False,
     self_train=False
   )
   hmm.fit(X, Y)
@@ -180,6 +186,102 @@ if sys.argv[1] == 'hmm':
 
     with Path('results/score/{}.preds.txt'.format(name)).open('wb') as f:
       for words, preds, tags in zip(w, p, t):
+        f.write(b'\n')
+        for word, pred, tag in zip(words, preds, tags):
+          f.write(' '.join([word, tag, pred]).encode() + b'\n')
+
+if sys.argv[1] == 'baum-welch':
+  def load(f):
+    with open(f, 'r') as f:
+      data = f.read().strip()
+  
+      sentences = data.split('\n\n')
+      sentences = [s for s in sentences if not s.startswith('-DOCSTART-')]
+      X = [[t.split(' ') for t in s.split('\n') if len(s) > 0] for s in sentences]
+      Y = []
+      T = []
+      for i, s in enumerate(X):
+        tkns, labels = [], []
+        for j, t in enumerate(s):
+          l = ['O', 'B-PER', 'I-PER'].index(t[1])
+          labels.append(0 if l == 0 else 1)
+          tkns.append(t[0])
+          X[i][j] = [int(x) for x in X[i][j][3:4] + X[i][j][5:7]]
+          # X[i][j] = [int(X[i][j][3])*2 + int(X[i][j][4])]
+  
+        Y.append(labels)
+        T.append(tkns)
+  
+      return X, Y, T
+      
+  Y, Z, W = load('data/ner_on_html/train')
+  Y_, Z_, W_ = load('data/ner_on_html/valid')
+  Y += Y_
+  Z += Z_
+  W += W_
+  Y_, Z_, W_ = load('data/ner_on_html/test')
+  Y += Y_
+  Z += Z_
+  W += W_
+  
+  samples = []
+  lengths = []
+  actual = []
+  
+  for i in range(len(Y)):
+      samples += [y_ for y_ in Y[i]]
+      actual += [z_ for z_ in Z[i]]
+      lengths.append(len(Y[i]))    
+      
+  # model = hmm.MultinomialHMM(n_components=2, algorithm='viterbi')
+  model = hmm.GaussianHMM(n_components=2, algorithm='viterbi')
+  
+  samples = np.array(samples)
+
+  model.fit(samples, lengths=lengths)
+ 
+  preds = model.predict(samples, lengths=lengths)
+  reverse = False
+
+  acc = np.sum(actual == preds) / float(len(actual))
+  if acc < 0.5:
+    preds = [-(p-1) for p in preds]
+    preds = np.array(preds)
+    reverse = True
+
+  acc = np.sum(actual == preds) / float(len(actual))
+  print('Accuracy:', acc)
+
+  for name in ['train', 'valid', 'test']:
+    print('Predicting ' + name)
+    Y, Z, W = load('data/ner_on_html/' + name)
+
+    samples = []
+    lengths = []
+    actual = []
+    
+    for i in range(len(Y)):
+      samples += [y_ for y_ in Y[i]]
+      actual += [z_ for z_ in Z[i]]
+      lengths.append(len(Y[i]))
+
+    preds = model.predict(samples, lengths)
+
+    if reverse:
+      preds = [-(p-1) for p in preds]
+      preds = np.array(preds)
+   
+    p = [] 
+    start = 0
+    for l in lengths:
+      p.append(preds[start:start+l])
+      start += l
+
+    t = [[['O', 'I-PER'][t__] for t__ in t_] for t_ in Z]
+    p = [[['O', 'I-PER'][p__] for p__ in p_] for p_ in p]
+
+    with Path('results/score/{}.preds.txt'.format(name)).open('wb') as f:
+      for words, preds, tags in zip(W, p, t):
         f.write(b'\n')
         for word, pred, tag in zip(words, preds, tags):
           f.write(' '.join([word, tag, pred]).encode() + b'\n')
