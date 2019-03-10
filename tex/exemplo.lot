@@ -1,0 +1,16 @@
+\select@language {english}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\contentsline {table}{\numberline {4.1}{\ignorespaces Number of HTML pages, sentences and tokens in each data file}}{20}{table.4.1}
+\contentsline {table}{\numberline {4.2}{\ignorespaces Features used in the NER on HTML dataset}}{21}{table.4.2}
+\contentsline {table}{\numberline {4.3}{\ignorespaces Gazetteer coverage in each data file}}{21}{table.4.3}
+\addvspace {10pt}
+\contentsline {table}{\numberline {5.1}{\ignorespaces Model descriptions}}{23}{table.5.1}
+\contentsline {table}{\numberline {5.2}{\ignorespaces Precision, recall and F1 in the NER on HTML dataset for models that incorporate no features}}{24}{table.5.2}
+\contentsline {table}{\numberline {5.3}{\ignorespaces Precision, recall and F1 in the NER on HTML dataset for models that incorporate all features}}{25}{table.5.3}
+\addvspace {10pt}

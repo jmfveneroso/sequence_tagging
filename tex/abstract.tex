@@ -1,0 +1,28 @@
+Web data extraction methods often rely on hand-coded rules to 
+identify and extract data from webpages. These methods are usually
+suited for extracting information from pages within
+the same website, however they perform poorly on extraction 
+tasks across different websites. Alternatively, statistical and 
+machine-learning-based sequence labeling methods provide a more flexible 
+approach to Web data extraction. Many times, HTML pages are very different 
+from plain text, because sentences are too short to provide adequate 
+context for conventional Named Entity Recognition methods to work 
+properly. Also, the HTML structure may encode information that is not 
+replicated in the text. Nonetheless, these limitations can be overcome by
+adequate feature engineering, the use of pretrained word 
+embeddings and neural character representations. In this article, we 
+evaluate the performance of different methods of named entity recognition 
+on the task of Web data extraction. In particular, we introduce a novel 
+dataset\footnote{The dataset and all models discussed in this article are 
+available in: https://github.com/jmfveneroso/ner-on-html.} 
+consisting of faculty listings from university webpages across
+the world in multiple languages and test the NER models on the task of 
+extracting researcher names from these listings. We found that a 
+neural network architecture that combines a bidirectional LSTM with
+a Conditional Random Fields output layer and LSTM-based character 
+representations outperforms other methods on the researcher name 
+extraction task, achieving an F1-score of 0.8867 with no feature engineering. 
+With the addition of hand crafted features, the F1-score can be slightly 
+improved to 0.8995.
+
+\keywords{Named entity recognition, information extraction, web data extraction}

@@ -1,0 +1,15 @@
+\select@language {english}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces RNN for NER}}{12}{figure.3.1}
+\contentsline {figure}{\numberline {3.2}{\ignorespaces LSTM Cell}}{13}{figure.3.2}
+\contentsline {figure}{\numberline {3.3}{\ignorespaces Bidirectional LSTM-CRF}}{15}{figure.3.3}
+\contentsline {figure}{\numberline {3.4}{\ignorespaces CNN based character representations}}{16}{figure.3.4}
+\contentsline {figure}{\numberline {3.5}{\ignorespaces LSTM based character representations}}{17}{figure.3.5}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}

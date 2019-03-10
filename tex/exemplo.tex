@@ -1,0 +1,950 @@
+\documentclass[msc]{ppgccufmg}    % ou [msc] para dissertações
+                                  % de mestrado. Para propostas ou
+                                  % projetos, usar [phd,project],
+                                  % [msc,proposal], etc.
+
+\usepackage[english]{babel}       % se o documento for em inglês
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{type1ec}
+\usepackage[a4paper,
+  portuguese,
+  bookmarks=true,
+  bookmarksnumbered=true,
+  linktocpage,
+  colorlinks,
+  citecolor=black,
+  urlcolor=black,
+  linkcolor=black,
+  filecolor=black,
+  ]{hyperref}
+\usepackage[square]{natbib}
+
+
+\usepackage{booktabs} % For formal tables
+\usepackage[ruled]{algorithm2e} % For algorithms
+\renewcommand{\algorithmcfname}{ALGORITHM}
+\SetAlFnt{\small}
+\SetAlCapFnt{\small}
+\SetAlCapNameFnt{\small}
+\SetAlCapHSkip{0pt}
+\IncMargin{-\parindent}
+
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{amsfonts}
+\usepackage{multirow}
+
+\DeclareMathOperator*{\argmax}{arg\,max\,}
+\renewcommand{\arraystretch}{1.2}
+
+\begin{document}
+
+\ppgccufmg{
+  title={Web data extraction through named entity labeling},
+  authorrev={de Freitas Veneroso, João Mateus},
+  cutter={D1234p},
+  cdu={519.6*82.10},
+  university={Federal University of Minas Gerais},
+  course={Computer Science},
+  portuguesetitle={Extração de dados da web por rotulamento de sequências},
+  portugueseuniversity={Universidade Federal de Minas Gerais},
+  portuguesecourse={Ciência da Computação},
+  address={Belo Horizonte},
+  date={2019-07},
+  advisor={Berthier Ribeiro-Neto de Araújo},
+  approval={pics/approvalsheet.eps},
+  abstract=[brazil]{Resumo}{resumo},
+  abstract={Abstract}{abstract},
+  dedication={dedicatoria},
+  ack={agradecimentos},
+  epigraphtext={Truth and lie are opposite things.}{Unknown},
+  keywords={Visão Computacional, Redes, Sabotagens},
+}
+
+
+% Os três comandos seguintes são apenas para gerar texto para ocupar espaço nas
+% páginas.
+\newcommand{\dummytxta}{%
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad
+minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+aliquip ex ea commodo consequat. Duis aute irure dolor in
+reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla
+pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
+culpa qui officia deserunt mollit anim id est laborum.\par
+}
+
+\newcommand{\dummytxtb}{%
+Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium
+doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore
+veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim
+ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia
+consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque
+porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur,
+adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et
+dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis
+nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex
+ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea
+voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem
+eum fugiat quo voluptas nulla pariatur?\par
+}
+
+\newcommand{\dummytxtc}{%
+At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis
+praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias
+excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui
+officia deserunt mollitia animi, id est laborum et dolorum fuga. Et harum
+quidem rerum facilis est et expedita distinctio. Nam libero tempore, cum soluta
+nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat
+facere possimus, omnis voluptas assumenda est, omnis dolor
+repellendus. Temporibus autem quibusdam et aut officiis debitis aut rerum
+necessitatibus saepe eveniet ut et voluptates repudiandae sint et molestiae non
+recusandae. Itaque earum rerum hic tenetur a sapiente delectus, ut aut
+reiciendis voluptatibus maiores alias consequatur aut perferendis doloribus
+asperiores repellat.\par
+}
+
+\newcommand{\dummytxt}{\dummytxta\dummytxtb\dummytxtc}
+
+\chapter{Introduction}
+
+Web data extraction (WDE) is the task of automatically extracting structured 
+information from unstructured or semi-structured Web documents. The input 
+usually consists of Web documents containing a number of predetermined entities 
+organized in a similar manner. The web data extraction task consists of 
+identifying these entities and organizing them according to a template. 
+
+HTML documents most often lie in between the structured/unstructured 
+data paradigm. DOM hierarchy, element disposition, CSS classes, and other 
+features related to the document structure and indirectly associated with the 
+data itself can be valuable information on the task of identifying
+entities. Yet, we cannot expect these features to be completely constrained 
+by an underlying pattern. Organization patterns tend to follow some guidelines 
+but they are in no way subject to strict rules. That is why classical web data 
+extraction systems such as automatic wrapper generators 
+\cite{Kushmerick2000,Hsu1998,Muslea1999}
+do not translate very well across different websites. 
+
+Most existing Web data extraction methods are tailored to extract data 
+from a single webpage, producing different compromises between efficacy and 
+degree of human supervision. Some unsupervised approaches proposed to tackle 
+the problem of data extraction for whole application domains 
+\cite{Zhu2005,Zhu2006,Abdessalem2010,Furche2012,Furche2012a}. Usually, 
+unsupervised WDE methods work in two stages. In the record segmentation stage,
+WDE systems seek to cluster visually and structurally similar webpage regions 
+and identify repeating data records with heuristics and 
+hand-coded rules. In the attribute labeling stage, WDE systems seek to identify 
+the correct attributes on data records, many times resorting to regular expressions 
+or gazetteer matching strategies. The outcome of each of these stages can aid one 
+another. The inner patterns of data records can help in identifying attributes of other 
+data records. Also, by properly identifying data record attributes, it becomes 
+easier to determine boundaries and perform record segmentation.
+
+While unsupervised approaches can be sometimes adequate to extract information from 
+webpages with similar templates, they usually fail on cross-website data extraction 
+tasks. Also, more sophisticated approaches may be needed when we are not dealing
+with easily distinguishable attributes such as prices and dates. In this regard, 
+machine-learning-based sequence labeling methods can provide a more flexible 
+approach that works regardless of website structure.
+
+In recent years, we saw an amazing progress in the field of Natural Language Processing, 
+particularly with the introduction of deep recurrent neural network architectures
+for sequence labeling. However, despite Web data extraction being a closely 
+related field, there is a lack of extraction tools that make use of these recent 
+advancements. The attribute labeling stage in Web data extraction systems
+is essentially a Named Entity Recognition (NER) problem, the problem of 
+detecting named entities in the text and classifying them into predetermined 
+categories such as person names, locations, dates or organizations. 
+
+In many cases, such as when we are extracting researcher names from faculty listings,
+detecting named entities is sufficient to solve the data extraction task. However, when we are
+dealing with multi-attribute data records or complex relationships, we may need to 
+perform additional steps. Nevertheless, even in the latter cases, flexible NER methods 
+are still desirable because, while many WDE algorithms can effectively exploit the 
+semi-structured nature of Web documents, too much reliance on structural webpage 
+features often produce poor generalizations on cross website extraction. Also, 
+data records may enclose plain text with relevant named entities. 
+
+In this article, we investigate methods of named entity recognition for Web data extraction.
+Recently proposed neural architectures have achieved exciting results 
+on the NER task in plain text while requiring almost 
+no feature engineering or access to gazetteers \cite{Huang2015,Lample2016,Ma2016}. 
+NER on HTML poses a slightly different type of challenge. Named entities may occur inside 
+tables, lists, or other types of visual elements that provide little to no textual 
+information that could give hints about the semantic category of a word. Still, even 
+with this limitation, we show that it is possible to obtain very good results with a 
+relatively small training set.
+
+By reliably detecting named entities on HTML, we can improve the performance of existing WDE 
+approaches or even construct an end-to-end neural network architecture to solve domain 
+wide data extraction with considerable flexibility. To test different NER approaches to
+Web data extraction, we explored the task of researcher name extraction from university 
+faculty listings across the world, introducing a novel NER dataset.
+
+Reliable researcher affiliation information is often missing from public researcher 
+databases (especially in departments other than Computer Science). Also, the display of 
+faculty information varies significantly between different university websites, so 
+this task can provide a good measure of the expected performance and data need of
+NER methods on other Web data extraction tasks. 
+
+
+\chapter{Related Work}
+
+In the last 20 years, the astonishing growth of public information in the Web has 
+led to the development of a number of different approaches to the problem of Web 
+data extraction. Traditionally, the task was solved by designing special purpose
+programs called wrappers to recognize relevant data and store records in a structured
+format. These early tools varied wildly relative to their degree of automation. 
+
+It was readily perceived that manual wrapper generation was a rather tedious and
+error prone process, unsuited for large scale operations. Wrappers tend to
+break frequently because they rely heavily on webpage features that can change 
+often. So, in the late nineties, several authors advocated for wrapper induction, a technique 
+that consists of automatically constructing wrappers from a small set of examples by 
+identifying delimiters or context tokens that single out the desired attributes. 
+Some remarkable wrapper induction methods are WIEN \cite{Kushmerick2000}, Soft 
+Mealy \cite{Hsu1998} and STALKER \cite{Muslea1999}.
+
+Despite being better than constructing wrappers manually, wrapper induction methods 
+still suffered from a lack of expressive power and flexibility. These methods had 
+trouble handling records with missing attributes or unusual structures because
+patterns could only be identified if they happened at least once in the examples.
+
+Other approaches such as NoDoSE \cite{Adelberg1998} and Debye \cite{Laender2002a} 
+brought greater flexibility to wrapper induction methods by requiring a greater level 
+of human interaction through graphical user interfaces. Web data extraction techniques often 
+require some sort of assistance from human experts to boost accuracy. One of the main challenges 
+in the field lies in determining an adequate trade-off between the degree of automation and 
+the precision and recall of the data extraction tool.
+
+To automate the task of Web data extraction completely some approaches,
+such as Road Runner \cite{Crescenzi2001}, removed entirely the need for data examples.
+Road Runner parses documents belonging to a same class (e.g. books on Amazon) and 
+generates wrappers based on their similarities and differences, yielding comparable results 
+to those obtained by wrapper induction methods. However, like previous approaches, it was 
+unsuited for cross site extraction tasks because the learned rules were not general enough.
+
+NLP based approaches aimed at extracting more general rules that could possibly
+be employed over multiple websites. RAPIER \cite{Califf1999} is a method of rule
+extraction that uses information such as part-of-speech tags and semantic classes from
+a lexicon to derive patterns from a set of training examples. This approach is more
+flexible than the wrapper induction methods, however it achieves much lower rates of 
+recall and precision.
+
+In 2002, a survey by Laender et al. \cite{Laender2002} made a thorough classification of the
+early approaches with a taxonomy based on their main technology, being them: languages for
+wrapper development, HTML-aware tools, NLP-based tools, Wrapper Induction Tools,
+Modeling-based tools and Ontology-based tools. Some noteworthy examples from this era
+are: 
+
+\begin{itemize}
+\item TSIMMIS \cite{Hammer1997} and WebOQL \cite{Arocena1999}, which are special purpose 
+languages for building wrappers.
+
+\item Road Runner \cite{Crescenzi2001}, XWRAP \cite{Liu2000} and W4F \cite{Sahuguet1999}, 
+which are HTML-aware tools that infer meaningful patterns from the HTML structure.
+
+\item RAPIER \cite{Califf1999}, SRV \cite{Freitag1998}, WHISK \cite{Soderland1999}, which 
+are NLP-based tools.
+
+\item WIEN \cite{Kushmerick2000}, Soft Mealy \cite{Hsu1998} and STALKER \cite{Muslea1999} which 
+are wrapper induction methods.
+
+\item NoDoSE \cite{Adelberg1998} and Debye \cite{Laender2002a}, which are semi supervised modeling
+based tools that require some interaction with the user by means of a graphical
+user interface.
+\end{itemize}
+
+In 2006, Chang et al. \cite{Chang2006} complemented the previous surveys with semi-supervised 
+technologies such as Thresher \cite{Hogue2005}, IEPAD \cite{Chang2001} and 
+OLERA \cite{Chang2004}. They differed from supervised 
+and unsupervised methods because they either needed only a rough description of
+data from users for extraction rule generation or some level of post processing
+that needed user attention. The survey also mentioned newer unsupervised methods
+such as DeLa \cite{Wang2003}, Exalg \cite{Arasu2003} and Depta \cite{Zhai2005}.
+
+Most of the early information extraction systems were rule-based with either 
+manual rule description or automatic rule learning from examples, thus they
+suffered from a lack of flexibility when dealing with noisy and unstructured data.
+Huge progress in the field of statistical learning led to the development of
+statistical models that tried to solve this problem.
+
+In 2008, Sarawagi \cite{Sarawagi2008} produced a survey that classified wrappers into
+rule-based methods, statistical methods and hybrid models, bringing together 
+the fields of named entity recognition, relationship extraction and information extraction. 
+The rule based methods encompass most of the 
+previous models. The statistical methods convert the extraction task into a token labeling 
+task, identifying the target entities through the assignment of labels as in a typical 
+Named Entity Recognition task. Traditionally, Hidden Markov Models \cite{Leek1997,Freitag1999}, 
+Linear Chain Conditional Random Fields \cite{Lafferty2001}, and Maximum Entropy Taggers 
+\cite{McCallum2000} have been the usual choice for linear sequence tagging models.
+More recently, with the advancement of Natural Language Processing and Deep Learning, 
+neural models outperformed previous NER methods for plain text. Huang et. al. \cite{Huang2015} introduced the 
+bidirectional Long Short-Term Memory (LSTM) model with a Conditional Random Field (CRF) output layer
+for NER. Ma and Hovy \cite{Ma2016} incorporated Convolutional Neural Network based character representations 
+on top of the architecture. And Lample et. al. \cite{Lample2016} introduced
+LSTM based character representations. 
+
+Surveys by Ferrara et al. \cite{Ferrara2014}, Schulz et al. \cite{Schulz2016} and 
+Varlamov et al. \cite{Varlamov2016} updated the previous surveys on information 
+extraction methods with some interesting innovations. 
+Some examples are: the Visual Box Model \cite{Krupl2005}, a data extraction system that produces 
+a visualization of the webpage to exploit visual cues to identify data presented in a tabular form;
+automatic wrapper adaptation \cite{Ferrara2011}, a technique that tries to reduce the cost of 
+wrapper maintenance by measuring the similarity of HTML trees and adapting
+wrappers to the new page structure; AutoRM \cite{Shi2015}, a method to mine
+records from a single webpage by identifying similar data regions through DOM
+tree analysis; Knowledge Vault \cite{Dong2014}, a method that combines different 
+extraction approaches to feed a probabilistic knowledge base.
+
+Most data extraction systems focus on extracting information from single websites
+and are therefore unsuited for cross website extraction tasks. Even unsupervised
+approaches that are domain independent, such as RoadRunner \cite{Crescenzi2001} 
+and EXALG \cite{Arasu2003} only work well for extracting data from pages generated 
+from a same template. 
+
+A statistical approach to unsupervised domain 
+independent Web data extraction was described by Zhu et al \cite{Zhu2005}. The 2D CRF 
+model takes a webpage segmented into data blocks and employs a two dimensional conditional 
+random field model to perform attribute labeling. The model was further improved
+\cite{Zhu2006} to model record segmentation and attribute labeling as a joint task.
+Some of the limitations of early unsupervised methods 
+were also tackled by ObjectRunner \cite{Abdessalem2010} and AMBER \cite{Furche2012}. 
+These methods work by annotating webpages automatically with regular expressions, gazetteers and 
+knowledge bases. They can rectify low quality annotations and even improve the annotators
+by exploring regular structures in the DOM during the record segmentation phase.
+
+Web data extraction methods have undoubtedly improved extraordinarily, but
+as pointed by Schulz et al. \cite{Schulz2016}, it is difficult to compare the results 
+achieved by competing tools, and many seem to rely excessively on heuristic methods.
+In that regard, the recent advancements in sequence taggers may provide more robust and
+flexible extraction tools.
+
+
+\chapter{Named Entity Recognition Models}
+
+Many Web data extraction systems rely on hand crafted rules or gazetteers to perform
+attribute annotation. Machine learning approaches to NER can improve annotations of 
+more complex entities and even perform entity detection without any feature
+engineering. We explored many methods of Named Entity Recognition
+in the context of a Web data extraction task. First, we discuss two traditional 
+approaches: Hidden Markov Models, and Linear Chain Conditional Random Fields. Then,
+we discuss neural network architectures.
+
+\section{Hidden Markov Models}
+
+A Markov Model is a stochastic model that computes the most probable sequence of states 
+given a limited set of observable states $ S = \{s_1, s_2, ..., s_n \} $.
+The Hidden Markov Model (HMM) differs from the Markov Model in that it
+does not observe the states directly, but rather a probabilistic function of those 
+states. For example in NER, the words are observed, however the Named Entity labels
+associated with these words are not. Formally, we want to compute the most probable
+sequence of labels $ Y = \{y_1, y_2, ..., y_n\} $ for a sequence of observed tokens
+$ X = \{x_1, x_2, ..., x_n\} $.
+
+\begin{equation}
+Y^* = \argmax_{Y} P(Y|X)
+\end{equation}
+
+With Bayes theorem, we can write $ P(Y|X) $ as:
+
+\begin{equation}
+P(Y|X) = \frac{P(X|Y) P(Y)}{P(X)}
+\end{equation}
+
+Since $ P(X) $ is the same for all label sequences $ Y $, we can simply maximize
+the probability $ P(X|Y) P(Y) $.
+
+A HMM makes two assumptions. First, the probability of being in a given state depends 
+only on a fixed number of previous states. That is:
+
+\begin{equation}
+P(y_i|y_{i-1}x_{i-1}, y_{i-2}x_{i-2}, ..., y_1x_1) = P(y_i|y_{i-1}, y_{i-2},..., y_{i-k})
+\end{equation}
+
+In fact, we can get much better results on the NER task by looking at trigrams
+or quadrigrams ($ k = 2 $ or $ k = 3 $) instead of bigrams as with a regular HMM. 
+Some label assignments are highly improbable, such as single token named entities 
+separated by a common word. These kinds of patterns can be perceived by a higher order HMM.
+Second, the probability of a word depends only on its assigned label. That is:
+
+\begin{equation}
+P(x_i|y_{i-1}x_{i-1}, ..., y_1x_1) = P(x_i|y_i)
+\end{equation}
+
+With these assumptions, 
+the probability $ P(Y|X) $ can be approximated by the expression:
+
+\begin{equation}
+P(Y|X) \propto \prod_{i=k+1}^{n} P(y_i|y_{i-1}, y_{i-2}, ..., y_{i-k}) P(x_i|y_i)
+\end{equation}
+
+All relevant probabilities can be estimated through maximum likelihood estimation from the relative
+frequencies of labels and features in the corpus. The best sequence of labels can be computed 
+with a variable state Viterbi approach \cite{Li2000}. However, as we increase $ k $, this computation 
+becomes exponentially more expensive. The beam-search strategy may be employed for a faster 
+search, but we found that for $ k \leq 4 $, the Viterbi algorithm is still viable.
+
+HMM based taggers have been successfully applied in many NLP and WDE tasks 
+\cite{Rabiner1990,Leek1997,Freitag2000}. They are incredibly fast to train and also they are very 
+interpretable, making them a good choice for a first approximation. However, these models 
+are highly dependent on the right selection of features, what may outweigh the benefit of a 
+small training cost.
+
+\subsection{Self training} 
+\label{sssec:self_training}
+
+In the task of NER on HTML, there are useful features related to the HTML
+structure that can help in identifying named entities. In a given website, named
+entities tend to occur inside the same HTML tags. The HTML tag feature or other
+HTML features could easily be incorporated in the HMM. However, these 
+features are only useful inside a single website and they cannot be generalized, 
+because different websites use distinct HTML templates. 
+Therefore, we propose a self-training strategy to obtain probabilities for
+these HTML features. It is implemented like this:
+
+\begin{itemize}
+\item Train the HMM without any HTML features.
+\item Compute labels for a website with the trained HMM.
+\item Use the computed labels as a proxy for the actual labels in the 
+website and estimate HTML feature frequencies for this website alone.
+\item Recompute the labels now using the HTML feature probabilities.
+\end{itemize}
+
+In theory, this strategy could be used with any sequence tagger, however
+retraining a classifier with new features can become prohibitively expensive.
+This strategy is only possible because the computation of HTML feature
+frequencies can be performed very quickly. This adds very little overhead 
+to the original HMM and improves precision and recall by a considerable 
+margin.
+
+\section{Linear Chain Conditional Random Fields}
+
+A Linear Chain Conditional Random Field (CRF) is the discriminative analog to the HMM,
+it was first introduced by Lafferty \cite{Lafferty2001}. It is a distribution $ P(Y|X) $ that takes the form:
+
+\begin{equation}
+P(Y|X) = \frac{1}{Z(x)} \prod_{t=1}^{T} exp \left( \sum_{k=1}^{K} \theta_k f_k(y_{t-1}, y_t, X) \right)
+\end{equation}
+\\
+
+where $ \theta $ is the parameter vector that we are going to learn, $ f_k(y_{t-1}, y_{t}, X) $ 
+are feature functions over the current timestep $ t_y $, the previous timestep $ y_{t-1}$, 
+and the observation vector $ X $. And the partition function $ Z(x) $, takes the form:
+
+\begin{equation}
+Z(x) = \sum_{Y} \prod_{t=1}^{T} exp \left( \sum_{k=1}^{K} \theta_k f_k(y_{t-1}, y_t, x) \right)
+\end{equation}
+\\
+
+which is a sum over all possible label assignments $ Y $. The partition function can be efficiently
+and exactly calculated with the sum-product algorithm. Parameter estimation is usually done through 
+negative log likelihood minimization. The function can be optimized with techniques suitable for other 
+maximum entropy models such as L-BFGS \cite{Liu1989}. The most likely label sequences can be decoded 
+with the Viterbi algorithm, as was the case for HMMs.
+
+CRFs are more general than HMMs because the transitions from $ y_{t-1} $ to $ y_{t} $ can depend 
+on the whole vector of observations $ X $. This flexibility of feature functions allows for a wide range of
+possibilities. Recently, CRFs have been successfully employed as the output layer in complex neural 
+architectures bringing improvements over models that compute labels independently.
+
+\section{Neural Network Architectures}
+
+Recurrent neural networks (RNN) have been successfully employed on numerous NLP tasks such as
+language modelling, POS tagging, speech recognition and NER. Different from feed-forward 
+neural networks, RNNs can retain information in their internal state, making them more 
+suitable for processing sequences, and consequently for solving text related tasks. 
+Figure~\ref{fig:rnn_network} describes an RNN for sequence labeling unrolled through multiple 
+timesteps. 
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.75\textwidth]{pics/rnn_network}
+  \caption{RNN for NER}
+  \label{fig:rnn_network}
+\end{figure}
+
+At each timestep, the neural network computes a hidden state $ h_t $ using an input 
+vector $ x_t $ and the previous hidden state $ h_{t-1} $, that retains information from past 
+iterations. Finally, the RNN produces an output vector $ y_t $ representing the label for that 
+timestep. A common definition for an RNN cell is given by the equations:
+
+\begin{flalign*}
+h_t &= tanh(W_x x_t + W_h h_{t-1}) &\\
+y_t &= softmax(W_y h_t) &
+\end{flalign*}
+
+Where $ W_x $, $ W_h $ and $ W_y $ are weight matrices that can be trained with the 
+Backpropagation Through Time (BPTT) algorithm. Theoretically, RNNs are capable of learning
+and retaining long term dependencies through their internal state $ h_t $. However, in practice,
+it becomes difficult due to the vanishing gradient problem. Long short term memory networks (LSTM) were 
+introduced by Hochreiter and Schmidhuber \cite{Hochreiter1997} with this problem in mind and 
+have been popularized since then. 
+
+LSTMs incorporate a memory cell $ c $ in the RNN definition and three gates to control 
+the flow of information that comes in and out of the memory cell.
+The input gate $ \Gamma_{i} $ controls the amount of new information that will flow into the memory cell,
+the forget gate $ \Gamma_{f} $ controls the amount of previous information that will be retained in the memory
+cell, and the output gate $ \Gamma_{o} $ controls the amount of information stored in the memory cell that
+will be used to compute the output activation of the LSTM unit. 
+LSTM cell implementations vary slightly in the literature. A visual description of 
+our LSTM cell is provided in Figure~\ref{fig:lstm_cell}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.75\textwidth]{pics/lstm_cell}
+  \caption{LSTM Cell}
+  \label{fig:lstm_cell}
+\end{figure}
+
+The equations for the LSTM cell are:
+
+\begin{flalign*}
+\Gamma_{i} &= \sigma(W_i \cdot [x_t,h_{t-1}] + b_i) &\\
+\Gamma_{f} &= \sigma(W_f \cdot [x_t,h_{t-1}] + b_f) &\\ 
+\Gamma_{o} &= \sigma(W_o \cdot [x_{t},h_{t-1}] + b_o) &\\
+c_t        &= \Gamma_{f} \ast c_{t-1} + \Gamma_{i} \ast tanh(W_c \cdot [x_{t},h_{t-1}] + b_c) &\\
+h_t        &= \Gamma_{o} \ast tanh(c_t) &
+\end{flalign*}
+
+Where $ \sigma $ is the logistic sigmoid function. $ \Gamma_i $, $ \Gamma_f $, and $ \Gamma_o $ are the input,
+forget and output gates, respectively, and $ W_i $, $ W_f $, $ W_o $ are the weight 
+matrices corresponding to each gate. $ c_{t} $ is the cell 
+state at time $ t $ and $ h_{t} $ is the hidden state at time $ t $. 
+The vector $ [x_{t},h_{t-1}] $ is formed by concatenating the current input vector 
+$ x_{t} $ and the hidden vector from a previous timestep $ h_{t-1} $. Finally,
+$ A \ast B $ represents the element-wise multiplication of matrices $ A $ and $ B $
+and $ A \cdot B $ represents the dot product of $ A $ and $ B $.
+
+This implementation differs from the LSTM cell described in Huang et al. \cite{Huang2015}
+in that the gates $ \Gamma_i $ and $ \Gamma_f $ do not receive inputs from the previous 
+cell state $ c_{t-1} $ and the output gate $ \Gamma_{o} $ does not receive inputs from the current cell 
+state $ c_{t} $. This variation produces little difference in terms of model accuracy on
+the performed task, but it reduces model complexity.
+
+\subsection{BI-LSTM-CRF}
+\label{sssec:lstm_crf}
+
+On named entity recognition tasks, both past and future words are important 
+to attribute a label at time $ t $, however a regular LSTM network only takes 
+past states into consideration. A bidirectional LSTM solves this problem by stacking 
+two regular LSTMs, and feeding them with observations in opposite directions. The first LSTM 
+receives forward states and the second LSTM receives backward states. The hidden states from both 
+networks can then be concatenated at each timestep to produce output labels. With this 
+architecture, LSTM cells may use information from past and future timesteps to decide 
+the label at time $ t $.
+
+Huang et al. \cite{Huang2015} proposed a bidirectional LSTM with a CRF layer (BI-LSTM-CRF) on 
+the output to tackle the sequence tagging problem. The main benefit of adding a CRF layer 
+in the neural sequence model is that the labels are jointly decoded for a whole sentence 
+instead of being predicted individually. Another possibility would be to use a beam search
+decoder to find an optimal sequence of labels. Predicted tags should be highly correlated 
+in a named entity recognition task, so it is desirable to predict sequences conjointly.
+The BI-LSTM-CRF is described in Figure~\ref{fig:bi_lstm_crf}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.75\textwidth]{pics/bi_lstm_crf}
+  \caption{Bidirectional LSTM-CRF}
+  \label{fig:bi_lstm_crf}
+\end{figure}
+
+This architecture achieved an F1 score of 90.10 on the English data from the CoNLL-2003 
+NER shared task \cite{Sang2003}, in contrast to 85.17 for a bidirectional LSTM without 
+a CRF layer. 
+In our experiments, the LSTM-CRF architecture uses a bidirectional LSTM with 100 
+hidden states, no peepholes and input and output dropout layers with a dropout
+rate of 0.5. The dropout layers have proven to be very important to prevent overfitting 
+and allow better generalization.
+
+\subsection{CNN character representations}
+\label{sssec:lstm_crf_cnn}
+
+Ma and Hovy \cite{Ma2016} proposed to add a convolutional neural network (CNN) layer 
+on top of a bidirectional LSTM-CRF to encode character-level information. The CNN
+layer is described visually in Figure \ref{fig:cnn}.
+
+\begin{figure}[h]
+  \centering
+	  \includegraphics[width=0.75\textwidth]{pics/cnn}
+  \caption{CNN based character representations}
+  \label{fig:cnn}
+\end{figure}
+
+The convolutional neural network receives character embeddings as inputs. The character 
+representations generated by the CNN are combined with word level representations 
+and fed to the BI-LSTM-CRF described in section \ref{sssec:lstm_crf}.
+This architecture can learn morphological features that are very
+useful in the NER task, since similar named entities often present morphological similarities. 
+This architecture obtained an F1 score of 91.21 in the CoNLL2003 dataset. In our experiments, 
+the LSTM-CRF architecture with CNN character representations uses a one dimensional convolutional 
+neural network with 30 filters and a window size of three characters on top of the LSTM-CRF 
+architecture. The character embeddings fed to the CNN have 30 dimensions that are randomly 
+initialized.
+
+\subsection{LSTM character representations}
+
+Lample et al \cite{Lample2016} proposed to use a bidirectional LSTM to model character-level 
+representations on top of a BI-LSTM-CRF. Combining the forward and backward LSTM hidden states 
+to form the character representation, as described in Figure~\ref{fig:lstm_char}. 
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.75\textwidth]{pics/lstm_char_representations}
+  \caption{LSTM based character representations}
+  \label{fig:lstm_char}
+\end{figure}
+
+This character representation is also combined with a word 
+representation and fed to a BI-LSTM-CRF network. 
+The forward state is expected to be a better representation of the suffix of 
+a token, and the backward state is expected to be a better representation of 
+the prefix of a token. This differentiates the architecture
+from the CNN based approach described in Section~\ref{sssec:lstm_crf_cnn}, because CNN filters 
+discover positional invariant features, while LSTMs can better represent 
+suffixes and prefixes. In our experiments, 
+the LSTM-CRF architecture with LSTM character representations was implemented with a bidirectional 
+LSTM with 25 hidden states, producing character representations of 
+size 50. The character embeddings have 30 dimensions that are randomly initialized.
+
+\subsection{Network training}
+
+All neural models were trained using mini batch Stochastic Gradient Descent over 50 epochs with batch size 10,
+learning rate 0.01, momentum 0.9 and decay rate 0.05. We used early stopping \cite{Caruana2000} to select the best 
+parameters, considering the F1 measure in the validation set. All neural models used 
+GloVe 100-dimensional word embeddings \cite{Pennington2014} that were fine tuned during training.
+In the case of NER on HTML, word embeddings work similarly to a gazetteer. Named entities 
+with the same type have similar embeddings, so good word embeddings can achieve exceptional 
+performance with little training and without a gazetteer. 
+
+
+\chapter{NER on HTML Dataset}
+\label{sec:ner_dataset}
+
+We built a novel dataset to evaluate the performance of NER models
+on the Web data extraction task. The task consists of finding researcher
+names in faculty listings from university webpages across the world. This would be a
+necessary step when linking researcher profiles from university websites to their entries
+in public databases such as DBLP \footnote{http://dblp.uni-trier.de/}. Unlike many
+information extraction datasets, each webpage in the dataset comes from a different 
+website, and therefore has a different format, what makes many information
+extraction approaches impractical. The idea is to explore systems that are general 
+enough to allow efficient entity extraction from different sources while requiring
+no supervision between different websites. 
+
+This task is similar to labeling authors in comments or articles collected
+from different publishing platforms. Another similar task is NER on tweets,
+because of the character limitation that is comparable to what we find in 
+HTML text.
+
+We collected 145 computer science faculty pages from 42 different countries in
+multiple languages, although the English version was preferred when it was available.
+We gathered faculty webpages randomly in proportion to
+the number of universities in each country\footnote{A detailed list of universities can
+be found in https://univ.cc/world.php}. Each HTML page was preprocessed and converted
+to the CoNLL 2003 data format. That is, one word per line with empty lines representing
+sentence boundaries. Sentence boundaries were determined by line break HTML tags
+(div, p, table, li, br, etc.) in contrast to inline tags (span, em, a, td, etc.). 
+Sentences that were more than fifty tokens long were also split according to the
+punctuation.
+
+A proper HTML segmenter poses many challenges by itself. We wanted to evaluate 
+models without relying on any sophisticated data record segmentation system.
+In many cases, entity annotation may precede the segmentation
+phase on Web data extraction methods, so annotators that are able to work 
+with raw HTML data allow for more flexible systems. 
+
+Finally, all tokens were tagged using the IOB scheme put forward by
+Ramshaw and Marcus \cite{Ramshaw1999}. 
+
+\section{Data}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      Data file & Documents & Sentences & Tokens & Names \\
+      \midrule
+      Training    & 85 & 24728 & 110269 & 5822 \\  
+      Validation  & 30 & 8743  & 36757  & 1788 \\
+      Test        & 30 & 10399 & 44795  & 2708 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Number of HTML pages, sentences and tokens in each data file}
+  \label{tab:dataset}
+\end{table}
+
+The dataset was divided in a training, validation and test set. Table \ref{tab:dataset} contains
+a description of the data files. The validation set was used in the early stopping validation strategy
+for the neural networks and CRF training, while the model performance was evaluated by comparing 
+results in the test set.
+
+\section{Features}
+
+Thirteen categorical features were associated with each token in the dataset. They 
+are presented in Table \ref{tab:features}.
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ ll }
+      \toprule
+      Feature & Description \\
+      \midrule
+      1  & Unaccented lowercase token \\
+      2  & Exact gazetteer match \\
+      3  & Partial gazetteer match \\
+      4  & Log name gazetteer count\\
+      5  & Log word gazetteer count\\
+      6  & Email \\
+      7  & Number \\
+      8  & Honorific (Mr., Mrs., Dr., etc.)\\
+      9  & URL \\
+      10 & Is capitalized \\
+      11 & Is a punctuation sign \\
+      12 & HTML tag + parent \\
+      13 & CSS class \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Features used in the NER on HTML dataset}
+  \label{tab:features}
+\end{table}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      Data file & Precision & Recall & F1 & Correct names \\
+      \midrule
+      Training   & 0.7316 & 0.2303 & 0.3504 & 1341 of 5822 \\ 
+      Validation & 0.8474 & 0.2858 & 0.4274 & 511 of 1788 \\ 
+      Test       & 0.8717 & 0.3287 & 0.4773 & 890 of 2708 \\ 
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Gazetteer coverage in each data file}
+  \label{tab:gazetteer}
+\end{table}
+
+The unaccented lowercase token was used as the key for the GloVe-100 embedding lookup.
+A gazetteer was constructed from a researcher list extracted from DBLP with 1,595,771
+names. Table \ref{tab:gazetteer} shows the precision, recall and F1 score obtained with an
+exact gazetteer matching strategy in each data file as a baseline.
+Feature 2 represents an exact match of a sequence of tokens to any of the 1,595,771 
+names, and feature 3 represents a partial match. Feature 4 is the rounded logarithm of 
+the frequency of a token in the gazetteer, and feature 5 is the rounded logarithm of the frequency
+of a token in a word corpus obtained through a random crawl on university websites.
+Features 6 to 11 represent a simple regular expression match to an email, number, 
+honorific, URL, capitalization or punctuation sign.
+
+Feature 12 represents the HTML enclosing tag and its parent concatenated. Feature 13
+represents all CSS classes concatenated. These features are not very useful in a general
+sense, because every HTML document has a different format, so only because a named entity
+occurs inside a given HTML tag in a document we cannot say it is more likely to be the case 
+in other documents. However, these features can be useful for the HMM self-training strategy 
+described in section \ref{sssec:self_training}. 
+
+
+\chapter{Experiments}
+
+We conducted experiments to evaluate sequence labeling methods of named entity 
+recognition on HTML in the context of Web data extraction using the dataset 
+described in Section~\ref{sec:ner_dataset}. The tested models are described in
+Table~\ref{tab:models}.
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ ll }
+      \toprule
+      Model & Description \\
+      \midrule
+      hmm-1            & Regular HMM \\
+      hmm-2            & HMM with $ k=2 $ \\
+      hmm-3            & HMM with $ k=3 $ \\
+      crf              & Linear chain conditional random fields \\
+      bi-lstm-crf      & BI-LSTM-CRF model \\
+      bi-lstm-crf-cnn  & BI-LSTM-CRF with CNN character representations \\
+      bi-lstm-crf-lstm & BI-LSTM-CRF with LSTM character representations \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Model descriptions}
+  \label{tab:models}
+\end{table}
+
+The evaluation of model performance was done through the precision, recall and 
+F1 scores \cite{Rijsbergen1979}. Precision is the percentage of named entities found by 
+the model that are correct. Recall is the percentage of named entities that are present
+in the corpus and were found by the model. The F1 score is a composite measure that combines
+precision and recall with the formula:
+
+\begin{equation}
+F1 = \frac{2 * precision * recall}{precision + recall}
+\end{equation}
+
+Named entities were only considered to be correct if they were a complete match of the 
+corresponding entity in the dataset.
+
+\section{Experiment 1: No features}
+
+Experiment 1 aimed to evaluate the performance of sequence model with no features
+besides GloVe-100 embeddings. In the case of HMMs, only the lowercase
+unaccented token was used as a feature. Table \ref{tab:experiment1} 
+shows the Precision (P), Recall (R), and F1-scores (F1) for this
+experiment.
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllllll }
+      \toprule
+      \multirow{2}{*}{Model} & \multicolumn{3}{c}{Validation} & \multicolumn{3}{c}{Test} \\
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
+      \midrule
+      hmm-1	       & 0.6965 & 0.5749 & 0.6299 & 0.6263 & 0.4431 & 0.5190 \\
+      hmm-2	       & 0.7047 & 0.6286 & 0.6645 & 0.6480 & 0.5222 & 0.5783 \\
+      hmm-3	       & 0.6127 & 0.6141 & 0.6134 & 0.5471 & 0.4634 & 0.5018 \\
+      crf	       & 0.7173 & 0.6683 & 0.6920 & 0.6671 & 0.5868 & 0.6244 \\
+      bi-lstm-crf      & 0.8484 & 0.9044 & 0.8755 & 0.8358 & 0.8497 & 0.8427 \\
+      bi-lstm-crf-cnn  & 0.9058 & 0.9575 & 0.9309 & 0.8779 & 0.8737 & 0.8758 \\
+      bi-lstm-crf-lstm & 0.9134 & 0.9435 & 0.9282 & \textbf{0.8920} & \textbf{0.8815} & \textbf{0.8867} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Precision, recall and F1 in the NER on HTML dataset for models that incorporate no features}
+  \label{tab:experiment1}
+\end{table}
+
+Without carefully designed features or gazetteers, HMMs and CRFs have a very 
+poor performance, achieving an F1-score of only 0.5783 for HMM-2 and 0.6244 for CRF
+at the test set. This is expected, since these models rely on good feature selections.
+
+The neural models achieved high F1-scores in the test
+set even with the absence of features. The plain BI-LSTM-CRF architecture improved performance 
+significantly in comparison with the conventional CRF (0.8427 against 0.6244). 
+Also, neural character representations boosted performance by a significant margin
+reaching an F1-score of 0.8758 for CNN-based representations and 0.8867 for LSTM-based
+representations. LSTM based representations were superior in modelling
+morphological features, perhaps because they are able to differentiate suffixes 
+and prefixes, while CNN filters are position invariant. 
+
+The results in Experiment 1 also show that pretrained word embeddings can work 
+as a kind of universal gazetteer. Words with similar embeddings are likely to 
+belong to the same class. This knowledge combined with the ability to learn 
+morphological features can make up for the scarcity of textual data on some 
+webpages.
+
+\section{Experiment 2: All features}
+
+Experiment 2 aimed to evaluate the performance of sequence model with all
+the features described in Table~\ref{tab:features}. In this experiment, we
+also evaluate the self-training strategy for HMMs described in Section 
+\ref{sssec:self_training}. The self trained HMMs are described with the 
+suffix "+ST". Table \ref{tab:experiment2} shows the results for Experiment 2.
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllllll }
+      \toprule
+      \multirow{2}{*}{Model} & \multicolumn{3}{c}{Validation} & \multicolumn{3}{c}{Test} \\
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
+      \midrule
+      hmm-1	         & 0.6061 & 0.7282 & 0.6616 & 0.7106 & 0.7633 & 0.7360 \\
+      hmm-2	         & 0.6279 & 0.7550 & 0.6856 & 0.7521 & 0.7810 & 0.7663 \\
+      hmm-3	         & 0.6573 & 0.7819 & 0.7142 & 0.7523 & 0.7795 & 0.7657 \\
+      hmm-1+ST           & 0.7032 & 0.9077 & 0.7925 & 0.7522 & 0.8663 & 0.8052 \\
+      hmm-2+ST           & 0.7321 & 0.9172 & 0.8143 & 0.7737 & 0.8789 & 0.8230 \\
+      hmm-3+ST           & 0.7551 & 0.9172 & 0.8283 & 0.7961 & 0.8534 & 0.8237 \\
+      crf	         & 0.9024 & 0.9049 & 0.9037 & 0.8751 & 0.8227 & 0.8481 \\
+      bi-lstm-crf        & 0.9430 & 0.9530 & 0.9480 & 0.8998 & 0.8527 & 0.8756 \\
+      bi-lstm-crf-cnn    & 0.9244 & 0.9715 & 0.9474 & 0.9017 & \textbf{0.8973} & \textbf{0.8995} \\
+      bi-lstm-crf-lstm   & 0.9465 & 0.9692 & 0.9577 & \textbf{0.9108} & 0.8715 & 0.8907 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Precision, recall and F1 in the NER on HTML dataset for models that incorporate all features}
+  \label{tab:experiment2}
+\end{table}
+
+Conventional models like HMMs, and CRFs can become competitive with
+the right selection of features and a good gazetteer, however they still lose
+to the best neural model without features, demonstrating their inherent limitations.
+HMMs that employed trigrams or quadrigrams (hmm-2, hmm-3) performed better than
+regular HMMs. Also, we can see that the self-training strategy for HMMs improved 
+the quality of the models significantly in all cases, boosting both precision and recall. 
+This hints at the possibility to adapt this strategy to neural networks and boost
+the performance of neural models on the NER on HTML task.
+
+The neural models also improved a little with the addition of features. The plain BI-LSTM-CRF
+model gets a closer performance to the models that employed neural character 
+representations. It suggests that the LSTM and CNN character representations 
+were able to learn at least part of the morphological features automatically in the
+first experiment. So, when these features are added explicitly, the differences 
+in performance between different neural models become less noticeable.
+
+
+\chapter{Conclusion}
+
+Machine-learning-based sequence labeling models provide a flexible approach to Web data 
+extraction, in contrast to more traditional methods. In simple cases, a neural
+named entity tagger may be sufficient to solve the entire data extraction task. In 
+other cases, the sequence tagger remains an important part of the web data extraction
+system, as it performs attribute labeling on data records with accuracy and flexibility.
+
+In this article, we compared the performance of different sequence models on the task of
+named entity recognition on HTML, introducing a novel dataset that is publicly available. 
+We found that there are two components to the most successful models: neural based character 
+representations that extract morphological features automatically, and the joint modelling 
+of output labels.
+
+We showed that a BI-LSTM-CRF neural network with LSTM-based character representations can 
+be employed effectively to solve a web data extraction task, achieving an F1-score of 
+0.8867 with no feature engineering on the faculty listings dataset.
+
+The effective recognition of named entities on HTML is an essential step in most general 
+Web data extraction methods. The accuracy achieved by deep neural architectures even
+on webpages that are very different from the plain text for which these architectures 
+were initially designed shows the potential for a truly flexible approach to cross domain 
+web data extraction.
+
+
+\ppgccbibliography{bibfile}
+
+
+% \begin{appendices}
+% 
+% \chapter{Um apêndice}
+% 
+% \dummytxta
+% 
+% \chapter{Outro apêndice}
+% 
+% \dummytxta
+% 
+% \end{appendices}
+% 
+% 
+% \begin{attachments}
+% 
+% % Para cada anexo, um \chapter
+% \chapter{Um anexo}
+% 
+% \dummytxta
+% 
+% \chapter{Outro anexo}
+% 
+% \dummytxta
+% 
+% \end{attachments}
+
+
+\end{document}
