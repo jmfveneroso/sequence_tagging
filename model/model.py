@@ -195,8 +195,16 @@ class SequenceModel:
       training=self.training
     )
 
-  def html_attention(self, char_embs='cnn', num_heads=2, residual='add'):
-    word_embs = glove(self.words, self.params['words'], self.params['glove'])
+  def html_attention(self, word_embs='glove', char_embs='cnn', num_heads=2, residual='add'):
+    if word_embs == 'elmo':
+      word_embs = elmo(self.words, self.nwords)
+    elif word_embs == 'glove':
+      word_embs = glove(self.words, self.params['words'], self.params['glove'])
+    elif word_embs == 'word2vec':
+      word_embs = word2vec(self.words, self.params['words'], self.params['word2vec'])
+    else:
+      raise Exception('No word embeddings were selected.')
+
     char_embs = get_char_representations(
       self.chars, self.nchars, 
       self.params['chars'], mode=char_embs,
@@ -276,7 +284,7 @@ class SequenceModel:
     if model == 'lstm_crf':
       output = self.lstm_crf(word_embs=self.params['word_embeddings'], char_embs=self.params['char_representation'], use_features=self.params['use_features'])
     elif model == 'html_attention':
-      output = self.html_attention(char_embs=self.params['char_representation'])
+      output = self.html_attention(word_embs=self.params['word_embeddings'], char_embs=self.params['char_representation'])
     elif model == 'self_attention':
       output = self.self_attention()
     elif model == 'transformer':

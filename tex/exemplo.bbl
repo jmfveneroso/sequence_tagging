@@ -1,0 +1,505 @@
+\begin{thebibliography}{}
+
+\bibitem[Abdessalem et~al.\@, 2010]{Abdessalem2010}
+\ppgccbibauthordoformat {Abdessalem, T.\ppgccbibauthorsep {} Cautis,
+  B.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Derouiche, N.}
+  (\ppgccyeardoformat {2010}).
+\newblock \ppgccbibtitledoformat {{ObjectRunner: lightweight, targeted
+  extraction and querying of structured web data}}.
+\newblock \ppgccbibjournaldoformat {Proceedings of the VLDB {\ldots}},
+  \ppgccvolumedoformat {3}({\ppgccnumberdoformat {2}}):\ppgccpagedoformat
+  {1585}-\ppgccpagedoformat {}-\ppgccpagedoformat {1588}.
+\newblock ISSN \ppgccissndoformat {21508097}.
+
+\bibitem[Adelberg, 1998]{Adelberg1998}
+\ppgccbibauthordoformat {Adelberg, B.} (\ppgccyeardoformat {1998}).
+\newblock \ppgccbibtitledoformat {{NoDoSE---a tool for semi-automatically
+  extracting structured and semistructured data from text documents}}.
+\newblock \ppgccbibjournaldoformat {ACM SIGMOD Record}, \ppgccvolumedoformat
+  {27}({\ppgccnumberdoformat {2}}):\ppgccpagedoformat {283}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {294}.
+\newblock ISSN \ppgccissndoformat {01635808}.
+
+\bibitem[Arasu et~al.\@, 2003]{Arasu2003}
+\ppgccbibauthordoformat {Arasu, A.\ppgccbibauthorsep {} Garcia-Molina,
+  H.\ppgccbibauthorsep {} Arasu, A.\ppgccbibauthorlastsep {} \ppgccbibauthorand
+  {} Garcia-Molina, H.} (\ppgccyeardoformat {2003}).
+\newblock \ppgccbibtitledoformat {{Extracting structured data from Web pages}}.
+\newblock \ppgccbibjournaldoformat {2003 ACM SIGMOD International Conference on
+  Management of Data}, \ppgccbibpagesstring {} \ppgccpagedoformat {337
+  }-\ppgccpagedoformat {}-\ppgccpagedoformat { 348}.
+
+\bibitem[Arocena \ppgccciteauthorand {} Mendelzon, 1999]{Arocena1999}
+\ppgccbibauthordoformat {Arocena, G.~O. \ppgccbibauthorand {} Mendelzon, A.~O.}
+  (\ppgccyeardoformat {1999}).
+\newblock \ppgccbibtitledoformat {{WebOQL: Restructuring documents, databases,
+  and webs}}.
+\newblock \ppgccbibjournaldoformat {Theory and Practice of Object Systems},
+  \ppgccvolumedoformat {5}({\ppgccnumberdoformat {3}}):\ppgccpagedoformat
+  {127}-\ppgccpagedoformat {}-\ppgccpagedoformat {141}.
+\newblock ISSN \ppgccissndoformat {10743227}.
+
+\bibitem[Califf \ppgccciteauthorand {} Mooney, 1999]{Califf1999}
+\ppgccbibauthordoformat {Califf, M.~E. \ppgccbibauthorand {} Mooney, R.~J.}
+  (\ppgccyeardoformat {1999}).
+\newblock \ppgccbibtitledoformat {{Relational learning of pattern-match rules
+  for information extraction}}.
+\newblock \ppgccbibjournaldoformat {Computational Linguistics},
+  \ppgccvolumedoformat {4}:\ppgccpagedoformat {9}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {15}.
+\newblock ISSN \ppgccissndoformat {15324435}.
+
+\bibitem[Caruana et~al.\@, 2000]{Caruana2000}
+\ppgccbibauthordoformat {Caruana, R.\ppgccbibauthorsep {} Lawrence,
+  S.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Giles, L.}
+  (\ppgccyeardoformat {2000}).
+\newblock \ppgccbibtitledoformat {Overfitting in neural nets: Backpropagation,
+  conjugate gradient, and early stopping}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  13th International Conference on Neural Information Processing Systems},
+  NIPS'00, \ppgccbibpagesstring {} \ppgccpagedoformat {381}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {387}, Cambridge, MA, USA. MIT Press.
+
+\bibitem[Chang et~al.\@, 2001]{Chang2001}
+\ppgccbibauthordoformat {Chang, C.\ppgccbibauthorsep {} Chang,
+  C.\ppgccbibauthorsep {} Lui, S.\ppgccbibauthorlastsep {} \ppgccbibauthorand
+  {} Lui, S.} (\ppgccyeardoformat {2001}).
+\newblock \ppgccbibtitledoformat {{IEPAD: information extraction based on
+  pattern discovery}}.
+\newblock \ppgccbibjournaldoformat {Proceedings of the 10th international
+  conference on World Wide Web}, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {681}-\ppgccpagedoformat {}-\ppgccpagedoformat {688}.
+
+\bibitem[Chang et~al.\@, 2006]{Chang2006}
+\ppgccbibauthordoformat {Chang, C.-H.\ppgccbibauthorsep {} Kayed,
+  M.\ppgccbibauthorsep {} Girgis, M.~R.\ppgccbibauthorlastsep {}
+  \ppgccbibauthorand {} Shaalan, K.~F.} (\ppgccyeardoformat {2006}).
+\newblock \ppgccbibtitledoformat {{A Survey of Web Information Extraction
+  Systems}}.
+\newblock \ppgccbibjournaldoformat {IEEE Transactions on Knowledge and Data
+  Engineering}, \ppgccvolumedoformat {18}({\ppgccnumberdoformat
+  {10}}):\ppgccpagedoformat {1411}-\ppgccpagedoformat {}-\ppgccpagedoformat
+  {1428}.
+\newblock ISSN \ppgccissndoformat {1041-4347}.
+
+\bibitem[Chang \ppgccciteauthorand {} Kuo, 2004]{Chang2004}
+\ppgccbibauthordoformat {Chang, C.~H. \ppgccbibauthorand {} Kuo, S.~C.}
+  (\ppgccyeardoformat {2004}).
+\newblock \ppgccbibtitledoformat {{OLERA: Semisupervised Web-data extraction
+  with visual support}}.
+\newblock \ppgccbibjournaldoformat {IEEE Intelligent Systems},
+  \ppgccvolumedoformat {19}({\ppgccnumberdoformat {6}}):\ppgccpagedoformat
+  {56}-\ppgccpagedoformat {}-\ppgccpagedoformat {64}.
+\newblock ISSN \ppgccissndoformat {15411672}.
+
+\bibitem[Crescenzi et~al.\@, 2001]{Crescenzi2001}
+\ppgccbibauthordoformat {Crescenzi, V.\ppgccbibauthorsep {} Mecca,
+  G.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Merialdo, P.}
+  (\ppgccyeardoformat {2001}).
+\newblock \ppgccbibtitledoformat {{Roadrunner: Towards automatic data
+  extraction from large web sites}}.
+\newblock \ppgccbibjournaldoformat {Proceedings of the 27th International
+  Conference on Very Large Data Bases}, \ppgccbibpagesstring {}
+  \ppgccpagedoformat {109}-\ppgccpagedoformat {}-\ppgccpagedoformat {118}.
+\newblock ISSN \ppgccissndoformat {10477349}.
+
+\bibitem[Dong et~al.\@, 2014]{Dong2014}
+\ppgccbibauthordoformat {Dong, X.\ppgccbibauthorsep {} Gabrilovich,
+  E.\ppgccbibauthorsep {} Heitz, G.\ppgccbibauthorsep {} Horn,
+  W.\ppgccbibauthorsep {} Lao, N.\ppgccbibauthorsep {} Murphy,
+  K.\ppgccbibauthorsep {} Strohmann, T.\ppgccbibauthorsep {} Sun,
+  S.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Zhang, W.}
+  (\ppgccyeardoformat {2014}).
+\newblock \ppgccbibtitledoformat {{Knowledge vault: a web-scale approach to
+  probabilistic knowledge fusion}}.
+\newblock \ppgccbibjournaldoformat {Proceedings of the 20th ACM SIGKDD
+  international conference on Knowledge discovery and data mining - KDD '14},
+  \ppgccbibpagesstring {} \ppgccpagedoformat {601}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {610}.
+\newblock ISSN \ppgccissndoformat {0893-6080}.
+
+\bibitem[Ferrara \ppgccciteauthorand {} Baumgartner, 2011]{Ferrara2011}
+\ppgccbibauthordoformat {Ferrara, E. \ppgccbibauthorand {} Baumgartner, R.}
+  (\ppgccyeardoformat {2011}).
+\newblock \ppgccbibtitledoformat {{Automatic wrapper adaptation by tree edit
+  distance matching}}.
+\newblock \ppgccbibjournaldoformat {Smart Innovation, Systems and
+  Technologies}, \ppgccvolumedoformat {8}:\ppgccpagedoformat
+  {41}-\ppgccpagedoformat {}-\ppgccpagedoformat {54}.
+\newblock ISSN \ppgccissndoformat {21903018}.
+
+\bibitem[Ferrara et~al.\@, 2014]{Ferrara2014}
+\ppgccbibauthordoformat {Ferrara, E.\ppgccbibauthorsep {} {De Meo},
+  P.\ppgccbibauthorsep {} Fiumara, G.\ppgccbibauthorlastsep {}
+  \ppgccbibauthorand {} Baumgartner, R.} (\ppgccyeardoformat {2014}).
+\newblock \ppgccbibtitledoformat {{Web data extraction, applications and
+  techniques: A survey}}.
+\newblock \ppgccbibjournaldoformat {Knowledge-Based Systems},
+  \ppgccvolumedoformat {70}:\ppgccpagedoformat {301}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {323}.
+\newblock ISSN \ppgccissndoformat {09507051}.
+
+\bibitem[Freitag, 1998]{Freitag1998}
+\ppgccbibauthordoformat {Freitag, D.} (\ppgccyeardoformat {1998}).
+\newblock \ppgccbibtitledoformat {{Information Extraction from HTML:
+  Application of a General Machine Learning Approach}}.
+\newblock \ppgccbibjournaldoformat {Proceedings of the Fifteenth National/Tenth
+  Conference on Artificial Intelligence/Innovative Applications of Artificial
+  Intelligence}, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {517}-\ppgccpagedoformat {}-\ppgccpagedoformat {523}.
+
+\bibitem[Freitag \ppgccciteauthorand {} McCallum, 2000]{Freitag2000}
+\ppgccbibauthordoformat {Freitag, D. \ppgccbibauthorand {} McCallum, A.}
+  (\ppgccyeardoformat {2000}).
+\newblock \ppgccbibtitledoformat {Information extraction with hmm structures
+  learned by stochastic optimization}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  Seventeenth National Conference on Artificial Intelligence and Twelfth
+  Conference on Innovative Applications of Artificial Intelligence},
+  \ppgccbibpagesstring {} \ppgccpagedoformat {584}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {589}. AAAI Press.
+
+\bibitem[Freitag \ppgccciteauthorand {} Mccallum, 1999]{Freitag1999}
+\ppgccbibauthordoformat {Freitag, D. \ppgccbibauthorand {} Mccallum, A.~K.}
+  (\ppgccyeardoformat {1999}).
+\newblock \ppgccbibtitledoformat {Information extraction with hmms and
+  shrinkage}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {In Proceedings of
+  the AAAI-99 Workshop on Machine Learning for Information Extraction},
+  \ppgccbibpagesstring {} \ppgccpagedoformat {31}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {36}.
+
+\bibitem[Furche et~al.\@, 2012a]{Furche2012a}
+\ppgccbibauthordoformat {Furche, T.\ppgccbibauthorsep {} Gottlob,
+  G.\ppgccbibauthorsep {} Grasso, G.\ppgccbibauthorsep {} Gunes,
+  O.\ppgccbibauthorsep {} Guo, X.\ppgccbibauthorsep {} Kravchenko,
+  A.\ppgccbibauthorsep {} Orsi, G.\ppgccbibauthorsep {} Schallhart,
+  C.\ppgccbibauthorsep {} Sellers, A.\ppgccbibauthorlastsep {}
+  \ppgccbibauthorand {} Wang, C.} (\ppgccyeardoformat {2012a}).
+\newblock \ppgccbibtitledoformat {Diadem: Domain-centric, intelligent,
+  automated data extraction methodology}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  21st International Conference on World Wide Web}, WWW '12 Companion,
+  \ppgccbibpagesstring {} \ppgccpagedoformat {267}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {270}, New York, NY, USA. ACM.
+
+\bibitem[Furche et~al.\@, 2012b]{Furche2012}
+\ppgccbibauthordoformat {Furche, T.\ppgccbibauthorsep {} Gottlob,
+  G.\ppgccbibauthorsep {} Grasso, G.\ppgccbibauthorsep {} Orsi,
+  G.\ppgccbibauthorsep {} Schallhart, C.\ppgccbibauthorlastsep {}
+  \ppgccbibauthorand {} Wang, C.} (\ppgccyeardoformat {2012b}).
+\newblock \ppgccbibtitledoformat {{AMBER: Automatic Supervision for
+  Multi-Attribute Extraction}}.
+\newblock \ppgccbibjournaldoformat {arXiv preprint}, \ppgccvolumedoformat
+  {1210}({\ppgccnumberdoformat {5984}}):\ppgccpagedoformat
+  {1}-\ppgccpagedoformat {}-\ppgccpagedoformat {22}.
+
+\bibitem[Hammer et~al.\@, 1997]{Hammer1997}
+\ppgccbibauthordoformat {Hammer, J.\ppgccbibauthorsep {} Mchugh,
+  J.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Garcia-molina, H.}
+  (\ppgccyeardoformat {1997}).
+\newblock \ppgccbibtitledoformat {{Semistructured Data : The TSIMMIS
+  Experience}}.
+\newblock \ppgccbibjournaldoformat {Proceedings of the First East-European
+  Symposium on Advances in Databases and Information Systems},
+  \ppgccbibpagesstring {} \ppgccpagedoformat {1}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {8}.
+
+\bibitem[Hochreiter \ppgccciteauthorand {} Schmidhuber, 1997]{Hochreiter1997}
+\ppgccbibauthordoformat {Hochreiter, S. \ppgccbibauthorand {} Schmidhuber, J.}
+  (\ppgccyeardoformat {1997}).
+\newblock \ppgccbibtitledoformat {Long short-term memory}.
+\newblock \ppgccbibjournaldoformat {Neural Comput.}, \ppgccvolumedoformat
+  {9}({\ppgccnumberdoformat {8}}):\ppgccpagedoformat {1735}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {1780}.
+\newblock ISSN \ppgccissndoformat {0899-7667}.
+
+\bibitem[Hogue \ppgccciteauthorand {} Karger, 2005]{Hogue2005}
+\ppgccbibauthordoformat {Hogue, A. \ppgccbibauthorand {} Karger, D.}
+  (\ppgccyeardoformat {2005}).
+\newblock \ppgccbibtitledoformat {{Thresher : Automating the Unwrapping of
+  Semantic Content from the World Wide Web}}.
+\newblock \ppgccbibjournaldoformat {WWW '05: Proceedings of the 14th
+  international conference on World Wide Web}, \ppgccbibpagesstring {}
+  \ppgccpagedoformat {86}-\ppgccpagedoformat {}-\ppgccpagedoformat {95}.
+
+\bibitem[Hsu \ppgccciteauthorand {} Dung, 1998]{Hsu1998}
+\ppgccbibauthordoformat {Hsu, C.~N. \ppgccbibauthorand {} Dung, M.~T.}
+  (\ppgccyeardoformat {1998}).
+\newblock \ppgccbibtitledoformat {{Generating finite-state transducers for
+  semi-structured data extraction from the Web}}.
+\newblock \ppgccbibjournaldoformat {Information Systems}, \ppgccvolumedoformat
+  {23}({\ppgccnumberdoformat {8}}):\ppgccpagedoformat {521}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {538}.
+\newblock ISSN \ppgccissndoformat {03064379}.
+
+\bibitem[Huang et~al.\@, 2015]{Huang2015}
+\ppgccbibauthordoformat {Huang, Z.\ppgccbibauthorsep {} Xu,
+  W.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Yu, K.} (\ppgccyeardoformat
+  {2015}).
+\newblock \ppgccbibtitledoformat {Bidirectional {LSTM-CRF} models for sequence
+  tagging}.
+\newblock \ppgccbibjournaldoformat {CoRR}, \ppgccvolumedoformat
+  {abs/1508.01991}.
+
+\bibitem[Kr{\"{u}}pl et~al.\@, 2005]{Krupl2005}
+\ppgccbibauthordoformat {Kr{\"{u}}pl, B.\ppgccbibauthorsep {} Herzog,
+  M.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Gatterbauer, W.}
+  (\ppgccyeardoformat {2005}).
+\newblock \ppgccbibtitledoformat {{Using visual cues for extraction of tabular
+  data from arbitrary HTML documents}}.
+\newblock \ppgccbibjournaldoformat {Special interest tracks and posters of the
+  14th international conference on World Wide Web - WWW '05},
+  \ppgccbibpagesstring {} \ppgccpagedoformat {1000}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {}-\ppgccpagedoformat {}-\ppgccpagedoformat {1001}.
+
+\bibitem[Kushmerick, 2000]{Kushmerick2000}
+\ppgccbibauthordoformat {Kushmerick, N.} (\ppgccyeardoformat {2000}).
+\newblock \ppgccbibtitledoformat {{Wrapper induction: efficiency and
+  expressiveness}}.
+\newblock \ppgccbibjournaldoformat {Artificial Intelligence},
+  \ppgccvolumedoformat {118}({\ppgccnumberdoformat {1-2}}):\ppgccpagedoformat
+  {15}-\ppgccpagedoformat {}-\ppgccpagedoformat {68}.
+\newblock ISSN \ppgccissndoformat {00043702}.
+
+\bibitem[Laender et~al.\@, 2002a]{Laender2002}
+\ppgccbibauthordoformat {Laender, A.\ppgccbibauthorsep {} Ribeiro-Neto,
+  B.~A.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} S.Teixeria, J.}
+  (\ppgccyeardoformat {2002a}).
+\newblock \ppgccbibtitledoformat {{A brief survey of web data extraction
+  tools}}.
+\newblock \ppgccbibjournaldoformat {ACM SIGMOD Record 31(2)},
+  \ppgccbibpagesstring {} \ppgccpagedoformat {84}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {93}.
+
+\bibitem[Laender et~al.\@, 2002b]{Laender2002a}
+\ppgccbibauthordoformat {Laender, A. H.~F.\ppgccbibauthorsep {} Ribeiro-Neto,
+  B.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} da~Silva, A.~S.}
+  (\ppgccyeardoformat {2002b}).
+\newblock \ppgccbibtitledoformat {{DEByE - Date extraction by example}}.
+\newblock \ppgccbibjournaldoformat {Data Knowl. Eng.}, \ppgccvolumedoformat
+  {40}({\ppgccnumberdoformat {2}}):\ppgccpagedoformat {121}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {154}.
+\newblock ISSN \ppgccissndoformat {0169-023X}.
+
+\bibitem[Lafferty, 2001]{Lafferty2001}
+\ppgccbibauthordoformat {Lafferty, J.} (\ppgccyeardoformat {2001}).
+\newblock \ppgccbibtitledoformat {Conditional random fields: Probabilistic
+  models for segmenting and labeling sequence data}.
+\newblock \ppgccbibpagesstring {} \ppgccpagedoformat {282}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {289}. Morgan Kaufmann.
+
+\bibitem[Lample et~al.\@, 2016]{Lample2016}
+\ppgccbibauthordoformat {Lample, G.\ppgccbibauthorsep {} Ballesteros,
+  M.\ppgccbibauthorsep {} Subramanian, S.\ppgccbibauthorsep {} Kawakami,
+  K.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Dyer, C.}
+  (\ppgccyeardoformat {2016}).
+\newblock \ppgccbibtitledoformat {Neural architectures for named entity
+  recognition}.
+\newblock \ppgccbibjournaldoformat {CoRR}, \ppgccvolumedoformat
+  {abs/1603.01360}.
+
+\bibitem[Leek, 1997]{Leek1997}
+\ppgccbibauthordoformat {Leek, T.~R.} (\ppgccyeardoformat {1997}).
+\newblock \ppgccbibtitledoformat {Information extraction using hidden markov
+  models}.
+
+\bibitem[Li \ppgccciteauthorand {} Gray, 2000]{Li2000}
+\ppgccbibauthordoformat {Li, J. \ppgccbibauthorand {} Gray, R.~M.}
+  (\ppgccyeardoformat {2000}).
+\newblock \ppgccbibbtitledoformat {Image Segmentation and Compression Using
+  Hidden Markov Models}.
+\newblock Kluwer Academic Publishers, Norwell, MA, USA.
+\newblock ISBN \ppgccissndoformat {0792378997}.
+
+\bibitem[Liu \ppgccciteauthorand {} Nocedal, 1989]{Liu1989}
+\ppgccbibauthordoformat {Liu, D.~C. \ppgccbibauthorand {} Nocedal, J.}
+  (\ppgccyeardoformat {1989}).
+\newblock \ppgccbibtitledoformat {On the limited memory bfgs method for large
+  scale optimization}.
+\newblock \ppgccbibjournaldoformat {Mathematical Programming},
+  \ppgccvolumedoformat {45}({\ppgccnumberdoformat {1}}):\ppgccpagedoformat
+  {503}-\ppgccpagedoformat {}-\ppgccpagedoformat {528}.
+
+\bibitem[Liu et~al.\@, 2000]{Liu2000}
+\ppgccbibauthordoformat {Liu, L.\ppgccbibauthorsep {} Pu,
+  C.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Han, W.}
+  (\ppgccyeardoformat {2000}).
+\newblock \ppgccbibtitledoformat {{XWRAP: an XML-enabled wrapper construction
+  system for Web information sources}}.
+\newblock \ppgccbibjournaldoformat {Proceedings of 16th International
+  Conference on Data Engineering}, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {611}-\ppgccpagedoformat {}-\ppgccpagedoformat {621}.
+\newblock ISSN \ppgccissndoformat {1063-6382}.
+
+\bibitem[Ma \ppgccciteauthorand {} Hovy, 2016]{Ma2016}
+\ppgccbibauthordoformat {Ma, X. \ppgccbibauthorand {} Hovy, E.~H.}
+  (\ppgccyeardoformat {2016}).
+\newblock \ppgccbibtitledoformat {End-to-end sequence labeling via
+  bi-directional lstm-cnns-crf}.
+\newblock \ppgccbibjournaldoformat {CoRR}, \ppgccvolumedoformat
+  {abs/1603.01354}.
+
+\bibitem[McCallum et~al.\@, 2000]{McCallum2000}
+\ppgccbibauthordoformat {McCallum, A.\ppgccbibauthorsep {} Freitag,
+  D.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Pereira, F. C.~N.}
+  (\ppgccyeardoformat {2000}).
+\newblock \ppgccbibtitledoformat {Maximum entropy markov models for information
+  extraction and segmentation}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  Seventeenth International Conference on Machine Learning}, ICML '00,
+  \ppgccbibpagesstring {} \ppgccpagedoformat {591}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {598}, San Francisco, CA, USA. Morgan Kaufmann
+  Publishers Inc.
+
+\bibitem[Muslea et~al.\@, 1999]{Muslea1999}
+\ppgccbibauthordoformat {Muslea, I.\ppgccbibauthorsep {} Minton,
+  S.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Knoblock, C.}
+  (\ppgccyeardoformat {1999}).
+\newblock \ppgccbibtitledoformat {{A Hierarchical Approach to Wrapper
+  Induction}}.
+\newblock \ppgccbibjournaldoformat {Proc. of the Third Annual Conf. on
+  Autonomous Agents, ACM}, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {190}-\ppgccpagedoformat {}-\ppgccpagedoformat {197}.
+
+\bibitem[Pennington et~al.\@, 2014]{Pennington2014}
+\ppgccbibauthordoformat {Pennington, J.\ppgccbibauthorsep {} Socher,
+  R.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Manning, C.~D.}
+  (\ppgccyeardoformat {2014}).
+\newblock \ppgccbibtitledoformat {Glove: Global vectors for word
+  representation}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {In EMNLP}.
+
+\bibitem[Rabiner, 1990]{Rabiner1990}
+\ppgccbibauthordoformat {Rabiner, L.~R.} (\ppgccyeardoformat {1990}).
+\newblock \ppgccbibtitledoformat {Readings in speech recognition}.
+\newblock \ppgccbibchapterstring {} A Tutorial on Hidden Markov Models and
+  Selected Applications in Speech Recognition, \ppgccbibpagesstring {}
+  \ppgccpagedoformat {267}-\ppgccpagedoformat {}-\ppgccpagedoformat {296}.
+  Morgan Kaufmann Publishers Inc., San Francisco, CA, USA.
+
+\bibitem[Ramshaw \ppgccciteauthorand {} Marcus, 1999]{Ramshaw1999}
+\ppgccbibauthordoformat {Ramshaw, L.~A. \ppgccbibauthorand {} Marcus, M.~P.}
+  (\ppgccyeardoformat {1999}).
+\newblock \ppgccbibbtitledoformat {Text Chunking Using Transformation-Based
+  Learning}, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {157}-\ppgccpagedoformat {}-\ppgccpagedoformat {176}.
+\newblock Springer Netherlands, Dordrecht.
+
+\bibitem[Rijsbergen, 1979]{Rijsbergen1979}
+\ppgccbibauthordoformat {Rijsbergen, C. J.~V.} (\ppgccyeardoformat {1979}).
+\newblock \ppgccbibbtitledoformat {Information Retrieval}.
+\newblock Butterworth-Heinemann, Newton, MA, USA, 2nd \ppgccbibeditionstring
+  {}.
+\newblock ISBN \ppgccissndoformat {0408709294}.
+
+\bibitem[Sahuguet \ppgccciteauthorand {} Azavant, 1999]{Sahuguet1999}
+\ppgccbibauthordoformat {Sahuguet, A. \ppgccbibauthorand {} Azavant, F.}
+  (\ppgccyeardoformat {1999}).
+\newblock \ppgccbibtitledoformat {{Building light-weight wrappers for legacy
+  Web data-sources using W4F}}.
+\newblock \ppgccbibjournaldoformat {Proceedings of the 25th VLDB Conference},
+  \ppgccvolumedoformat {99}:\ppgccpagedoformat {738}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {741}.
+
+\bibitem[Sarawagi, 2008]{Sarawagi2008}
+\ppgccbibauthordoformat {Sarawagi, S.} (\ppgccyeardoformat {2008}).
+\newblock \ppgccbibtitledoformat {{Information extraction}}.
+\newblock \ppgccbibjournaldoformat {Foundations and Trends in Databases},
+  \ppgccvolumedoformat {1}({\ppgccnumberdoformat {3}}):\ppgccpagedoformat
+  {261}-\ppgccpagedoformat {}-\ppgccpagedoformat {377}.
+\newblock ISSN \ppgccissndoformat {1931-7883}.
+
+\bibitem[Schulz et~al.\@, 2016]{Schulz2016}
+\ppgccbibauthordoformat {Schulz, A.\ppgccbibauthorsep {} L{\"{a}}ssig,
+  J.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Gaedke, M.}
+  (\ppgccyeardoformat {2016}).
+\newblock \ppgccbibtitledoformat {{Practical web data extraction: Are we there
+  yet? --- A short survey}}.
+\newblock \ppgccbibjournaldoformat {IEEE/WIC/ACM International Conference on
+  Web Intelligence (WI), 2016}, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {562}-\ppgccpagedoformat {}-\ppgccpagedoformat {}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {567}.
+
+\bibitem[Shi et~al.\@, 2015]{Shi2015}
+\ppgccbibauthordoformat {Shi, S.\ppgccbibauthorsep {} Liu, C.\ppgccbibauthorsep
+  {} Shen, Y.\ppgccbibauthorsep {} Yuan, C.\ppgccbibauthorlastsep {}
+  \ppgccbibauthorand {} Huang, Y.} (\ppgccyeardoformat {2015}).
+\newblock \ppgccbibtitledoformat {{AutoRM: An effective approach for automatic
+  Web data record mining}}.
+\newblock \ppgccbibjournaldoformat {Knowledge-Based Systems},
+  \ppgccvolumedoformat {89}:\ppgccpagedoformat {314}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {331}.
+\newblock ISSN \ppgccissndoformat {09507051}.
+
+\bibitem[Soderland, 1999]{Soderland1999}
+\ppgccbibauthordoformat {Soderland, S.} (\ppgccyeardoformat {1999}).
+\newblock \ppgccbibtitledoformat {{Learning Information Extraction Rules for
+  Semi-Structured and Free Text}}.
+\newblock \ppgccbibjournaldoformat {Machine Learning}, \ppgccvolumedoformat
+  {34}({\ppgccnumberdoformat {1}}):\ppgccpagedoformat {233}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {272}.
+\newblock ISSN \ppgccissndoformat {0885-6125}.
+
+\bibitem[Tjong Kim~Sang \ppgccciteauthorand {} De~Meulder, 2003]{Sang2003}
+\ppgccbibauthordoformat {Tjong Kim~Sang, E.~F. \ppgccbibauthorand {}
+  De~Meulder, F.} (\ppgccyeardoformat {2003}).
+\newblock \ppgccbibtitledoformat {Introduction to the conll-2003 shared task:
+  Language-independent named entity recognition}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  Seventh Conference on Natural Language Learning at HLT-NAACL 2003 - Volume
+  4}, CONLL '03, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {142}-\ppgccpagedoformat {}-\ppgccpagedoformat {147}, Stroudsburg, PA, USA.
+  Association for Computational Linguistics.
+
+\bibitem[Varlamov \ppgccciteauthorand {} Turdakov, 2016]{Varlamov2016}
+\ppgccbibauthordoformat {Varlamov, M.~I. \ppgccbibauthorand {} Turdakov, D.~Y.}
+  (\ppgccyeardoformat {2016}).
+\newblock \ppgccbibtitledoformat {{A survey of methods for the extraction of
+  information from Web resources}}.
+\newblock \ppgccbibjournaldoformat {Programming and Computer Software},
+  \ppgccvolumedoformat {42}({\ppgccnumberdoformat {5}}):\ppgccpagedoformat
+  {279}-\ppgccpagedoformat {}-\ppgccpagedoformat {291}.
+\newblock ISSN \ppgccissndoformat {0361-7688}.
+
+\bibitem[Wang \ppgccciteauthorand {} Lochovsky, 2003]{Wang2003}
+\ppgccbibauthordoformat {Wang, J. \ppgccbibauthorand {} Lochovsky, F.~H.}
+  (\ppgccyeardoformat {2003}).
+\newblock \ppgccbibtitledoformat {{Data extraction and label assignment for web
+  databases}}.
+\newblock \ppgccbibjournaldoformat {Proceedings of the twelfth international
+  conference on World Wide Web - WWW '03}, \ppgccbibpagestring {} 187.
+\newblock ISSN \ppgccissndoformat {00320862}.
+
+\bibitem[Zhai \ppgccciteauthorand {} Liu, 2005]{Zhai2005}
+\ppgccbibauthordoformat {Zhai, Y. \ppgccbibauthorand {} Liu, B.}
+  (\ppgccyeardoformat {2005}).
+\newblock \ppgccbibtitledoformat {{Web data extraction based on partial tree
+  alignment}}.
+\newblock \ppgccbibjournaldoformat {Proceedings of the 14th international
+  conference on World Wide Web - WWW '05}, \ppgccbibpagestring {}~76.
+\newblock ISSN \ppgccissndoformat {10414347}.
+
+\bibitem[Zhu et~al.\@, 2005]{Zhu2005}
+\ppgccbibauthordoformat {Zhu, J.\ppgccbibauthorsep {} Nie, Z.\ppgccbibauthorsep
+  {} Wen, J.-R.\ppgccbibauthorsep {} Zhang, B.\ppgccbibauthorlastsep {}
+  \ppgccbibauthorand {} Ma, W.-Y.} (\ppgccyeardoformat {2005}).
+\newblock \ppgccbibtitledoformat {2d conditional random fields for web
+  information extraction}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  22Nd International Conference on Machine Learning}, ICML '05,
+  \ppgccbibpagesstring {} \ppgccpagedoformat {1044}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {1051}, New York, NY, USA. ACM.
+
+\bibitem[Zhu et~al.\@, 2006]{Zhu2006}
+\ppgccbibauthordoformat {Zhu, J.\ppgccbibauthorsep {} Nie, Z.\ppgccbibauthorsep
+  {} Wen, J.-R.\ppgccbibauthorsep {} Zhang, B.\ppgccbibauthorlastsep {}
+  \ppgccbibauthorand {} Ma, W.-Y.} (\ppgccyeardoformat {2006}).
+\newblock \ppgccbibtitledoformat {Simultaneous record detection and attribute
+  labeling in web data extraction}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  12th ACM SIGKDD International Conference on Knowledge Discovery and Data
+  Mining}, KDD '06, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {494}-\ppgccpagedoformat {}-\ppgccpagedoformat {503}, New York, NY, USA. ACM.
+
+\end{thebibliography}

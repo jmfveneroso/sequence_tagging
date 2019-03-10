@@ -1,0 +1,25 @@
+\select@language {english}
+\contentsline {chapter}{Acknowledgments}{xi}{chapter*.1}
+\contentsline {chapter}{Resumo}{xv}{chapter*.2}
+\contentsline {chapter}{Abstract}{xvii}{chapter*.3}
+\contentsline {chapter}{List of Figures}{xix}{section*.4}
+\contentsline {chapter}{List of Tables}{xxi}{section*.5}
+\contentsline {chapter}{\chapternumberline {1}Introduction}{1}{chapter.1}
+\contentsline {chapter}{\chapternumberline {2}Related Work}{5}{chapter.2}
+\contentsline {chapter}{\chapternumberline {3}Named Entity Recognition Models}{9}{chapter.3}
+\contentsline {section}{\numberline {3.1}Hidden Markov Models}{9}{section.3.1}
+\contentsline {subsection}{\numberline {3.1.1}Self training}{10}{subsection.3.1.1}
+\contentsline {section}{\numberline {3.2}Linear Chain Conditional Random Fields}{11}{section.3.2}
+\contentsline {section}{\numberline {3.3}Neural Network Architectures}{12}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}BI-LSTM-CRF}{14}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.3.2}CNN character representations}{15}{subsection.3.3.2}
+\contentsline {subsection}{\numberline {3.3.3}LSTM character representations}{16}{subsection.3.3.3}
+\contentsline {subsection}{\numberline {3.3.4}Network training}{17}{subsection.3.3.4}
+\contentsline {chapter}{\chapternumberline {4}NER on HTML Dataset}{19}{chapter.4}
+\contentsline {section}{\numberline {4.1}Data}{20}{section.4.1}
+\contentsline {section}{\numberline {4.2}Features}{20}{section.4.2}
+\contentsline {chapter}{\chapternumberline {5}Experiments}{23}{chapter.5}
+\contentsline {section}{\numberline {5.1}Experiment 1: No features}{24}{section.5.1}
+\contentsline {section}{\numberline {5.2}Experiment 2: All features}{25}{section.5.2}
+\contentsline {chapter}{\chapternumberline {6}Conclusion}{27}{chapter.6}
+\contentsline {chapter}{Bibliography}{29}{section*.7}
