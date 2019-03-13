@@ -3,48 +3,53 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: exemplo.aux
 The style file: ppgccufmg.bst
 Database file #1: bibfile.bib
+Repeated entry---line 909 of file bibfile.bib
+ : @inproceedings{Grishman1996
+ :                            ,
+I'm skipping whatever remains of this entry
+Warning--I didn't find a database entry for "Katyar2018"
 Warning--empty booktitle in Lafferty2001
 Warning--empty booktitle in Rabiner1990
 Warning--can't use both author and editor fields in Ramshaw1999
-You've used 54 entries,
+You've used 61 entries,
             2043 wiz_defined-function locations,
-            923 strings with 15352 characters,
-and the built_in function-call counts, 25476 in all, are:
-= -- 2623
-> -- 896
-< -- 57
-+ -- 301
-- -- 298
-* -- 2301
-:= -- 4093
-add.period$ -- 195
-call.type$ -- 54
-change.case$ -- 417
-chr.to.int$ -- 51
-cite$ -- 57
-duplicate$ -- 998
-empty$ -- 1784
-format.name$ -- 390
-if$ -- 5245
+            980 strings with 16974 characters,
+and the built_in function-call counts, 29082 in all, are:
+= -- 2992
+> -- 1035
+< -- 64
++ -- 349
+- -- 346
+* -- 2631
+:= -- 4668
+add.period$ -- 220
+call.type$ -- 61
+change.case$ -- 476
+chr.to.int$ -- 58
+cite$ -- 64
+duplicate$ -- 1137
+empty$ -- 2037
+format.name$ -- 447
+if$ -- 5997
 int.to.chr$ -- 4
 int.to.str$ -- 0
-missing$ -- 107
-newline$ -- 296
-num.names$ -- 162
-pop$ -- 374
+missing$ -- 121
+newline$ -- 331
+num.names$ -- 183
+pop$ -- 424
 preamble$ -- 1
-purify$ -- 419
+purify$ -- 478
 quote$ -- 0
-skip$ -- 879
+skip$ -- 1001
 stack$ -- 0
-substring$ -- 1906
-swap$ -- 226
-text.length$ -- 27
+substring$ -- 2178
+swap$ -- 258
+text.length$ -- 31
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 318
+type$ -- 360
 warning$ -- 3
-while$ -- 222
+while$ -- 252
 width$ -- 0
-write$ -- 772
-(There were 3 warnings)
+write$ -- 875
+(There was 1 error message)

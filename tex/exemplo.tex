@@ -246,6 +246,17 @@ that ultimately renders it comprehensible. However, in the context of \textit{In
 we refer to unstructured data in contraposition to tabular data, which are in many cases 
 easier to work with than plain text.
 
+\textit{Information Extraction} is a multifaceted problem that spans communities 
+of researchers in the fields of \textit{Text Mining}, Information Retrieval, and Natural 
+Language Processing. \textit{Text mining} is the search of patterns in unstructured text 
+that may involve document clustering, document summarization, \textit{Information Extraction},
+and other subtasks. \textit{Information Retrieval} is tipically concerned with the parsing, 
+indexing and retrieval of documents and \textit{Information Extraction} can help giving a more precise 
+answer to the user's information needs. Finally, \textit{Natural Language Processing}
+is a field of Computer Science concerned with how computers process and understand natural 
+language of which two subtasks, namely Named Entity recognition and Relation Extraction,
+are of special importance for \textit{Information Extraction}.
+
 A popular application of \textit{Information Extraction} is the identification of 
 entities such as people, organizations, or events from news sources and the determination
 of their relations. For example, one could be interested in determining who is the CEO of a company
@@ -259,55 +270,156 @@ remarkably different challenge since the context of tweets is very limited and t
 of abbreviations and typos is more widespread than in the case of highly curated content
 such as news.
 
-A different application of \textit{Information Extraction} is extracting scientific 
-valuable information from medical texts such as the interaction between human genes
-and proteins. This task 
+The field of bio-informatics has also found important applications for 
+\textit{Information Extraction}. The first BioCreAtIvE challenge dealt with extraction 
+of gene or protein names from text, and their mapping into standardized gene identifiers 
+for three model organism databases (fly, mouse, yeast).~\cite{Hirschman2005}.
+In the BioCreative/OHNLP Challenge 2018~\cite{Rastegar-Mojarad2018}, researchers 
+were required to investigate methods of family history information extraction. Family
+history is a critical piece of information in the decision process for diagnosis and 
+treatment of diseases, however the main sources of data are unstructured electronic 
+health records. The task is divided in two subtasks: 1) Entity recognition 
+(family members and disease names); and 2) Relation Extraction (family members and
+corresponding observations).
 
-The field of bio-informatics has also found an application for 
-\textit{Information Extraction} in determining gene and protein 
-relationships by extracting these entities from paper repositories
-such as PubMed [22, 32, 166].
-
-Another scientific application of \textit{Information Extraction} is important 
-for citation 
-databases such as Citeseer [126], Google Scholar and Cora [144], DBLP and Arxiv.
+Another scientific application for \textit{Information Extraction} methods is the 
+the extraction of information from research papers to populate citation 
+databases and bibliography search engines such as Citeseer~\cite{Lawrence1999}, 
+DBLP~\footnote{http://dblp.uni-trier.de/}, 
+Semantic Scholar~\footnote{https://www.semanticscholar.org}, and 
+Google Scholar~\footnote{https://scholar.google.com/}.
 The vast amount of scientific knowledge produced daily demands automatic
 methods for extracting authors, titles, affiliations, references, venues 
 and the year of publication from research papers and online resources such
 as university websites, individual researcher home pages and conference
-websites. This application is especially important for the evaluation and 
+websites. This application is especially important to the evaluation and 
 bibliometrics research communities, that are concerned with the measure of
 academic impact and researcher productivity through the usage of quantitative
-indices of academic impact such as such as the H-index (citation) and 
-P-score (citation). This application does not involve only Informa
+indices of academic impact such as the H-index~\cite{Hirsch2005} and 
+P-score~\cite{Ribas2015a}. 
 
-Sarawagi~\cite{Sarawagi2008} gives a far more detailed description of the applications of 
-\textit{Information Extraction} in her survey.
+\textit{Web Data Extraction} works a little different from
+\textit{Information Extraction} in plain text because HTML documents frequently
+lie in between the structured/unstructured data paradigm. Relevant entities 
+may occur inside tables, lists, or other types of visual elements that provide 
+little to no contextual information that could give hints about their category.
+Web pages have a two dimensional tabular structure that is usually more similar
+to a spreadsheet than to text found in news corpora. For this reason, features
+extracted from the DOM hierarchy such as element disposition, CSS classes, and
+nesting structure can provide valuable information in identifying entities and
+extracting their attributes. Yet, we cannot expect these features to be completely 
+constrained by an underlying pattern. Organization patterns tend to follow some 
+guidelines but they are in no way subject to strict rules. 
 
-\textit{Web Data Extraction} is different from \textit{Information Extraction} from
-news sources because....
+Most existing Web data extraction methods are tailored to extract data 
+from a single webpage, producing different compromises between efficacy and 
+degree of human supervision. Usually, these methods work in two steps. In the 
+record segmentation step, we seek to cluster visually and structurally 
+similar webpage regions and identify repeating data records. In the attribute 
+labeling stage, we seek to identify the correct attributes for each data record,
+maybe resorting to regular expressions or simple dictionary matching strategies
+depending on the task at hand. The outcome of each step can aid one 
+another. The inner patterns of data records can help identifying attributes 
+of other data records. Also, by properly identifying attributes, 
+it becomes easier to determine boundaries and perform record segmentation 
+correctly. Figure~\ref{fig:amazon} shows how a hypothetical \ref{Web Data Extraction} 
+system that aims to collect book titles and prices from Amazon could perform record
+segmentation and attribute labeling.
 
+The task of extracting product names and prices from online catalogs can 
+likely be solved by a rather inflexible system that operates mainly with 
+hard coded rules and simple regular expressions, especially if we only 
+consider pages with a very similar template (e.g. Amazon product listings).
+Classical wrapper generators \cite{Kushmerick2000,Hsu1998,Muslea1999} are 
+well suited for this type of task. However, when we need to identify more 
+complex and ambiguous entities such as researcher names in many different 
+contexts such as faculty websites, we might be better off with a more 
+flexible approach. The task of Named Entity Recognition aims to identify
+named entities (e.g. people, organizations, etc.) in plain text, but we will
+see in the next chapters that the sequence models that work well in plain text
+can also be employed succesfully in web extraction tasks, sometimes with a few
+alterations.
 
-
-
-
-
-\textit{Information Extraction} 
-is a multifaceted problem that spans communities of researchers in the fields of Text Mining, 
-Information Retrieval, and Natural Language Processing. 
-
-
-
-
-
+This section gives a brief introduction to \textit{Information Extraction}, but
+there are many applications that were not discussed here. A more detailed view 
+of the field is given in Sarawagi~\cite{Sarawagi2008}.
 
 \section{Named Entity Recognition}
 \label{sec:named_entity_recognition}
 
-MUC-6  MUC-7~\cite{Chinchor1998}, the CoNLL-2003~\cite{KimSang2003}
+\textit{Named Entity Recognition} is a task in Natural Language Processing that
+aims to identify \textit{Named Entities} in a text. The Named Entity Recognition 
+task first appeared as a subtask of 
+\textit{Information Extraction} in the context of the Message Understanding 
+Conference (MUC) promoted by the american Naval Ocean Systems Center. In 
+MUC-3, a precursor task involved extracting information on terrorist 
+incidents (incident type, date, location, perpetrator, target, instrument,
+outcome, etc.) from messages disseminated by the Foreign Broadcast
+Information Service of the U.S. Government~\cite{Sundheim1991}. In MUC-6~\cite{Grishman1996} the 
+"named entity" task was created with the goal of identifying the names of people, 
+organizations, and geographic locations from articles of the Wall Street Journal.
+In MUC-7, the task was expanded to handle multilingual evaluation and 
+"Named Entities (NE) were defined as proper names and quantities of 
+interest. Person, organization, and location names were marked as well 
+as dates, times, percentages, and monetary amounts"~\cite{Chinchor1998}.
+The shared-task at the Conference on Computational Natural Language Learning 
+in 2003~\cite{KimSang2003} concerned language-independent named entity recognition 
+and it is especially important because it established an enduring data format for
+NER and it introduced a dataset of articles extracted from news sources that is to this
+day still employed to evaluate the quality of NER systems.
 
-or authors and citations from scientific
-articles.
+The task of \textit{Named Entity Recognition} is essentialy a sequence labeling
+task. That is, given a sequence of tokens we want to attribute labels to each
+token classifying them in one of a number of predefined classes. Figure~\ref{fig:ner_example}
+describes the process of atributing Named Entity labels to a sentence according to the
+CONLL format. There are cases where a token may belong to more than one class because of
+nested named entities (e.g. in "CoNLL 2003", 2003 is both part of a conference name and a date).
+This complexity is of importance to some applications~\cite{Katyar2018} but it will not be discussed 
+here because nested named entities are absent from our concrete problem of researcher name extraction
+and most sequence models can be adapted to handle this special case with a few modifications.
+
+A simple approach to \textit{Named Entity Recognition} can be devised through the use
+of regular expressions, which are search patterns that describe a regular language and can
+be easily implemented in most programming languages. These programs can be perfectly suited
+to extract regular entities such as dates and prices with almost perfect accuracy. The extraction
+of other types of entities that belong to a limited set such as the names of states in a country can 
+be accomplished through dictionary matching. Other types of entities such as the ones investigated in
+the CoNLL-2003 challenge require more sophisticated methods of sequence labeling.
+
+Some classical statistical methods of \textit{Sequence Labeling} that are able to handle the labeling
+of complex entities with decent accuracy are Hidden Markov Models, Linear Chain 
+Conditional Random Fields and Maximum Entropy Markov Models. The first two will be explored
+in further detail in Chapter~\ref{cha:sequence_models}, and the latter is essentialy a more
+restrictive discriminative model in comparison with Condition Random Fields. These statistical 
+approaches have had remarkable resiliency in \textit{Sequence Labeling} tasks and still provide 
+a good first approximation to a solution because of their simplicity, speed and accuracy.
+
+As is the case with most NLP tasks, the deep learning revolution has brought huge advancements
+to \textit{Named Entity Recognition}. Essentialy all the current best scoring models at the 
+Conll-2003 task employ some form of deep neural network, and most often Long Short Term Memory 
+recurrent neural networks with a range of differing characteristics. Combined with pretrained
+word embeddings these models provide a powerful method of sequence labeling that requires 
+practically no feature engineering or dictionary. However, these models have become quite 
+complex, constrasting with earlier approaches such as HMMs, in the fact that the 
+training time of such networks has increased by many orders of magnitude, and if we take into
+consideration the training of word embeddings such as Word2Vec's skip gram model in a billion token
+corpus it is no exaggeration to say that deep learning models increase the training time by a
+thousandfold when compared to earlier approaches. Additionaly, most deep learning models require
+expensive hardware in the form of GPUs or more recently TPUs (Google's Tensor Processing Units)
+to become practical options. That is to say that despite deep learning representing the 
+inquivocal state-of-the-art, classical statistical models still are of significance and one might 
+also risk saying competitive as we will see in later chapters.
+
+Another disadvantage of deep learning in contrast with other models such a HMMs is the lack
+of interpretability of trained models. The complexity of a neural networks renders impractical 
+the effort of understanding why the model takes the decisions it takes. We also have to discuss the
+problem of causality
+
+
+
+
+
+
 
 
 \section{Researcher Name Extraction}

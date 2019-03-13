@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.10.12)  13 MAR 2019 13:31
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015/Debian) (preloaded format=pdflatex 2018.10.12)  13 MAR 2019 19:37
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -946,88 +946,96 @@ cle are avail-able in:
 
 ] [2] [3] [4
 
-] [5]
+] [5] [6] [7]
 
-Package natbib Warning: Citation `McCallum2005' on page 6 undefined on input li
-ne 239.
-
-[6]
-
-Package natbib Warning: Citation `Chinchor1998' on page 7 undefined on input li
-ne 301.
+LaTeX Warning: Reference `fig:amazon' on page 8 undefined on input line 325.
 
 
-Package natbib Warning: Citation `KimSang2003' on page 7 undefined on input lin
-e 301.
+LaTeX Warning: Reference `Web Data Extraction' on page 8 undefined on input lin
+e 325.
 
-[7] [8
+[8]
 
-] [9]
+LaTeX Warning: Reference `fig:ner_example' on page 9 undefined on input line 37
+3.
+
+
+Package natbib Warning: Citation `Katyar2018' on page 9 undefined on input line
+ 377.
+
+[9]
+
+LaTeX Warning: Reference `cha:sequence_models' on page 10 undefined on input li
+ne 392.
+
+[10] [11
+
+]
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[10] [11] [12
+[12] [13] [14
 
-] [13] [14] [15] [16] [17
+] [15] [16] [17] [18] [19
 
-] [18]
-Underfull \hbox (badness 10000) in paragraph at lines 700--702
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 709--711
+] [20]
+Underfull \hbox (badness 10000) in paragraph at lines 818--820
 
  []
 
-[19]
+
+Underfull \hbox (badness 10000) in paragraph at lines 827--829
+
+ []
+
+[21]
 * ppgccufmg: Pelo menos uma ilustracao encontrada.
-<pics/rnn_network.png, id=588, 599.99156pt x 286.82156pt>
+<pics/rnn_network.png, id=639, 599.99156pt x 286.82156pt>
 File: pics/rnn_network.png Graphic file (type png)
 
 <use pics/rnn_network.png>
-Package pdftex.def Info: pics/rnn_network.png used on input line 734.
+Package pdftex.def Info: pics/rnn_network.png used on input line 852.
 (pdftex.def)             Requested size: 330.75pt x 158.11559pt.
 
 Underfull \vbox (badness 7273) has occurred while \output is active []
 
- [20 <./pics/rnn_network.png>] <pics/lstm_cell.png, id=599, 597.73312pt x 359.0
+ [22 <./pics/rnn_network.png>] <pics/lstm_cell.png, id=650, 597.73312pt x 359.0
 9157pt>
 File: pics/lstm_cell.png Graphic file (type png)
 
 <use pics/lstm_cell.png>
-Package pdftex.def Info: pics/lstm_cell.png used on input line 767.
+Package pdftex.def Info: pics/lstm_cell.png used on input line 885.
 (pdftex.def)             Requested size: 330.75pt x 198.70093pt.
 
 Underfull \vbox (badness 3780) has occurred while \output is active []
 
- [21 <./pics/lstm_cell.png>] <pics/bi_lstm_crf.png, id=611, 563.14285pt x 254.3
+ [23 <./pics/lstm_cell.png>] <pics/bi_lstm_crf.png, id=662, 563.14285pt x 254.3
 5286pt>
 File: pics/bi_lstm_crf.png Graphic file (type png)
 
 <use pics/bi_lstm_crf.png>
-Package pdftex.def Info: pics/bi_lstm_crf.png used on input line 819.
+Package pdftex.def Info: pics/bi_lstm_crf.png used on input line 937.
 (pdftex.def)             Requested size: 330.75pt x 149.39157pt.
- [22]
-<pics/cnn.png, id=622, 605.64296pt x 559.83803pt>
+ [24]
+<pics/cnn.png, id=673, 605.64296pt x 559.83803pt>
 File: pics/cnn.png Graphic file (type png)
  <use pics/cnn.png>
-Package pdftex.def Info: pics/cnn.png used on input line 841.
+Package pdftex.def Info: pics/cnn.png used on input line 959.
 (pdftex.def)             Requested size: 330.75pt x 305.74208pt.
 
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
-[23 <./pics/bi_lstm_crf.png>]
-<pics/lstm_char_representations.png, id=633, 603.0028pt x 347.04657pt>
+[25 <./pics/bi_lstm_crf.png>]
+<pics/lstm_char_representations.png, id=685, 603.0028pt x 347.04657pt>
 File: pics/lstm_char_representations.png Graphic file (type png)
 
 <use pics/lstm_char_representations.png>
 Package pdftex.def Info: pics/lstm_char_representations.png used on input line 
-865.
+983.
 (pdftex.def)             Requested size: 330.75pt x 190.35194pt.
 
 
@@ -1036,24 +1044,24 @@ LaTeX Warning: `h' float specifier changed to `ht'.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [24 <./pics/cnn.png>] [25 <./pics/lstm_char_representations.png>] [26
+ [26 <./pics/cnn.png>] [27 <./pics/lstm_char_representations.png>] [28
 
 ]
 
-LaTeX Warning: Reference `sec:ner_dataset' on page 27 undefined on input line 8
-97.
+LaTeX Warning: Reference `sec:ner_dataset' on page 29 undefined on input line 1
+015.
 
-[27]
+[29]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [28]
-[29] [30
+ [30]
+[31] [32
 
-] [31] [32
+] [33] [34
 
-] (./exemplo.bbl [33
+] (./exemplo.bbl [35
 
-] [34] [35] [36] [37]) [38]
+] [36] [37] [38] [39]) [40]
 
 Package natbib Warning: There were undefined citations.
 
@@ -1066,16 +1074,11 @@ Package natbib Warning: There were undefined citations.
 \tf@toc=\write7
 \openout7 = `exemplo.toc'.
 
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1090.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1090.
-(./exemplo.aux
-
-Package natbib Warning: Citation(s) may have changed.
-(natbib)                Rerun to get citations correct.
-
-)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1090.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1090.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1208.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1208.
+(./exemplo.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1208.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1208.
 
 Package rerunfilecheck Info: File `exemplo.out' has not changed.
 (rerunfilecheck)             Checksum: C6249421D2C2519E3B5999820A6DA901;1861.
@@ -1089,13 +1092,13 @@ LaTeX Warning: There were undefined references.
 ### semi simple group (level 1) entered at line 41 (\begingroup)
 ### bottom level 
 Here is how much of TeX's memory you used:
- 13487 strings out of 493029
- 197854 string characters out of 6136233
- 350479 words of memory out of 5000000
- 16652 multiletter control sequences out of 15000+600000
+ 13525 strings out of 493029
+ 198543 string characters out of 6136233
+ 350851 words of memory out of 5000000
+ 16678 multiletter control sequences out of 15000+600000
  25894 words of font info for 65 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 37i,12n,31p,881b,1750s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 37i,12n,31p,881b,1749s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/share/texmf/fonts/enc/dvips/cm-super/cm-super-t1.enc}</us
 r/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/shar
 e/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texl
@@ -1117,10 +1120,10 @@ e1/public/cm-super/sfrm1440.pfb></usr/share/texmf/fonts/type1/public/cm-super/s
 fsx1440.pfb></usr/share/texmf/fonts/type1/public/cm-super/sfsx1728.pfb></usr/sh
 are/texmf/fonts/type1/public/cm-super/sfsx2488.pfb></usr/share/texmf/fonts/type
 1/public/cm-super/sfti1200.pfb>
-Output written on exemplo.pdf (62 pages, 521558 bytes).
+Output written on exemplo.pdf (64 pages, 561659 bytes).
 PDF statistics:
- 839 PDF objects out of 1000 (max. 8388607)
- 731 compressed objects within 8 object streams
- 169 named destinations out of 1000 (max. 500000)
+ 890 PDF objects out of 1000 (max. 8388607)
+ 780 compressed objects within 8 object streams
+ 181 named destinations out of 1000 (max. 500000)
  263 words of extra memory for PDF output out of 10000 (max. 10000000)
 

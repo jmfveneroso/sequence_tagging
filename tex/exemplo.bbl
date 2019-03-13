@@ -201,6 +201,17 @@
   {1210}({\ppgccnumberdoformat {5984}}):\ppgccpagedoformat
   {1}-\ppgccpagedoformat {}-\ppgccpagedoformat {22}.
 
+\bibitem[Grishman \ppgccciteauthorand {} Sundheim, 1996]{Grishman1996}
+\ppgccbibauthordoformat {Grishman, R. \ppgccbibauthorand {} Sundheim, B.}
+  (\ppgccyeardoformat {1996}).
+\newblock \ppgccbibtitledoformat {Message understanding conference-6: A brief
+  history}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  16th Conference on Computational Linguistics - Volume 1}, COLING '96,
+  \ppgccbibpagesstring {} \ppgccpagedoformat {466}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {471}, Stroudsburg, PA, USA. Association for
+  Computational Linguistics.
+
 \bibitem[Hammer et~al.\@, 1997]{Hammer1997}
 \ppgccbibauthordoformat {Hammer, J.\ppgccbibauthorsep {} Mchugh,
   J.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Garcia-molina, H.}
@@ -211,6 +222,24 @@
   Symposium on Advances in Databases and Information Systems},
   \ppgccbibpagesstring {} \ppgccpagedoformat {1}-\ppgccpagedoformat
   {}-\ppgccpagedoformat {8}.
+
+\bibitem[Hirsch, 2005]{Hirsch2005}
+\ppgccbibauthordoformat {Hirsch, J.~E.} (\ppgccyeardoformat {2005}).
+\newblock \ppgccbibtitledoformat {{An index to quantify an individual's
+  scientific research output}}.
+\newblock \ppgccbibjournaldoformat {Proceedings of the National Academy of
+  Sciences}, \ppgccvolumedoformat {102}({\ppgccnumberdoformat
+  {46}}):\ppgccpagedoformat {16569}-\ppgccpagedoformat {}-\ppgccpagedoformat
+  {16572}.
+
+\bibitem[Hirschman et~al.\@, 2005]{Hirschman2005}
+\ppgccbibauthordoformat {Hirschman, L.\ppgccbibauthorsep {} Yeh,
+  A.~S.\ppgccbibauthorsep {} Blaschke, C.\ppgccbibauthorlastsep {}
+  \ppgccbibauthorand {} Valencia, A.} (\ppgccyeardoformat {2005}).
+\newblock \ppgccbibtitledoformat {Overview of biocreative: critical assessment
+  of information extraction for biology}.
+\newblock \ppgccbibjournaldoformat {BMC Bioinformatics}, \ppgccvolumedoformat
+  {6}:\ppgccpagedoformat {S1 }--\ppgccpagedoformat { S1}.
 
 \bibitem[Hochreiter \ppgccciteauthorand {} Schmidhuber, 1997]{Hochreiter1997}
 \ppgccbibauthordoformat {Hochreiter, S. \ppgccbibauthorand {} Schmidhuber, J.}
@@ -305,6 +334,16 @@
   recognition}.
 \newblock \ppgccbibjournaldoformat {CoRR}, \ppgccvolumedoformat
   {abs/1603.01360}.
+
+\bibitem[{Lawrence} et~al.\@, 1999]{Lawrence1999}
+\ppgccbibauthordoformat {{Lawrence}, S.\ppgccbibauthorsep {} {Lee Giles},
+  C.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} {Bollacker}, K.}
+  (\ppgccyeardoformat {1999}).
+\newblock \ppgccbibtitledoformat {Digital libraries and autonomous citation
+  indexing}.
+\newblock \ppgccbibjournaldoformat {Computer}, \ppgccvolumedoformat
+  {32}({\ppgccnumberdoformat {6}}):\ppgccpagedoformat {67}--\ppgccpagedoformat
+  {71}.
 
 \bibitem[Leek, 1997]{Leek1997}
 \ppgccbibauthordoformat {Leek, T.~R.} (\ppgccyeardoformat {1997}).
@@ -402,6 +441,30 @@
   {157}-\ppgccpagedoformat {}-\ppgccpagedoformat {176}.
 \newblock Springer Netherlands, Dordrecht.
 
+\bibitem[Rastegar-Mojarad et~al.\@, 2018]{Rastegar-Mojarad2018}
+\ppgccbibauthordoformat {Rastegar-Mojarad, M.\ppgccbibauthorsep {} Liu,
+  S.\ppgccbibauthorsep {} Wang, Y.\ppgccbibauthorsep {} Afzal,
+  N.\ppgccbibauthorsep {} Wang, L.\ppgccbibauthorsep {} Shen,
+  F.\ppgccbibauthorsep {} Fu, S.\ppgccbibauthorlastsep {} \ppgccbibauthorand {}
+  Liu, H.} (\ppgccyeardoformat {2018}).
+\newblock \ppgccbibtitledoformat {Biocreative/ohnlp challenge 2018}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  2018 ACM International Conference on Bioinformatics, Computational Biology,
+  and Health Informatics}, BCB '18, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {575}-\ppgccpagedoformat {}-\ppgccpagedoformat {575}, New York, NY, USA. ACM.
+
+\bibitem[Ribas et~al.\@, 2015]{Ribas2015a}
+\ppgccbibauthordoformat {Ribas, S.\ppgccbibauthorsep {} Ribeiro-Neto,
+  B.\ppgccbibauthorsep {} de~Souza~e Silva, E.\ppgccbibauthorsep {} Ueda,
+  A.~H.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Ziviani, N.}
+  (\ppgccyeardoformat {2015}).
+\newblock \ppgccbibtitledoformat {Using reference groups to assess academic
+  productivity in computer science}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  24th International Conference on World Wide Web}, WWW '15 Companion,
+  \ppgccbibpagesstring {} \ppgccpagedoformat {603}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {608}, New York, NY, USA. ACM.
+
 \bibitem[Rijsbergen, 1979]{Rijsbergen1979}
 \ppgccbibauthordoformat {Rijsbergen, C. J.~V.} (\ppgccyeardoformat {1979}).
 \newblock \ppgccbibbtitledoformat {Information Retrieval}.
@@ -456,6 +519,15 @@
   {34}({\ppgccnumberdoformat {1}}):\ppgccpagedoformat {233}-\ppgccpagedoformat
   {}-\ppgccpagedoformat {272}.
 \newblock ISSN \ppgccissndoformat {0885-6125}.
+
+\bibitem[Sundheim, 1991]{Sundheim1991}
+\ppgccbibauthordoformat {Sundheim, B.~M.} (\ppgccyeardoformat {1991}).
+\newblock \ppgccbibtitledoformat {Overview of the third message understanding
+  evaluation and conference}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  3rd Conference on Message Understanding}, MUC3 '91, \ppgccbibpagesstring {}
+  \ppgccpagedoformat {3}-\ppgccpagedoformat {}-\ppgccpagedoformat {16},
+  Stroudsburg, PA, USA. Association for Computational Linguistics.
 
 \bibitem[Tjong Kim~Sang \ppgccciteauthorand {} De~Meulder, 2003a]{KimSang2003}
 \ppgccbibauthordoformat {Tjong Kim~Sang, E.~F. \ppgccbibauthorand {}
