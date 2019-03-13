@@ -6,45 +6,45 @@ Database file #1: bibfile.bib
 Warning--empty booktitle in Lafferty2001
 Warning--empty booktitle in Rabiner1990
 Warning--can't use both author and editor fields in Ramshaw1999
-You've used 51 entries,
+You've used 54 entries,
             2043 wiz_defined-function locations,
-            909 strings with 15013 characters,
-and the built_in function-call counts, 24221 in all, are:
-= -- 2491
-> -- 869
-< -- 53
-+ -- 292
-- -- 290
-* -- 2196
-:= -- 3894
-add.period$ -- 184
-call.type$ -- 51
-change.case$ -- 398
-chr.to.int$ -- 49
-cite$ -- 54
-duplicate$ -- 941
-empty$ -- 1681
-format.name$ -- 377
-if$ -- 4980
-int.to.chr$ -- 3
+            923 strings with 15352 characters,
+and the built_in function-call counts, 25476 in all, are:
+= -- 2623
+> -- 896
+< -- 57
++ -- 301
+- -- 298
+* -- 2301
+:= -- 4093
+add.period$ -- 195
+call.type$ -- 54
+change.case$ -- 417
+chr.to.int$ -- 51
+cite$ -- 57
+duplicate$ -- 998
+empty$ -- 1784
+format.name$ -- 390
+if$ -- 5245
+int.to.chr$ -- 4
 int.to.str$ -- 0
-missing$ -- 101
-newline$ -- 280
-num.names$ -- 153
-pop$ -- 355
+missing$ -- 107
+newline$ -- 296
+num.names$ -- 162
+pop$ -- 374
 preamble$ -- 1
-purify$ -- 400
+purify$ -- 419
 quote$ -- 0
-skip$ -- 835
+skip$ -- 879
 stack$ -- 0
-substring$ -- 1807
-swap$ -- 217
-text.length$ -- 26
+substring$ -- 1906
+swap$ -- 226
+text.length$ -- 27
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 300
+type$ -- 318
 warning$ -- 3
-while$ -- 211
+while$ -- 222
 width$ -- 0
-write$ -- 729
+write$ -- 772
 (There were 3 warnings)

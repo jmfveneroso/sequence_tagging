@@ -92,6 +92,13 @@
   {56}-\ppgccpagedoformat {}-\ppgccpagedoformat {64}.
 \newblock ISSN \ppgccissndoformat {15411672}.
 
+\bibitem[Chinchor, 1998]{Chinchor1998}
+\ppgccbibauthordoformat {Chinchor, N.} (\ppgccyeardoformat {1998}).
+\newblock \ppgccbibtitledoformat {Overview of muc-7}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Seventh Message
+  Understanding Conference (MUC-7): Proceedings of a Conference Held in
+  Fairfax, Virginia, April 29 - May 1, 1998}.
+
 \bibitem[Crescenzi et~al.\@, 2001]{Crescenzi2001}
 \ppgccbibauthordoformat {Crescenzi, V.\ppgccbibauthorsep {} Mecca,
   G.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Merialdo, P.}
@@ -340,6 +347,15 @@
 \newblock \ppgccbibjournaldoformat {CoRR}, \ppgccvolumedoformat
   {abs/1603.01354}.
 
+\bibitem[McCallum, 2005]{McCallum2005}
+\ppgccbibauthordoformat {McCallum, A.} (\ppgccyeardoformat {2005}).
+\newblock \ppgccbibtitledoformat {Information extraction: Distilling structured
+  data from unstructured text}.
+\newblock \ppgccbibjournaldoformat {Queue}, \ppgccvolumedoformat
+  {3}({\ppgccnumberdoformat {9}}):\ppgccpagedoformat {4:48}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {4:57}.
+\newblock ISSN \ppgccissndoformat {1542-7730}.
+
 \bibitem[McCallum et~al.\@, 2000]{McCallum2000}
 \ppgccbibauthordoformat {McCallum, A.\ppgccbibauthorsep {} Freitag,
   D.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Pereira, F. C.~N.}
@@ -441,9 +457,20 @@
   {}-\ppgccpagedoformat {272}.
 \newblock ISSN \ppgccissndoformat {0885-6125}.
 
-\bibitem[Tjong Kim~Sang \ppgccciteauthorand {} De~Meulder, 2003]{Sang2003}
+\bibitem[Tjong Kim~Sang \ppgccciteauthorand {} De~Meulder, 2003a]{KimSang2003}
 \ppgccbibauthordoformat {Tjong Kim~Sang, E.~F. \ppgccbibauthorand {}
-  De~Meulder, F.} (\ppgccyeardoformat {2003}).
+  De~Meulder, F.} (\ppgccyeardoformat {2003a}).
+\newblock \ppgccbibtitledoformat {Introduction to the conll-2003 shared task:
+  Language-independent named entity recognition}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  Seventh Conference on Natural Language Learning at HLT-NAACL 2003 - Volume
+  4}, CONLL '03, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {142}-\ppgccpagedoformat {}-\ppgccpagedoformat {147}, Stroudsburg, PA, USA.
+  Association for Computational Linguistics.
+
+\bibitem[Tjong Kim~Sang \ppgccciteauthorand {} De~Meulder, 2003b]{Sang2003}
+\ppgccbibauthordoformat {Tjong Kim~Sang, E.~F. \ppgccbibauthorand {}
+  De~Meulder, F.} (\ppgccyeardoformat {2003b}).
 \newblock \ppgccbibtitledoformat {Introduction to the conll-2003 shared task:
   Language-independent named entity recognition}.
 \newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
