@@ -5,13 +5,15 @@
 \addvspace {10pt}
 \addvspace {10pt}
 \addvspace {10pt}
-\contentsline {table}{\numberline {3.1}{\ignorespaces Number of HTML pages, sentences and tokens in each data file}}{12}{table.3.1}
-\contentsline {table}{\numberline {3.2}{\ignorespaces Features used in the NER on HTML dataset}}{13}{table.3.2}
-\contentsline {table}{\numberline {3.3}{\ignorespaces Gazetteer coverage in each data file}}{13}{table.3.3}
+\contentsline {table}{\numberline {3.1}{\ignorespaces Number of HTML pages, sentences and tokens in each data file}}{16}{table.3.1}
+\contentsline {table}{\numberline {3.2}{\ignorespaces Number of HTML pages, sentences and tokens in each data file}}{17}{table.3.2}
+\contentsline {table}{\numberline {3.3}{\ignorespaces Gazetteer coverage in each data file}}{17}{table.3.3}
+\contentsline {table}{\numberline {3.4}{\ignorespaces Features used in the NER on HTML dataset}}{18}{table.3.4}
 \addvspace {10pt}
 \addvspace {10pt}
+\contentsline {table}{\numberline {5.1}{\ignorespaces Model descriptions}}{31}{table.5.1}
+\contentsline {table}{\numberline {5.2}{\ignorespaces Precision, recall and F1 in the NER on HTML dataset for models that incorporate no features}}{32}{table.5.2}
+\contentsline {table}{\numberline {5.3}{\ignorespaces Precision, recall and F1 in the NER on HTML dataset for models that incorporate all features}}{33}{table.5.3}
 \addvspace {10pt}
-\contentsline {table}{\numberline {6.1}{\ignorespaces Model descriptions}}{29}{table.6.1}
-\contentsline {table}{\numberline {6.2}{\ignorespaces Precision, recall and F1 in the NER on HTML dataset for models that incorporate no features}}{30}{table.6.2}
-\contentsline {table}{\numberline {6.3}{\ignorespaces Precision, recall and F1 in the NER on HTML dataset for models that incorporate all features}}{31}{table.6.3}
+\addvspace {10pt}
 \addvspace {10pt}

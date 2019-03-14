@@ -379,7 +379,7 @@ here because nested named entities are absent from our concrete problem of resea
 and most sequence models can be adapted to handle this special case with a few modifications.
 
 A simple approach to \textit{Named Entity Recognition} can be devised through the use
-of regular expressions, which are search patterns that describe a regular language and can
+of regular expressions, that are search patterns that describe a regular language and which can
 be easily implemented in most programming languages. These programs can be perfectly suited
 to extract regular entities such as dates and prices with almost perfect accuracy. The extraction
 of other types of entities that belong to a limited set such as the names of states in a country can 
@@ -390,47 +390,96 @@ Some classical statistical methods of \textit{Sequence Labeling} that are able t
 of complex entities with decent accuracy are Hidden Markov Models, Linear Chain 
 Conditional Random Fields and Maximum Entropy Markov Models. The first two will be explored
 in further detail in Chapter~\ref{cha:sequence_models}, and the latter is essentialy a more
-restrictive discriminative model in comparison with Condition Random Fields. These statistical 
+restrictive discriminative model in comparison to Condition Random Fields. These statistical 
 approaches have had remarkable resiliency in \textit{Sequence Labeling} tasks and still provide 
 a good first approximation to a solution because of their simplicity, speed and accuracy.
 
-As is the case with most NLP tasks, the deep learning revolution has brought huge advancements
-to \textit{Named Entity Recognition}. Essentialy all the current best scoring models at the 
-Conll-2003 task employ some form of deep neural network, and most often Long Short Term Memory 
-recurrent neural networks with a range of differing characteristics. Combined with pretrained
+The deep learning revolution has brought huge advancements to \textit{Named Entity Recognition}, 
+as was the case with most NLP tasks. Deep learning differs from classical machine learning in
+regard to the levels of abstraction learned by the classifiers. While a conventional feed-forward
+neural network may perform classification by learning the weights of a single hidden layer through
+backpropagation, a deep learning model is usually composed of multiple hidden layers that handle 
+different levels of abstractions. In text related tasks, the first level of abstraction could
+consist of a word embedding layer, where words are mapped to a continuous vectorial space with
+reduced dimensionsality, and the next level of abstraction could be composed of a multi layered 
+recurrent neural network.
+
+Essentialy all the best scoring models at the Conll-2003 task employ some form of deep 
+neural network, and most often Long Short Term Memory 
+recurrent neural networks with a range of differing characteristics. When combined with pretrained
 word embeddings these models provide a powerful method of sequence labeling that requires 
-practically no feature engineering or dictionary. However, these models have become quite 
-complex, constrasting with earlier approaches such as HMMs, in the fact that the 
-training time of such networks has increased by many orders of magnitude, and if we take into
-consideration the training of word embeddings such as Word2Vec's skip gram model in a billion token
-corpus it is no exaggeration to say that deep learning models increase the training time by a
-thousandfold when compared to earlier approaches. Additionaly, most deep learning models require
-expensive hardware in the form of GPUs or more recently TPUs (Google's Tensor Processing Units)
-to become practical options. That is to say that despite deep learning representing the 
-inquivocal state-of-the-art, classical statistical models still are of significance and one might 
-also risk saying competitive as we will see in later chapters.
+practically no feature engineering or dictionary matching. However, these models have 
+become quite complex, constrasting with earlier approaches such as Hidden Markov Models, that
+only require estimation of a comparatevely small number of weights in closed form. The training time
+required by such deep models is many orders of magnitude larger than that of classical approaches, 
+and if we take into consideration the training of word embeddings such as Word2Vec's skip gram model 
+in a billion token corpus, it is no exaggeration to say that deep learning models increase the 
+training time a thousandfold when compared to earlier approaches. Additionaly, most deep learning 
+models require expensive hardware in the form of GPUs or 
+TPUs~\footnote{Those are Google's Tensor Processing Units "https://cloud.google.com/tpu/"}
+to become practical options. 
 
-Another disadvantage of deep learning in contrast with other models such a HMMs is the lack
-of interpretability of trained models. The complexity of a neural networks renders impractical 
-the effort of understanding why the model takes the decisions it takes. We also have to discuss the
-problem of causality
-
-
-
-
-
-
-
+Despite some noteworthy efforts on data visualization {references here}, DNNs still lack 
+interpretability. Also, they have limited applicability when we care about causal inference 
+{references here}, a goal that is especially meaningful in applied statistics and the social 
+sciences. Regardless, it must be acknowledged that deep learning is a remarkably useful tool to build 
+classifiers with unparallaled accuracy in \textit{Named Entity Recognition} as well as in other
+tasks. We must only be aware of its shortcomings.
 
 \section{Researcher Name Extraction}
 \label{sec:researcher_name_extraction}
 
+This dissertation has the goal of finding the best approaches to sequence modelling for 
+Web Data Extraction. To achieve this goal, we compare multiple systems at the researcher 
+name extraction task. The task consists of extracting researchers names from university 
+faculty listings across the world to discover their affiliations and link their profiles 
+to public databases such as DBLP or Google Scholar~\footnote{
+  This is useful, for instance, if one needs to compare the research output of 
+  deparments in Germany, or study international publication patterns.
+}. Public researcher databases only have sparse information about author affiliation and 
+even in fields for which the information is more easily available, such as Computer Science,
+only a small fraction of the records have reliable affiliation information. 
+
+\begin{figure}
+  \centering
+  \includegraphics[width=1.0\textwidth]{pics/jap_osaka_lab}
+  \caption{Example of a faculty directory}
+  \label{fig:faculty_directory}
+\end{figure}
+
+To acknowledge the complexity of this task, take for example a snippet extracted from
+the staff page for the intelligent robotics laboratory from Osaka University shown in 
+Figure~\ref{fig:faculty_directory}. There is some structure to the way member profiles are arranged, 
+but the organization is rather flexible. Other pages, even from the same website, can show very different 
+patterns, ranging from tables and lists to free form.
+Researcher names can appear inside plain text, similar to the case of \textit{Named Entity Recognition}
+from news sources or in a more tabular structure. Names may also be part of larger sentences such as in 
+"Michael Johnson Chair" and "John Doe Avenue" yielding false positives. Or they can be composed 
+of common words (e.g. Summer Hall) yielding false negatives. There is no rule that fits all cases.
+
+State-of-the-art named entity recognition models trained on news datasets (cite here) do not
+perform so well at this task, because in many webpages, text alone is insufficient to provide proper 
+contextual information about the semantic category of a word. The absence of context demands
+extraction systems to rely on information from sources outside the dataset, being them 
+features extracted from unlabeled corpora obtained through unsupervised pretraining, or 
+dictionaries containing many instances of the relevant entities. Although, as we argued earlier,
+entity instances will rather frequently be unique, rendering dictionary matching approaches
+insufficient. Therefore, a key problem in the task of entity name extraction is accounting for all
+possible name combinations, even those that seem unlikely. Since there is no database with all 
+possible named entity combinations, we need holistic statistical methods that can handle 
+unknown tokens with relative efficacy.
+
+Since NER datasets built from news corpora such as CoNLL-2003 cannot provide an adequate 
+measure for the performance of sequence models on HTML. We introduce a novel dataset that is 
+described in detail in Chapter~\ref{cha:dataset} to run experiments on sequence modelling for 
+HTML.
 
 \chapter{Dataset}
-\label{sec:dataset}
+\label{cha:dataset}
 
-We built a novel dataset to evaluate the performance of NER models
-on the Web data extraction task. The task consists of finding researcher
+This chapter describes the dataset used to evaluate the performance of sequence models
+on the Web data extraction task. We call it the NER-on-HTML dataset. The task consists 
+of finding researcher
 names in faculty listings from university webpages across the world. This would be a
 necessary step when linking researcher profiles from university websites to their entries
 in public databases such as DBLP \footnote{http://dblp.uni-trier.de/}. Unlike many
@@ -441,9 +490,9 @@ enough to allow efficient entity extraction from different sources while requiri
 no supervision between different websites. 
 
 This task is similar to labeling authors in comments or articles collected
-from different publishing platforms. Another similar task is NER on tweets,
-because of the character limitation that is comparable to what we find in 
-HTML text.
+from different publishing platforms. Another similar task is NER on tweets.
+Because of the character limitation, tweets rarely provide sufficient context
+for NER systems to perform token labeling adequately.
 
 We collected 145 computer science faculty pages from 42 different countries in
 multiple languages, although the English version was preferred when it was available.
@@ -454,16 +503,38 @@ to the CoNLL 2003 data format. That is, one word per line with empty lines repre
 sentence boundaries. Sentence boundaries were determined by line break HTML tags
 (div, p, table, li, br, etc.) in contrast to inline tags (span, em, a, td, etc.). 
 Sentences that were more than fifty tokens long were also split according to the
-punctuation.
+punctuation. Our approach to sentence segmentation is described in detail in
+Appendix~\ref{app:html_segmenter}.
 
 A proper HTML segmenter poses many challenges by itself. We wanted to evaluate 
 models without relying on any sophisticated data record segmentation system.
 In many cases, entity annotation may precede the segmentation
-phase on Web data extraction methods, so annotators that are able to work 
-with raw HTML data allow for more flexible systems. 
+phase on Web data extraction methods. Also, depending on the task (as is the case
+of researcher name extraction), a good annotator that is able to work 
+with raw HTML allows for a more flexible system and can provide a sufficient 
+solution.
 
 Finally, all tokens were tagged using the IOB scheme put forward by
-Ramshaw and Marcus \cite{Ramshaw1999}. 
+Ramshaw and Marcus \cite{Ramshaw1999} that is described in Figure~\ref{fig:iob}. 
+The performance of sequence models in the NER-on-HTML dataset was evaluated 
+according to the precision, recall and F-measures~\cite{Rijsbergen1979} in the test
+set, as was done both in the MUC conferences and CONLL-2003. Precision accounts for the 
+percentage of named entities found by the model that are correct, this is the proportion of 
+true positives relative to all extracted entities. Recall is the percentage of named entities 
+that are present in the corpus and were found by the model, this is the proportion of true 
+positives relative to all named entities that should have been extracted. The relation between
+both of these measures is expressed in Figure~\ref{fig:precision_recall}. The F-measure score 
+is a composite measure that combines precision and recall with the formula:
+
+\begin{equation}
+F_{\beta} = (1 + \beta^2) \cdot \frac{precision \cdot recall}{(\beta^2 \cdot precision) + recall}
+\end{equation}
+
+The choice for $ \beta $ depends on the importance attributed to the precision and recall measures.
+This formula "measures the effectiveness of retrieval with respect to a user who attaches 
+$ \beta$ times as much importance to recall as precision"~\cite{Rijsbergen1979}. A common choice
+for the value of $ \beta $ is $ 1 $, this measure is called the $ F_1 $-score. That is, we attribute 
+as much importance to recall as to precision.
 
 \section{Data}
 
@@ -474,9 +545,11 @@ Ramshaw and Marcus \cite{Ramshaw1999}.
       \toprule
       Data file & Documents & Sentences & Tokens & Names \\
       \midrule
-      Training    & 85 & 24728 & 110269 & 5822 \\  
-      Validation  & 30 & 8743  & 36757  & 1788 \\
-      Test        & 30 & 10399 & 44795  & 2708 \\
+      Training    & 85  & 24728 & 110269 & 5822  \\  
+      Validation  & 30  & 8743  & 36757  & 1788  \\
+      Test        & 30  & 10399 & 44795  & 2708  \\
+      \midrule
+      Total       & 145 & 43870 & 151821 & 10318 \\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -484,15 +557,67 @@ Ramshaw and Marcus \cite{Ramshaw1999}.
   \label{tab:dataset}
 \end{table}
 
-The dataset was divided in a training, validation and test set. Table \ref{tab:dataset} contains
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ llllllll }
+      \toprule
+      Data file & Documents & Sentences & Tokens & PER & LOC & ORG & MISC \\
+      \midrule
+      Training    & 946  & 14987 & 203621 & 1 & 1 & 1 & 1 \\  
+      Validation  & 216  & 3466  & 51362 & 1 & 1 & 1 & 1  \\
+      Test        & 231  & 3684  & 46435 & 1 & 1 & 1 & 1  \\
+      \midrule
+      Total       & 1393 & 22137 & 301418 & 1 & 1 & 1 & 1 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Number of HTML pages, sentences and tokens in each data file}
+  \label{tab:conll}
+\end{table}
+
+The NER-on-HTML dataset is comparable in size to other popular NER datasets. Its characteristics
+are presented in Table~\ref{tab:dataset}. For comparison, the characteristics of the
+CONLL-2003 dataset are described in Table~\ref{tab:conll}. Take note that the number of documents
+in the NER-on-HTML dataset is much smaller, only 145, against 1393 documents in CONLL-2003. However, 
+the number of sentences in the NER-on-HTML dataset is higher: 43870 against 22137. Also, the number 
+of tokens in the NER-on-HTML is roughly half the number present in the CONLL-2003 dataset. These 
+numbers show that the target HTML documents of the researcher extraction task are longer than news 
+texts and, more importantly, they are composed of shorter sentences when compared to the text from 
+news corpora (~3.46 words per sentence in NER-on-HTML versus ~13.62 words per sentence in Conll-2003). 
+This attests to the fact that HTML provides far less context to be made use by sequence models 
+than plain text.
+
+The dataset was divided in training, validation and test sets. Table \ref{tab:dataset} contains
 a description of the data files. The validation set was used in the early stopping validation strategy
-for the neural networks and CRF training, while the model performance was evaluated by comparing 
-results in the test set.
+to avoid overfitting the models, and model performance was evaluated by comparing results in the test 
+set. 
+
+\section{Dictionary}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      Data file & Precision & Recall & F1 & Correct names \\
+      \midrule
+      Training   & 0.7316 & 0.2303 & 0.3504 & 1341 of 5822 \\ 
+      Validation & 0.8474 & 0.2858 & 0.4274 & 511 of 1788 \\ 
+      Test       & 0.8717 & 0.3287 & 0.4773 & 890 of 2708 \\ 
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Gazetteer coverage in each data file}
+  \label{tab:gazetteer}
+\end{table}
 
 \section{Features}
 
-Thirteen categorical features were associated with each token in the dataset. They 
-are presented in Table \ref{tab:features}.
+Thirteen categorical features were associated with each token in the dataset. 
+These features were selected through feature engineering from a larger pool
+features by eliminating features that did not contribute to the classification 
+strategy. The features are presented in Table \ref{tab:features}.
 
 \begin{table}[h]
   \small
@@ -521,23 +646,6 @@ are presented in Table \ref{tab:features}.
   \label{tab:features}
 \end{table}
 
-\begin{table}[h]
-  \small
-  \begin{center}
-    \begin{tabular}{ lllll }
-      \toprule
-      Data file & Precision & Recall & F1 & Correct names \\
-      \midrule
-      Training   & 0.7316 & 0.2303 & 0.3504 & 1341 of 5822 \\ 
-      Validation & 0.8474 & 0.2858 & 0.4274 & 511 of 1788 \\ 
-      Test       & 0.8717 & 0.3287 & 0.4773 & 890 of 2708 \\ 
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \caption{Gazetteer coverage in each data file}
-  \label{tab:gazetteer}
-\end{table}
-
 The unaccented lowercase token was used as the key for the GloVe-100 embedding lookup.
 A gazetteer was constructed from a researcher list extracted from DBLP with 1,595,771
 names. Table \ref{tab:gazetteer} shows the precision, recall and F1 score obtained with an
@@ -558,157 +666,6 @@ described in section \ref{sssec:self_training}.
 
 
 
-
-
-
-
-
-
-
-
-
-\section{Web Data Extraction}
-
-Web data extraction (WDE) is the task of automatically extracting structured 
-information from unstructured or semi-structured Web documents. The input 
-usually consists of Web documents containing a number of predetermined entities 
-organized in a similar manner. The web data extraction task consists of 
-identifying these entities and organizing them according to a template. 
-
-
-\chapter{Related Work}
-
-% Getting simple structured information out of text.
-
-In the last 20 years, the astonishing growth of public information in the Web has 
-led to the development of a number of different approaches to the problem of Web 
-data extraction. Traditionally, the task was solved by designing special purpose
-programs called wrappers to recognize relevant data and store records in a structured
-format. These early tools varied wildly relative to their degree of automation. 
-
-It was readily perceived that manual wrapper generation was a rather tedious and
-error prone process, unsuited for large scale operations. Wrappers tend to
-break frequently because they rely heavily on webpage features that can change 
-often. So, in the late nineties, several authors advocated for wrapper induction, a technique 
-that consists of automatically constructing wrappers from a small set of examples by 
-identifying delimiters or context tokens that single out the desired attributes. 
-Some remarkable wrapper induction methods are WIEN \cite{Kushmerick2000}, Soft 
-Mealy \cite{Hsu1998} and STALKER \cite{Muslea1999}.
-
-Despite being better than constructing wrappers manually, wrapper induction methods 
-still suffered from a lack of expressive power and flexibility. These methods had 
-trouble handling records with missing attributes or unusual structures because
-patterns could only be identified if they happened at least once in the examples.
-
-Other approaches such as NoDoSE \cite{Adelberg1998} and Debye \cite{Laender2002a} 
-brought greater flexibility to wrapper induction methods by requiring a greater level 
-of human interaction through graphical user interfaces. Web data extraction techniques often 
-require some sort of assistance from human experts to boost accuracy. One of the main challenges 
-in the field lies in determining an adequate trade-off between the degree of automation and 
-the precision and recall of the data extraction tool.
-
-To automate the task of Web data extraction completely some approaches,
-such as Road Runner \cite{Crescenzi2001}, removed entirely the need for data examples.
-Road Runner parses documents belonging to a same class (e.g. books on Amazon) and 
-generates wrappers based on their similarities and differences, yielding comparable results 
-to those obtained by wrapper induction methods. However, like previous approaches, it was 
-unsuited for cross site extraction tasks because the learned rules were not general enough.
-
-NLP based approaches aimed at extracting more general rules that could possibly
-be employed over multiple websites. RAPIER \cite{Califf1999} is a method of rule
-extraction that uses information such as part-of-speech tags and semantic classes from
-a lexicon to derive patterns from a set of training examples. This approach is more
-flexible than the wrapper induction methods, however it achieves much lower rates of 
-recall and precision.
-
-In 2002, a survey by Laender et al. \cite{Laender2002} made a thorough classification of the
-early approaches with a taxonomy based on their main technology, being them: languages for
-wrapper development, HTML-aware tools, NLP-based tools, Wrapper Induction Tools,
-Modeling-based tools and Ontology-based tools. Some noteworthy examples from this era
-are: 
-
-\begin{itemize}
-\item TSIMMIS \cite{Hammer1997} and WebOQL \cite{Arocena1999}, which are special purpose 
-languages for building wrappers.
-
-\item Road Runner \cite{Crescenzi2001}, XWRAP \cite{Liu2000} and W4F \cite{Sahuguet1999}, 
-which are HTML-aware tools that infer meaningful patterns from the HTML structure.
-
-\item RAPIER \cite{Califf1999}, SRV \cite{Freitag1998}, WHISK \cite{Soderland1999}, which 
-are NLP-based tools.
-
-\item WIEN \cite{Kushmerick2000}, Soft Mealy \cite{Hsu1998} and STALKER \cite{Muslea1999} which 
-are wrapper induction methods.
-
-\item NoDoSE \cite{Adelberg1998} and Debye \cite{Laender2002a}, which are semi supervised modeling
-based tools that require some interaction with the user by means of a graphical
-user interface.
-\end{itemize}
-
-In 2006, Chang et al. \cite{Chang2006} complemented the previous surveys with semi-supervised 
-technologies such as Thresher \cite{Hogue2005}, IEPAD \cite{Chang2001} and 
-OLERA \cite{Chang2004}. They differed from supervised 
-and unsupervised methods because they either needed only a rough description of
-data from users for extraction rule generation or some level of post processing
-that needed user attention. The survey also mentioned newer unsupervised methods
-such as DeLa \cite{Wang2003}, Exalg \cite{Arasu2003} and Depta \cite{Zhai2005}.
-
-Most of the early information extraction systems were rule-based with either 
-manual rule description or automatic rule learning from examples, thus they
-suffered from a lack of flexibility when dealing with noisy and unstructured data.
-Huge progress in the field of statistical learning led to the development of
-statistical models that tried to solve this problem.
-
-In 2008, Sarawagi \cite{Sarawagi2008} produced a survey that classified wrappers into
-rule-based methods, statistical methods and hybrid models, bringing together 
-the fields of named entity recognition, relationship extraction and information extraction. 
-The rule based methods encompass most of the 
-previous models. The statistical methods convert the extraction task into a token labeling 
-task, identifying the target entities through the assignment of labels as in a typical 
-Named Entity Recognition task. Traditionally, Hidden Markov Models \cite{Leek1997,Freitag1999}, 
-Linear Chain Conditional Random Fields \cite{Lafferty2001}, and Maximum Entropy Taggers 
-\cite{McCallum2000} have been the usual choice for linear sequence tagging models.
-More recently, with the advancement of Natural Language Processing and Deep Learning, 
-neural models outperformed previous NER methods for plain text. Huang et. al. \cite{Huang2015} introduced the 
-bidirectional Long Short-Term Memory (LSTM) model with a Conditional Random Field (CRF) output layer
-for NER. Ma and Hovy \cite{Ma2016} incorporated Convolutional Neural Network based character representations 
-on top of the architecture. And Lample et. al. \cite{Lample2016} introduced
-LSTM based character representations. 
-
-Surveys by Ferrara et al. \cite{Ferrara2014}, Schulz et al. \cite{Schulz2016} and 
-Varlamov et al. \cite{Varlamov2016} updated the previous surveys on information 
-extraction methods with some interesting innovations. 
-Some examples are: the Visual Box Model \cite{Krupl2005}, a data extraction system that produces 
-a visualization of the webpage to exploit visual cues to identify data presented in a tabular form;
-automatic wrapper adaptation \cite{Ferrara2011}, a technique that tries to reduce the cost of 
-wrapper maintenance by measuring the similarity of HTML trees and adapting
-wrappers to the new page structure; AutoRM \cite{Shi2015}, a method to mine
-records from a single webpage by identifying similar data regions through DOM
-tree analysis; Knowledge Vault \cite{Dong2014}, a method that combines different 
-extraction approaches to feed a probabilistic knowledge base.
-
-Most data extraction systems focus on extracting information from single websites
-and are therefore unsuited for cross website extraction tasks. Even unsupervised
-approaches that are domain independent, such as RoadRunner \cite{Crescenzi2001} 
-and EXALG \cite{Arasu2003} only work well for extracting data from pages generated 
-from a same template. 
-
-A statistical approach to unsupervised domain 
-independent Web data extraction was described by Zhu et al \cite{Zhu2005}. The 2D CRF 
-model takes a webpage segmented into data blocks and employs a two dimensional conditional 
-random field model to perform attribute labeling. The model was further improved
-\cite{Zhu2006} to model record segmentation and attribute labeling as a joint task.
-Some of the limitations of early unsupervised methods 
-were also tackled by ObjectRunner \cite{Abdessalem2010} and AMBER \cite{Furche2012}. 
-These methods work by annotating webpages automatically with regular expressions, gazetteers and 
-knowledge bases. They can rectify low quality annotations and even improve the annotators
-by exploring regular structures in the DOM during the record segmentation phase.
-
-Web data extraction methods have undoubtedly improved extraordinarily, but
-as pointed by Schulz et al. \cite{Schulz2016}, it is difficult to compare the results 
-achieved by competing tools, and many seem to rely excessively on heuristic methods.
-In that regard, the recent advancements in sequence taggers may provide more robust and
-flexible extraction tools.
 
 
 \chapter{Named Entity Recognition Models}
@@ -1150,6 +1107,141 @@ first experiment. So, when these features are added explicitly, the differences
 in performance between different neural models become less noticeable.
 
 
+\chapter{Related Work}
+
+% Getting simple structured information out of text.
+
+In the last 20 years, the astonishing growth of public information in the Web has 
+led to the development of a number of different approaches to the problem of Web 
+data extraction. Traditionally, the task was solved by designing special purpose
+programs called wrappers to recognize relevant data and store records in a structured
+format. These early tools varied wildly relative to their degree of automation. 
+
+It was readily perceived that manual wrapper generation was a rather tedious and
+error prone process, unsuited for large scale operations. Wrappers tend to
+break frequently because they rely heavily on webpage features that can change 
+often. So, in the late nineties, several authors advocated for wrapper induction, a technique 
+that consists of automatically constructing wrappers from a small set of examples by 
+identifying delimiters or context tokens that single out the desired attributes. 
+Some remarkable wrapper induction methods are WIEN \cite{Kushmerick2000}, Soft 
+Mealy \cite{Hsu1998} and STALKER \cite{Muslea1999}.
+
+Despite being better than constructing wrappers manually, wrapper induction methods 
+still suffered from a lack of expressive power and flexibility. These methods had 
+trouble handling records with missing attributes or unusual structures because
+patterns could only be identified if they happened at least once in the examples.
+
+Other approaches such as NoDoSE \cite{Adelberg1998} and Debye \cite{Laender2002a} 
+brought greater flexibility to wrapper induction methods by requiring a greater level 
+of human interaction through graphical user interfaces. Web data extraction techniques often 
+require some sort of assistance from human experts to boost accuracy. One of the main challenges 
+in the field lies in determining an adequate trade-off between the degree of automation and 
+the precision and recall of the data extraction tool.
+
+To automate the task of Web data extraction completely some approaches,
+such as Road Runner \cite{Crescenzi2001}, removed entirely the need for data examples.
+Road Runner parses documents belonging to a same class (e.g. books on Amazon) and 
+generates wrappers based on their similarities and differences, yielding comparable results 
+to those obtained by wrapper induction methods. However, like previous approaches, it was 
+unsuited for cross site extraction tasks because the learned rules were not general enough.
+
+NLP based approaches aimed at extracting more general rules that could possibly
+be employed over multiple websites. RAPIER \cite{Califf1999} is a method of rule
+extraction that uses information such as part-of-speech tags and semantic classes from
+a lexicon to derive patterns from a set of training examples. This approach is more
+flexible than the wrapper induction methods, however it achieves much lower rates of 
+recall and precision.
+
+In 2002, a survey by Laender et al. \cite{Laender2002} made a thorough classification of the
+early approaches with a taxonomy based on their main technology, being them: languages for
+wrapper development, HTML-aware tools, NLP-based tools, Wrapper Induction Tools,
+Modeling-based tools and Ontology-based tools. Some noteworthy examples from this era
+are: 
+
+\begin{itemize}
+\item TSIMMIS \cite{Hammer1997} and WebOQL \cite{Arocena1999}, which are special purpose 
+languages for building wrappers.
+
+\item Road Runner \cite{Crescenzi2001}, XWRAP \cite{Liu2000} and W4F \cite{Sahuguet1999}, 
+which are HTML-aware tools that infer meaningful patterns from the HTML structure.
+
+\item RAPIER \cite{Califf1999}, SRV \cite{Freitag1998}, WHISK \cite{Soderland1999}, which 
+are NLP-based tools.
+
+\item WIEN \cite{Kushmerick2000}, Soft Mealy \cite{Hsu1998} and STALKER \cite{Muslea1999} which 
+are wrapper induction methods.
+
+\item NoDoSE \cite{Adelberg1998} and Debye \cite{Laender2002a}, which are semi supervised modeling
+based tools that require some interaction with the user by means of a graphical
+user interface.
+\end{itemize}
+
+In 2006, Chang et al. \cite{Chang2006} complemented the previous surveys with semi-supervised 
+technologies such as Thresher \cite{Hogue2005}, IEPAD \cite{Chang2001} and 
+OLERA \cite{Chang2004}. They differed from supervised 
+and unsupervised methods because they either needed only a rough description of
+data from users for extraction rule generation or some level of post processing
+that needed user attention. The survey also mentioned newer unsupervised methods
+such as DeLa \cite{Wang2003}, Exalg \cite{Arasu2003} and Depta \cite{Zhai2005}.
+
+Most of the early information extraction systems were rule-based with either 
+manual rule description or automatic rule learning from examples, thus they
+suffered from a lack of flexibility when dealing with noisy and unstructured data.
+Huge progress in the field of statistical learning led to the development of
+statistical models that tried to solve this problem.
+
+In 2008, Sarawagi \cite{Sarawagi2008} produced a survey that classified wrappers into
+rule-based methods, statistical methods and hybrid models, bringing together 
+the fields of named entity recognition, relationship extraction and information extraction. 
+The rule based methods encompass most of the 
+previous models. The statistical methods convert the extraction task into a token labeling 
+task, identifying the target entities through the assignment of labels as in a typical 
+Named Entity Recognition task. Traditionally, Hidden Markov Models \cite{Leek1997,Freitag1999}, 
+Linear Chain Conditional Random Fields \cite{Lafferty2001}, and Maximum Entropy Taggers 
+\cite{McCallum2000} have been the usual choice for linear sequence tagging models.
+More recently, with the advancement of Natural Language Processing and Deep Learning, 
+neural models outperformed previous NER methods for plain text. Huang et. al. \cite{Huang2015} introduced the 
+bidirectional Long Short-Term Memory (LSTM) model with a Conditional Random Field (CRF) output layer
+for NER. Ma and Hovy \cite{Ma2016} incorporated Convolutional Neural Network based character representations 
+on top of the architecture. And Lample et. al. \cite{Lample2016} introduced
+LSTM based character representations. 
+
+Surveys by Ferrara et al. \cite{Ferrara2014}, Schulz et al. \cite{Schulz2016} and 
+Varlamov et al. \cite{Varlamov2016} updated the previous surveys on information 
+extraction methods with some interesting innovations. 
+Some examples are: the Visual Box Model \cite{Krupl2005}, a data extraction system that produces 
+a visualization of the webpage to exploit visual cues to identify data presented in a tabular form;
+automatic wrapper adaptation \cite{Ferrara2011}, a technique that tries to reduce the cost of 
+wrapper maintenance by measuring the similarity of HTML trees and adapting
+wrappers to the new page structure; AutoRM \cite{Shi2015}, a method to mine
+records from a single webpage by identifying similar data regions through DOM
+tree analysis; Knowledge Vault \cite{Dong2014}, a method that combines different 
+extraction approaches to feed a probabilistic knowledge base.
+
+Most data extraction systems focus on extracting information from single websites
+and are therefore unsuited for cross website extraction tasks. Even unsupervised
+approaches that are domain independent, such as RoadRunner \cite{Crescenzi2001} 
+and EXALG \cite{Arasu2003} only work well for extracting data from pages generated 
+from a same template. 
+
+A statistical approach to unsupervised domain 
+independent Web data extraction was described by Zhu et al \cite{Zhu2005}. The 2D CRF 
+model takes a webpage segmented into data blocks and employs a two dimensional conditional 
+random field model to perform attribute labeling. The model was further improved
+\cite{Zhu2006} to model record segmentation and attribute labeling as a joint task.
+Some of the limitations of early unsupervised methods 
+were also tackled by ObjectRunner \cite{Abdessalem2010} and AMBER \cite{Furche2012}. 
+These methods work by annotating webpages automatically with regular expressions, gazetteers and 
+knowledge bases. They can rectify low quality annotations and even improve the annotators
+by exploring regular structures in the DOM during the record segmentation phase.
+
+Web data extraction methods have undoubtedly improved extraordinarily, but
+as pointed by Schulz et al. \cite{Schulz2016}, it is difficult to compare the results 
+achieved by competing tools, and many seem to rely excessively on heuristic methods.
+In that regard, the recent advancements in sequence taggers may provide more robust and
+flexible extraction tools.
+
+
 \chapter{Conclusion}
 
 Machine-learning-based sequence labeling models provide a flexible approach to Web data 
@@ -1178,17 +1270,18 @@ web data extraction.
 \ppgccbibliography{bibfile}
 
 
-% \begin{appendices}
-% 
-% \chapter{Um apêndice}
-% 
-% \dummytxta
-% 
+\begin{appendices}
+\label{app:html_segmenter}
+
+\chapter{HTML sentence segmenter}
+
+Lorem ipsum dolor.
+
 % \chapter{Outro apêndice}
 % 
 % \dummytxta
 % 
-% \end{appendices}
+\end{appendices}
 % 
 % 
 % \begin{attachments}
@@ -1201,7 +1294,6 @@ web data extraction.
 % \chapter{Outro anexo}
 % 
 % \dummytxta
-% 
 % \end{attachments}
 
 
