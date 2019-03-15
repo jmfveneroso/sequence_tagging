@@ -6,12 +6,14 @@
 \addvspace {10pt}
 \contentsline {figure}{\numberline {2.1}{\ignorespaces Example of a faculty directory}}{12}{figure.2.1}
 \addvspace {10pt}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Word Frequencies on ConLL-2003 and NER-on-HTML}}{18}{figure.3.1}
 \addvspace {10pt}
-\contentsline {figure}{\numberline {4.1}{\ignorespaces RNN for NER}}{24}{figure.4.1}
-\contentsline {figure}{\numberline {4.2}{\ignorespaces LSTM Cell}}{25}{figure.4.2}
-\contentsline {figure}{\numberline {4.3}{\ignorespaces Bidirectional LSTM-CRF}}{27}{figure.4.3}
-\contentsline {figure}{\numberline {4.4}{\ignorespaces CNN based character representations}}{28}{figure.4.4}
-\contentsline {figure}{\numberline {4.5}{\ignorespaces LSTM based character representations}}{29}{figure.4.5}
+\contentsline {figure}{\numberline {4.1}{\ignorespaces RNN for NER}}{27}{figure.4.1}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces LSTM Cell}}{28}{figure.4.2}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Bidirectional LSTM-CRF}}{29}{figure.4.3}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces CNN based character representations}}{30}{figure.4.4}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces LSTM based character representations}}{31}{figure.4.5}
+\addvspace {10pt}
 \addvspace {10pt}
 \addvspace {10pt}
 \addvspace {10pt}

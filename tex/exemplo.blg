@@ -3,10 +3,6 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: exemplo.aux
 The style file: ppgccufmg.bst
 Database file #1: bibfile.bib
-Repeated entry---line 909 of file bibfile.bib
- : @inproceedings{Grishman1996
- :                            ,
-I'm skipping whatever remains of this entry
 Warning--I didn't find a database entry for "Katyar2018"
 Warning--empty booktitle in Lafferty2001
 Warning--empty booktitle in Rabiner1990
@@ -52,4 +48,4 @@ warning$ -- 3
 while$ -- 252
 width$ -- 0
 write$ -- 875
-(There was 1 error message)
+(There were 4 warnings)

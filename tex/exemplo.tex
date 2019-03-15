@@ -109,7 +109,6 @@ asperiores repellat.\par
 
 \chapter{Introduction}
 
-
 HTML documents most often lie in between the structured/unstructured 
 data paradigm. DOM hierarchy, element disposition, CSS classes, and other 
 features related to the document structure and indirectly associated with the 
@@ -396,13 +395,14 @@ a good first approximation to a solution because of their simplicity, speed and 
 
 The deep learning revolution has brought huge advancements to \textit{Named Entity Recognition}, 
 as was the case with most NLP tasks. Deep learning differs from classical machine learning in
-regard to the levels of abstraction learned by the classifiers. While a conventional feed-forward
+regard to the levels of abstraction learned by the classifiers. Deep learning techniques combine 
+feature extraction and classification in a single system. While a conventional feed-forward
 neural network may perform classification by learning the weights of a single hidden layer through
 backpropagation, a deep learning model is usually composed of multiple hidden layers that handle 
 different levels of abstractions. In text related tasks, the first level of abstraction could
 consist of a word embedding layer, where words are mapped to a continuous vectorial space with
 reduced dimensionsality, and the next level of abstraction could be composed of a multi layered 
-recurrent neural network.
+recurrent neural network. 
 
 Essentialy all the best scoring models at the Conll-2003 task employ some form of deep 
 neural network, and most often Long Short Term Memory 
@@ -462,25 +462,33 @@ perform so well at this task, because in many webpages, text alone is insufficie
 contextual information about the semantic category of a word. The absence of context demands
 extraction systems to rely on information from sources outside the dataset, being them 
 features extracted from unlabeled corpora obtained through unsupervised pretraining, or 
-dictionaries containing many instances of the relevant entities. Although, as we argued earlier,
-entity instances will rather frequently be unique, rendering dictionary matching approaches
+dictionaries containing many instances of the relevant entities. Although, entity instances will rather 
+frequently be unique occurences, rendering dictionary matching approaches
 insufficient. Therefore, a key problem in the task of entity name extraction is accounting for all
 possible name combinations, even those that seem unlikely. Since there is no database with all 
 possible named entity combinations, we need holistic statistical methods that can handle 
 unknown tokens with relative efficacy.
 
-Since NER datasets built from news corpora such as CoNLL-2003 cannot provide an adequate 
-measure for the performance of sequence models on HTML. We introduce a novel dataset that is 
-described in detail in Chapter~\ref{cha:dataset} to run experiments on sequence modelling for 
-HTML.
+Considering that NER datasets built from news corpora such as CoNLL-2003 do not provide an adequate 
+measure for the performance of sequence models on HTML, we introduce the NER-on-HTML dataset
+to evaluate the performance of different sequence models at the researcher name extraction task. 
+This dataset is described in Chapter~\ref{cha:dataset}.
+
+Another important related task in the context of researcher name extraction is performing named 
+entity disambiguation, which consists of linking the extracted named entities to a unique profile in a 
+unified database. This task is called \textit{Named Entity Linking}. Roughly half the records found in 
+faculty webpages can be linked to their records in public databases without great difficulty. For the 
+other half we may need to employ more complex systems or perform manual classification. This task 
+however is not the object of our study.
 
 \chapter{Dataset}
 \label{cha:dataset}
 
 This chapter describes the dataset used to evaluate the performance of sequence models
 on the Web data extraction task. We call it the NER-on-HTML dataset. The task consists 
-of finding researcher
-names in faculty listings from university webpages across the world. This would be a
+of finding researcher names in faculty listings from university webpages across the world,
+mainly from Computer Science departments.
+This would be a
 necessary step when linking researcher profiles from university websites to their entries
 in public databases such as DBLP \footnote{http://dblp.uni-trier.de/}. Unlike many
 information extraction datasets, each webpage in the dataset comes from a different 
@@ -503,14 +511,14 @@ to the CoNLL 2003 data format. That is, one word per line with empty lines repre
 sentence boundaries. Sentence boundaries were determined by line break HTML tags
 (div, p, table, li, br, etc.) in contrast to inline tags (span, em, a, td, etc.). 
 Sentences that were more than fifty tokens long were also split according to the
-punctuation. Our approach to sentence segmentation is described in detail in
+punctuation. The algorithm used for sentence segmentation is described in detail in
 Appendix~\ref{app:html_segmenter}.
 
 A proper HTML segmenter poses many challenges by itself. We wanted to evaluate 
 models without relying on any sophisticated data record segmentation system.
 In many cases, entity annotation may precede the segmentation
-phase on Web data extraction methods. Also, depending on the task (as is the case
-of researcher name extraction), a good annotator that is able to work 
+phase on Web Data Extraction methods. Also, depending on the task (as is the case
+for researcher name extraction), a good annotator that is able to work 
 with raw HTML allows for a more flexible system and can provide a sufficient 
 solution.
 
@@ -518,8 +526,8 @@ Finally, all tokens were tagged using the IOB scheme put forward by
 Ramshaw and Marcus \cite{Ramshaw1999} that is described in Figure~\ref{fig:iob}. 
 The performance of sequence models in the NER-on-HTML dataset was evaluated 
 according to the precision, recall and F-measures~\cite{Rijsbergen1979} in the test
-set, as was done both in the MUC conferences and CONLL-2003. Precision accounts for the 
-percentage of named entities found by the model that are correct, this is the proportion of 
+set. Precision accounts for the percentage of named entities found by the model that are 
+correct, this is the proportion of 
 true positives relative to all extracted entities. Recall is the percentage of named entities 
 that are present in the corpus and were found by the model, this is the proportion of true 
 positives relative to all named entities that should have been extracted. The relation between
@@ -536,7 +544,7 @@ $ \beta$ times as much importance to recall as precision"~\cite{Rijsbergen1979}.
 for the value of $ \beta $ is $ 1 $, this measure is called the $ F_1 $-score. That is, we attribute 
 as much importance to recall as to precision.
 
-\section{Data}
+\section{Data Description}
 
 \begin{table}[h]
   \small
@@ -553,45 +561,122 @@ as much importance to recall as to precision.
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Number of HTML pages, sentences and tokens in each data file}
+  \caption{Description of the data files in the NER-on-HTML dataset}
   \label{tab:dataset}
 \end{table}
+
+The NER-on-HTML dataset is comparable in size to other popular NER datasets.
+It was divided in training, validation and test sets, which are described in 
+Table~\ref{tab:dataset}. The validation set was used in the early stopping 
+validation strategy to avoid overfitting classifiers, and model performance 
+was evaluated by comparing the performance in the test set. 
+
+Most web pages in this dataset are faculty directories with informative
+text from small passages, eventhough prose is not absent from more than a few
+webpages. Size and structure varies wildly, therefore some documents 
+may contain up to a few hundred names whereas other documents may contain 
+only twenty or thirty names. This difference in document size may be problematic
+when comparing different extraction systems, because a system that performs well 
+on pages with large content may perform poorly in a set of smaller pages, but this
+characteristic would not affect so much the averaged results. A different approach 
+might be to consider the averaged precision, recall and F-measures per page, 
+privileging systems that have a more regular performance between websites. However, 
+this approach might cover other deficiencies, since a system that produced 100 false 
+positives in a page with 500 names would account for the same level of drop in average 
+recall as a system that missed 10 false positives in a page with 50 names. For that
+reason, we chose to keep the same criteria of evaluation used on other 
+\textit{Named Entity Recognition} tasks, that is, calculating global precision, recall,
+and F-measures relative to the total amount of named entties in the corpus.
+
+\section{Differences between NER-on-HTML and ConLL-2003}
 
 \begin{table}[h]
   \small
   \begin{center}
     \begin{tabular}{ llllllll }
       \toprule
-      Data file & Documents & Sentences & Tokens & PER & LOC & ORG & MISC \\
+      Data file & Documents & Sentences & Tokens & LOC & MISC & ORG & PER \\
       \midrule
-      Training    & 946  & 14987 & 203621 & 1 & 1 & 1 & 1 \\  
-      Validation  & 216  & 3466  & 51362 & 1 & 1 & 1 & 1  \\
-      Test        & 231  & 3684  & 46435 & 1 & 1 & 1 & 1  \\
+      Training    & 946  & 14987 & 203621 & 7140 & 3438 & 6321 & 6600 \\  
+      Validation  & 216  & 3466  & 51362 & 1837 & 922 & 1341 & 1842  \\
+      Test        & 231  & 3684  & 46435 & 1668 & 702 & 1661 & 1617  \\
       \midrule
-      Total       & 1393 & 22137 & 301418 & 1 & 1 & 1 & 1 \\
+      Total       & 1393 & 22137 & 301418 & 10645 & 5062 & 9323 & 10059 \\
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Number of HTML pages, sentences and tokens in each data file}
+  \caption{Description of the CoNLL-2003 English dataset}
   \label{tab:conll}
 \end{table}
 
-The NER-on-HTML dataset is comparable in size to other popular NER datasets. Its characteristics
-are presented in Table~\ref{tab:dataset}. For comparison, the characteristics of the
-CONLL-2003 dataset are described in Table~\ref{tab:conll}. Take note that the number of documents
-in the NER-on-HTML dataset is much smaller, only 145, against 1393 documents in CONLL-2003. However, 
-the number of sentences in the NER-on-HTML dataset is higher: 43870 against 22137. Also, the number 
-of tokens in the NER-on-HTML is roughly half the number present in the CONLL-2003 dataset. These 
-numbers show that the target HTML documents of the researcher extraction task are longer than news 
-texts and, more importantly, they are composed of shorter sentences when compared to the text from 
-news corpora (~3.46 words per sentence in NER-on-HTML versus ~13.62 words per sentence in Conll-2003). 
-This attests to the fact that HTML provides far less context to be made use by sequence models 
-than plain text.
+The CoNLL-2003 dataset was introduced in the \textit{Named Entity Recognition} 
+shared-task at the Conference on Computational Natural Language Learning and
+is still one of the most popular NER datasets, being used to attest the performance
+of state-of-the-art sequence labeling systems. The English data is composed of 
+news stories extracted from the Reuters Corpus, and provides annotations for
+four types of entities: people (PER), organizations (ORG), locations (LOC),
+and miscellaneous (MISC), which includes entities that cannot be classified 
+in one of the former groups. In this section, we present a brief 
+comparison between the ConLL-2003 English dataset and the NER-on-HTML dataset to 
+understand how documents from both sources differ, and why this difference may be 
+responsible for the observed drop of performance when we apply NER systems trained 
+in news corpora to HTML extraction tasks.
 
-The dataset was divided in training, validation and test sets. Table \ref{tab:dataset} contains
-a description of the data files. The validation set was used in the early stopping validation strategy
-to avoid overfitting the models, and model performance was evaluated by comparing results in the test 
-set. 
+The characteristics of the ConLL-2003 dataset are described in Table~\ref{tab:conll}.
+The number of documents in the NER-on-HTML dataset is much smaller: only 145 against 
+1393. However, the number of sentences in the NER-on-HTML 
+dataset is higher: 43870 against 22137. Also, the number of tokens in the NER-on-HTML 
+is roughly half the number present in the ConLL-2003 dataset. These numbers show that 
+the HTML documents relevant to the researcher name extraction task are longer than news 
+stories and, more importantly, they are composed of much shorter sentences when compared 
+to the text from news corpora (~3.46 words per sentence in NER-on-HTML versus ~13.62 
+words per sentence in ConLL-2003). This attests to the fact that HTML provides far 
+less context to be made use by sequence models than plain text. This means that the 
+sequence models must make use of information other than textual context to perform
+well.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.75\textwidth]{pics/word_frequencies}
+  \caption{Word Frequencies on ConLL-2003 and NER-on-HTML}
+  \label{fig:word_frequencies}
+\end{figure}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ llll }
+      \toprule
+      Word & Frequency & Word & Frequency \\
+      \midrule
+      the & 12310 & , & 10439      \\
+      , & 10876 & - & 8140         \\
+      . & 10874 & ) & 3655         \\
+      of & 5502 & ( & 3641         \\
+      in & 5405 & : & 3484         \\
+      to & 5129 & of & 3345        \\
+      a & 4731 & and & 2499        \\
+      ( & 4226 & professor & 2456  \\
+      ) & 4225 & university & 1611 \\
+      and & 4223 & research & 1315 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Thirty most frequent words for the ConLL-2003 dataset and the NER-on-HTML dataset}
+  \label{tab:conll}
+\end{table}
+
+The word frequency distributions for the hundred most frequenct words in both datasets 
+are described in Figure~\ref{fig:word_frequencies}. Their shape is rather similar, 
+presenting a small number of very frequent words and a long tail of words that happen 
+only once or twice in the dataset. This long tail is where most named entities are located.
+To allow further comparison between both datasets, we present the ten most frequent words 
+(including punctuation signs) for each dataset in Table~\ref{tab:frequent_words}. As 
+expected, the ConLL-2003 contains more generic terms whereas the subject of the NER-on-HTML
+becomes evident with words such as "professor" and "university" happening with a high
+frequency in the corpus. Also, punctuation signs are relatively more frequent in the 
+NER-on-HTML owing to the factual tabular structure of the HTML texts present in the 
+collection. 
 
 \section{Dictionary}
 
@@ -612,12 +697,31 @@ set.
   \label{tab:gazetteer}
 \end{table}
 
+A dictionary or gazetteer can be a powerful aid on generic sequence labeling systems,
+eventhough deep learning architectures can be much less reliant on these types of 
+features, especially when we make use of pretrained word embeddings. We extracted 
+a list of 1,595,771 researcher names from the DBLP database and annotated tokens in the
+NER-on-HTML dataset with exact and partial matches tags. That is, if a sequence of tokens
+corresponded exactly to a name from the DBLP list, the entire sequence was annotated as 
+an exact match. Otherwise, if some tokens in the sequence matched a name from the DBLP
+list partially, the matching tokens were annotated with a partial match tag. 
+Table~\ref{tab:gazetteer} shows the precision, recall and F1 scores obtained with an
+exact gazetteer matching strategy in each NER-on-HTML data file as a baseline. This is 
+the performance obtained by only extracting sequences of tokens that correspond to an exact 
+match with the DBLP list. As expected, recall is very low and precision falls short of
+top performance extraction methods. Having established this baseline, any useful extraction 
+method should easily beat the dictionary exact matching approach.
+
 \section{Features}
 
-Thirteen categorical features were associated with each token in the dataset. 
-These features were selected through feature engineering from a larger pool
-features by eliminating features that did not contribute to the classification 
-strategy. The features are presented in Table \ref{tab:features}.
+Finally, thirteen categorical features were associated with each token in the dataset. 
+These were selected through feature engineering from a larger pool of features, 
+considering their aid to the performance of the extraction systems. Deep learning 
+architectures can work incredibly well without any of these features, however these 
+features are of critical importance to classical approaches such as HMMs and CRFs. 
+The selected features are presented in Table~\ref{tab:features}. Additionaly, all 
+models also make use of the unmodified tokens as features directly or as embedding
+lookups.
 
 \begin{table}[h]
   \small
@@ -642,43 +746,61 @@ strategy. The features are presented in Table \ref{tab:features}.
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Features used in the NER on HTML dataset}
+  \caption{Features used in the NER-on-HTML dataset}
   \label{tab:features}
 \end{table}
 
-The unaccented lowercase token was used as the key for the GloVe-100 embedding lookup.
-A gazetteer was constructed from a researcher list extracted from DBLP with 1,595,771
-names. Table \ref{tab:gazetteer} shows the precision, recall and F1 score obtained with an
-exact gazetteer matching strategy in each data file as a baseline.
+Feature 1 represents the token converted to unaccented lowercase format.
 Feature 2 represents an exact match of a sequence of tokens to any of the 1,595,771 
-names, and feature 3 represents a partial match. Feature 4 is the rounded logarithm of 
+names from the DBLP list, and feature 3 represents a partial match. Feature 4 is the rounded logarithm of 
 the frequency of a token in the gazetteer, and feature 5 is the rounded logarithm of the frequency
 of a token in a word corpus obtained through a random crawl on university websites.
 Features 6 to 11 represent a simple regular expression match to an email, number, 
-honorific, URL, capitalization or punctuation sign.
-
-Feature 12 represents the HTML enclosing tag and its parent concatenated. Feature 13
-represents all CSS classes concatenated. These features are not very useful in a general
-sense, because every HTML document has a different format, so only because a named entity
-occurs inside a given HTML tag in a document we cannot say it is more likely to be the case 
-in other documents. However, these features can be useful for the HMM self-training strategy 
-described in section \ref{sssec:self_training}. 
+honorific, URL, capitalization or punctuation sign. Feature 12 represents the HTML enclosing tag 
+and its parent concatenated. Finally, feature 13 represents all CSS classes concatenated. 
+Features 12 and 13 are of importance to the self-training strategy of HMMs described in 
+Section~\ref{sssec:self_training} and the attention architecture for DNNs described in
+Section~\ref{sssec:attention}.
 
 
+\chapter{Sequence Labeling Methods for Named Entity Recognition}
 
+Many important tasks in Natural Language Processing ranging from Part-of-speech 
+tagging to Named Entity Recognition involve attributing labels to sequences of 
+words. In the \textit{Named Entity Recognition} task, we want to 
+attribute labels to tokens, classifying them into one of many predefined classes 
+according to the available evidence. In Part-of-speech tagging we do essentialy
+the same task with different classes.
+Both of these tasks, as any other sequence labeling task can be modeled generically.
+If $ X = \{x_1, x_2, ..., x_n\} $ is a sequence of words and 
+$ Y = \{y_1, y_2, ..., y_n\} $ is a sequence of labels attributed to the word 
+sequence $ X $. Our goal is to find the optimal sequence of labels $ Y* $
+that maximizes the conditional probability of $ Y $ given $ X $. That is:
 
+\begin{equation}
+Y^* = \argmax_{Y} P(Y|X)
+\end{equation}
 
-\chapter{Named Entity Recognition Models}
+Calculating these probabilities precisely is impractical due to the exponential
+increase in the number of label combinations as we increase the sequence size 
+$ n $. As $ n $ becomes large, label combinations will become increasingly
+uncommon in the dataset, what will make probability estimation less reliable.
+Taking this into consideration, ultimately, the difference between sequence 
+labelling models lies in the assumptions behind the estimation of the conditional 
+probabilities $ P(Y|X) $. In this chapter we will describe several machine learning
+approches to sequence labeling, starting with the classical methods in 
+Section~\ref{sec:classical_methods}, which are: Hidden Markov Models, 
+Conditional Random Fields and Maximum Entropy Markov Models. In 
+Section~\ref{sec:neural_models} we will describe some neural architectures for 
+sequence labelling, which are: bidirectional recurrent neural networks, LSTM-CRF,
+CNN character representations, LSTM character representations.
+Finally, in Section~\ref{sec:word_embeddings} we will describe how word embeddings can
+help improve the performance of some of the previously introduced sequence labeling 
+methods on the Named Entity Recognition for the web task.
 
-Many Web data extraction systems rely on hand crafted rules or gazetteers to perform
-attribute annotation. Machine learning approaches to NER can improve annotations of 
-more complex entities and even perform entity detection without any feature
-engineering. We explored many methods of Named Entity Recognition
-in the context of a Web data extraction task. First, we discuss two traditional 
-approaches: Hidden Markov Models, and Linear Chain Conditional Random Fields. Then,
-we discuss neural network architectures.
+\section{Classical Methods}
 
-\section{Hidden Markov Models}
+\subsection{Hidden Markov Models}
 
 A Markov Model is a stochastic model that computes the most probable sequence of states 
 given a limited set of observable states $ S = \{s_1, s_2, ..., s_n \} $.
@@ -765,7 +887,7 @@ frequencies can be performed very quickly. This adds very little overhead
 to the original HMM and improves precision and recall by a considerable 
 margin.
 
-\section{Linear Chain Conditional Random Fields}
+\subsection{Linear Chain Conditional Random Fields}
 
 A Linear Chain Conditional Random Field (CRF) is the discriminative analog to the HMM,
 it was first introduced by Lafferty \cite{Lafferty2001}. It is a distribution $ P(Y|X) $ that takes the form:
@@ -964,6 +1086,31 @@ In the case of NER on HTML, word embeddings work similarly to a gazetteer. Named
 with the same type have similar embeddings, so good word embeddings can achieve exceptional 
 performance with little training and without a gazetteer. 
 
+\section{Word Embeddings}
+
+\subsection{Word2Vec}
+
+\subsection{Glove}
+
+\subsection{Elmo}
+
+\subsection{Other embeddings and some thoughts}
+
+BERT, language model do Chen. How a human can never learn with so many words.
+
+\section{Numerical Optimization}
+
+How to do it? ADAM. SGD. Minibatch.
+
+\chapter{Sequence Labeling on HTML}
+
+Self training for HMMs
+
+Soft attention
+
+Hard attention
+
+F1 optimization
 
 \chapter{Experiments}
 
