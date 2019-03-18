@@ -777,11 +777,19 @@ $ Y = \{y_1, y_2, ..., y_n\} $ is a sequence of labels attributed to the word
 sequence $ X $. Our goal is to find the optimal sequence of labels $ Y* $
 that maximizes the conditional probability of $ Y $ given $ X $. That is:
 
+THIS DEMANDS BETTER EXPLANATION. THIS IS ACTUALLY THE MAXIMUM LIKELIHOOD ESTIMATE.
+
 \begin{equation}
+\label{eq:1}
 Y^* = \argmax_{Y} P(Y|X)
 \end{equation}
 
-Calculating these probabilities precisely is impractical due to the exponential
+HOW EXACTLY DO WE ESTIMATE THESE FOR NEURAL NETWORKS?
+
+MAXIMUM ENTROPY
+
+
+Calculating these probabilities precisely is usually impractical due to the exponential
 increase in the number of label combinations as we increase the sequence size 
 $ n $. As $ n $ becomes large, label combinations will become increasingly
 uncommon in the dataset, what will make probability estimation less reliable.
@@ -802,51 +810,137 @@ methods on the Named Entity Recognition for the web task.
 
 \subsection{Hidden Markov Models}
 
-A Markov Model is a stochastic model that computes the most probable sequence of states 
-given a limited set of observable states $ S = \{s_1, s_2, ..., s_n \} $.
+The Hidden Markov Model is an expanded Markov Chain where the sequence of observed states
+depends on an underlying sequence of hidden states. A Markov Chain is a stochastic 
+model for describing sequences, where the sequences have the Markov Property. That is, 
+considering a discrete sequence of states $ X = \{x_1, x_2, ..., x_n\} $ in which each observed
+state $ x_i $ s.t. $ i \in (1, n) $ takes its value from a limited set of possible
+states $ S = \{s_1, s_2, ..., s_k \} $. Sequence $ X $ only satisfies the Markov property if:
+
+\begin{equation}
+P(y_i|y_{i-1}x_{i-1}, y_{i-2}x_{i-2}, ..., y_1x_1) = P(y_i|y_{i-1}, y_{i-2},..., y_{i-k})
+\end{equation}
+
+Namely, the current state $ x_i $ only depends on a limited number of previous states $ k $.
+When $ k = 1, k = 2, ... $ the Markov Chain is said to be of first order, second order, and so on.
+What the Markov assumption means is that the entire history of states in the sequence is 
+encoded in a limited number of previous states at any time. Thus, by knowing a limited number of 
+previous states, we can make as accurate predictions about future states as we would make by 
+knowing all the sequence history. So, conditioned on this limited set of previous states, the 
+future and past states are independent. 
+
+A Markov Chain can represent a wide range of phenomena such as daily temperatures in a region, 
+closing prices in the financial market, yearly demographic growth, or words in a text. Nevertheless, 
+it is always a simplification of reality that makes sequences mathematically treatable. The extent 
+to which this simplification will hurt our predictions depend of course on the nature of the studied 
+phenomena. In practice, considering more than three or four previous states at any time makes 
+parameter esimation unreliable for the reasons explained in the beginning of the chapter, also 
+decoding the optimal sequence of states becomes prohibitively expensive in terms of computation. 
+To see why this might be a problem on text related tasks, we only need to consider a long sentence
+such as "He took ker"
+
+where the subject (e.g. he or she) is defined at the
+
+a larger number of previous states
+
+
+As we will see later, Markov Chains of second and third order are fairly adequate models 
+for sequence labeling tasks. Because of our present interest in describing sequence labeling models, 
+we only considered discrete time Markov Chains in our explanation, when in fact there are also 
+continuous-time Markov Chains (REFERENCE), which are rather called Markov processes, but they are of 
+lesser interest for text modelling because words and characters in a text are countable and therefore 
+discrete.
+
+When
+Considering that the transition probabilities from state $ a $ to state $ b $, $ P(S_a|S_b) $ are
+time invariant. That is, 
+
+\begin{equation}
+P(y_i+1 = s_j |y_{i} = s_k) = P(y_i = s_j |y_{i-1} = s_k)
+\end{equation}
+
+we only need to estimate a fixed set of parameters 
+
+
+The Hidden Markov Model (HMM) differs from the Markov Chain in that it does not observe the states 
+$ Y $ directly, but rather a probabilistic function of these states. For example in NER, the words 
+are observed, however the Named Entity labels associated with these words are not. 
+
+
+A Hidden Markov 
+Model keeps the Markov assumption
+
+makes two assumptions. First, the probability 
+of being in a given state depends only on a fixed number of previous states, this is known as the 
+Markov assumption. That is:
+
+
+
+
+
+
+we only need to know a limited number of previous states to determine
+all future states. k
+
+we can predict
+
+Formally, we want to compute the most probable
+sequence of labels $ Y = \{y_1, y_2, ..., y_n\} $ for a sequence of observed tokens
+$ X = \{x_1, x_2, ..., x_n\} $ as we saw in Equation~\ref{eq:1}. With Bayes theorem, we 
+can write $ P(Y|X) $ as:
+
+
+. These can be meteorological phenomena, 
+demographical processes or 
+
+DNA sequences of nucleobases
+
+
+
+
 The Hidden Markov Model (HMM) differs from the Markov Model in that it
 does not observe the states directly, but rather a probabilistic function of those 
 states. For example in NER, the words are observed, however the Named Entity labels
-associated with these words are not. Formally, we want to compute the most probable
-sequence of labels $ Y = \{y_1, y_2, ..., y_n\} $ for a sequence of observed tokens
-$ X = \{x_1, x_2, ..., x_n\} $.
+associated with these words are not. A Hidden Markov Model makes two assumptions. First, the probability 
+of being in a given state depends only on a fixed number of previous states, this is known as the 
+Markov assumption. That is:
 
 \begin{equation}
-Y^* = \argmax_{Y} P(Y|X)
+P(y_i|y_{i-1}x_{i-1}, y_{i-2}x_{i-2}, ..., y_1x_1) = P(y_i|y_{i-1}, y_{i-2},..., y_{i-k})
 \end{equation}
 
-With Bayes theorem, we can write $ P(Y|X) $ as:
+Second, the probability of a word depends only on its assigned label. That means tokens
+are independent once we know their their correct label. That is:
+
+\begin{equation}
+P(x_i|y_{i-1}x_{i-1}, ..., y_1x_1) = P(x_i|y_i)
+\end{equation}
+
+
+Formally, we want to compute the most probable
+sequence of labels $ Y = \{y_1, y_2, ..., y_n\} $ for a sequence of observed tokens
+$ X = \{x_1, x_2, ..., x_n\} $ as we saw in Equation~\ref{eq:1}. With Bayes theorem, we 
+can write $ P(Y|X) $ as:
 
 \begin{equation}
 P(Y|X) = \frac{P(X|Y) P(Y)}{P(X)}
 \end{equation}
 
 Since $ P(X) $ is the same for all label sequences $ Y $, we can simply maximize
-the probability $ P(X|Y) P(Y) $.
+the probability $ P(X|Y) P(Y) $, that is equivalent to the joint distribution 
+$ P(X, Y) $. 
 
-A HMM makes two assumptions. First, the probability of being in a given state depends 
-only on a fixed number of previous states. That is:
+
+With these assumptions, the probability $ P(Y|X) $ can be approximated by the expression:
 
 \begin{equation}
-P(y_i|y_{i-1}x_{i-1}, y_{i-2}x_{i-2}, ..., y_1x_1) = P(y_i|y_{i-1}, y_{i-2},..., y_{i-k})
+P(Y|X) \propto \prod_{i=k+1}^{n} P(y_i|y_{i-1}, y_{i-2}, ..., y_{i-k}) P(x_i|y_i)
 \end{equation}
 
 In fact, we can get much better results on the NER task by looking at trigrams
 or quadrigrams ($ k = 2 $ or $ k = 3 $) instead of bigrams as with a regular HMM. 
 Some label assignments are highly improbable, such as single token named entities 
 separated by a common word. These kinds of patterns can be perceived by a higher order HMM.
-Second, the probability of a word depends only on its assigned label. That is:
-
-\begin{equation}
-P(x_i|y_{i-1}x_{i-1}, ..., y_1x_1) = P(x_i|y_i)
-\end{equation}
-
-With these assumptions, 
-the probability $ P(Y|X) $ can be approximated by the expression:
-
-\begin{equation}
-P(Y|X) \propto \prod_{i=k+1}^{n} P(y_i|y_{i-1}, y_{i-2}, ..., y_{i-k}) P(x_i|y_i)
-\end{equation}
 
 All relevant probabilities can be estimated through maximum likelihood estimation from the relative
 frequencies of labels and features in the corpus. The best sequence of labels can be computed 
