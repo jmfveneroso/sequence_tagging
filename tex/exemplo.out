@@ -13,7 +13,7 @@
 \BOOKMARK [1][-]{section.3.2}{3.2 Differences between NER-on-HTML and ConLL-2003}{chapter.3}% 13
 \BOOKMARK [1][-]{section.3.3}{3.3 Dictionary}{chapter.3}% 14
 \BOOKMARK [1][-]{section.3.4}{3.4 Features}{chapter.3}% 15
-\BOOKMARK [0][-]{chapter.4}{4 Sequence Labeling Methods for Named Entity Recognition}{}% 16
+\BOOKMARK [0][-]{chapter.4}{4 Sequence Labeling Methods for NER}{}% 16
 \BOOKMARK [1][-]{section.4.1}{4.1 Classical Methods}{chapter.4}% 17
 \BOOKMARK [2][-]{subsection.4.1.1}{4.1.1 Hidden Markov Models}{section.4.1}% 18
 \BOOKMARK [2][-]{subsection.4.1.2}{4.1.2 Self training}{section.4.1}% 19
@@ -35,5 +35,5 @@
 \BOOKMARK [1][-]{section.6.2}{6.2 Experiment 2: All features}{chapter.6}% 35
 \BOOKMARK [0][-]{chapter.7}{7 Related Work}{}% 36
 \BOOKMARK [0][-]{chapter.8}{8 Conclusion}{}% 37
-\BOOKMARK [0][-]{chapter*.6}{Bibliography}{}% 38
+\BOOKMARK [0][-]{section*.7}{Bibliography}{}% 38
 \BOOKMARK [0][-]{appendix.A}{A HTML sentence segmenter}{}% 39
