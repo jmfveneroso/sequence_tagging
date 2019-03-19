@@ -33,7 +33,9 @@
 \usepackage{graphicx}
 \usepackage{mathtools}
 \usepackage{amsfonts}
+\usepackage{amsmath}
 \usepackage{multirow}
+\usepackage[cal=boondox]{mathalfa}
 
 \DeclareMathOperator*{\argmax}{arg\,max\,}
 \renewcommand{\arraystretch}{1.2}
@@ -913,63 +915,82 @@ $ \mathcal{L(Y; \theta)} $ of a sequence of observed states $ Y = \{ y_1, y_2, .
 we need only calculate the product of all transitions, which are known from the data:
 
 \begin{equation}
-\mathcal{L}(Y; \theta) = \prod_{i=1}^{n} P(y_i|y_{i-1})
-\mathcal{L}(Y; \theta) = \prod_{i=1}^{n} \theta_{y_i, y_{i-1}}
+P(Y) = P(y_0) \prod_{i=1}^{n} P(y_i|y_{i-1}) \\
+\mathcal{L}(Y; \theta) = v_0 \prod_{i=1}^{n} \theta_{y_i, y_{i-1}}
 \end{equation}
 
-Finally, to obtain maximum likelihood 
-esimates for the transition matrix parameters, it is useful to define the identity function
-$ I(x) $ defined in Equation~\ref{eq:identity_fn}.
+We can write $ \mathcal{L}(Y; \theta) $ in another form by defining $ \eta_{a,b} $
+to be the count of transitions from $ a $ to $ b $ in the sequence $ X $. This way:
 
 \begin{equation}
-I(x) = \begin{cases}
-    1, & \text{if the statement } x \text{is true} \\
-    0, & \text{otherwise}
-\end{cases}
-\label{eq:identity_fn}
+\mathcal{L}(Y; \theta) = v_0 \prod_{a, b} \theta_{a, b}^{\eta_{a, b}}
+\label{eq:hmm_likelihood}
 \end{equation}
 
-That way we can write the likelihood $ \mathcal{L(Y; \theta)} $ as:
+However, this expression shows only half the truth, because not all the parameters
+$ \theta_{a, b} $ are free since every row in the transition matrix must sum up to one.
+To introduce this constraint in the likelihood calculation, we must choose a column
+$ B $ arbitrarily for which the values $ \theta_{a, b=B} $ will be determined by the
+remaining values in each corresponding row. This way, by choosing $ B=0 $ 
+Equation~\ref{eq:hmm_likelihood} becomes:
 
 \begin{equation}
-\mathcal{L}(Y; \theta) = \prod_{i=1}^{n} \prod_{a,b} \theta_{a, b}^{I(x_{i-1}=a, x_{i}=b)} (1 - \theta_{a, b})^{I(x_{i-1} \neq a, x_{i} \neq b)}
-\label{eq:identity_fn}
+\begin{array}{l}
+\mathcal{L}(Y; \theta) = v_0 \prod_{a, b \neq 0} \theta_{a, b}^{\eta_{a, b}} 
+\prod_{a, b = 0} (1 - \sum_{b' \neq 0} \theta_{a, b'})^{\eta_{a, b}} \\
+\mathcal{l}(Y; \theta) = ln v_0 \sum{a, b \neq 0} \eta_{a, b} ln(\theta_{a, b}) +
+\sum{a, b = 0} \eta_{a, b} ln(1 - \sum_{b' \neq 0} \theta_{a, b'})
+\end{array}
+\label{eq:hmm_likelihood}
 \end{equation}
 
-If we define the function $ K(a, b, X) $ to be equal to the count of transitions from $ a $ to $ b $
-in sequence $ X $, we can write $ \mathcal{L}(Y; \theta) $ as:
+The likelihood function $ \mathcal{L}(Y; \theta) $ is always positive, so finding the parameters 
+that maximize $ \mathcal{l}(Y; \theta) $ is identical to maximizing the likelihood itself, with the
+benefit of transforming a product over transition probabilities into a sum of logarithms. Next, we must
+calculate the derivatives for the log likelihood in order to find the maximum:
 
 \begin{equation}
-\mathcal{L}(Y; \theta) = \prod_{a,b} \theta_{a, b}^K(a, b, X) (1 - \theta_{a, b})^{n - K(a, b, X)}
-\mathcal{l}(Y; \theta) = \sum_{a,b} K(a, b, X) log \theta_{a, b} + (n - K(a, b, X)) \cdot (1 - \theta_{a, b})
+\begin{array}{l}
+\frac{\partial \mathcal{l}(Y; \theta)}{\partial \theta_{a, b}} = 
+\frac{\eta_{a, b}}{\theta_{a, b}} - \frac{\eta_{a, 0}}{1 - \sum_{b' \neq 0} \theta_{a, b'}} = 0 \\
+\frac{\eta_{a, b}}{\theta_{a, b}} = \frac{\eta_{a, 0}}{1 - \sum_{b' \neq 0} \theta_{a, b'}} \\
+\frac{\theta_{a, b}}{1 - \sum_{b' \neq 0} \theta_{a, b'}} = \frac{\eta_{a, b}}{\eta_{a, 0}}
+\end{array}
 \end{equation}
 
-Since the likelihood function $ \mathcal{L}(Y; \theta) $ is always positive, maximizing the logarithm
-of this function $ \mathcal{l}(Y; \theta) $ is identical to maximizing the function itself, with the
-benefit of transforming a product over transition probabilities into the sum of the logarithm of 
-the transition probabilities.
+Therefore, knowing that $ \eta_{a, b} \propto \theta_{a, b} $:
 
 \begin{equation}
-\frac{\partial \mathcal{l}(Y; \theta)}{\partial \theta_{a, b}} = \frac{K(a, b, X)}{\theta_{a, b}} - \frac{n - K(a, b, X)}{1 - \theta_{a, b}}
+\theta_{a, b} = \frac{\eta_{a, b}}{\sum_{b'}\eta_{a, b'}}
 \end{equation}
 
-Making $ \frac{\partial\mathcal{l}(Y; \theta)}{\theta_{a, b}} = 0 $ to find the maximum value of
-$ \mathcal{l}(Y; \theta) $ and isolating $ theta_{a, b} $ yields a closed form expression to the 
-maximum likelihood estimator:
+% By making $ \frac{\partial\mathcal{l}(Y; \theta)}{\theta_{a, b}} = 0 $, we can find the maximum value
+% for $ \mathcal{l}(Y; \theta) $. To ascertain that this is a global maximum we take the second 
+% derivative:
+% 
+% \begin{equation}
+% \frac{\partial^2 \mathcal{l}(Y; \theta)}{\partial \theta_{a, b}^2} = 
+% \frac{-K(a, b, X)}{\theta_{a, b}^2} - \frac{n - K(a, b, X)}{(1 - \theta_{a, b})^2}
+% \end{equation}
+% 
+% Observe that the partial second derivatives are always negative, what makes this function strictly 
+% concave, therefore if there is a maximum value, it is a global maximum. Finally:
+% 
+% \begin{equation}
+% \begin{array}{l}
+% \frac{\partial \mathcal{n}(Y; \theta)}{\partial \theta_{a, b}} = 0 \\
+% \frac{K(a, b, X)}{\theta_{a, b}} - \frac{n - K(a, b, X)}{1 - \theta_{a, b}} = 0 \\
+% theta_{a, b} = \frac{K(a, b, X)}{n}
+% \end{array}
+% \end{equation}
 
-\begin{equation}
-theta_{a, b} = \frac{K(a, b, X)}{n}
-\end{equation}
-
-What is really convenient, since this is average number of transitions from state $ a $ to state
-$ b $ in sequence $ X $. A value that can be easily obtained with $ O(n) $ time complexity. Up to 
-this point, we can easily estimate the transition matrix from the data, and we are also able to 
-reliably predict the future states of a sequence based on the current state. But in NER, the words 
-are observed, however the Named Entity labels associated with these words are not. That is why need
+We get a closed form expression for the maximum likelihood estimator $ theta_{a, b} $.
+What is really convenient, since this is the average number of transitions from state $ a $ to state
+$ b $ in sequence $ X $. A value that can be easily obtained with $ O(n) $ time complexity. So
+far, we assumed all states $ X $ are observable, but in NER, only the words 
+are observed, while the Named Entity labels associated with these words are not. That is why we need
 another layer of complexity. The Hidden Markov Model (HMM) differs from the Markov Chain in that it 
 does not observe the states $ X $ directly, but rather a probabilistic function of these states. 
-Since we will only be working with boolean features, these probability functions are simply 
-identity functions.
 
 With the Hidden Markov Model we want to predict a sequence of labels $ Y = \{y_1, y_2, ..., y_n\} $ 
 (i.e. our Markov Chain) from a sequence of observed states $ X = \{x_1, x_2, ..., x_n\} $
@@ -979,94 +1000,47 @@ With the Hidden Markov Model we want to predict a sequence of labels $ Y = \{y_1
 P(x_i|y_{i-1}x_{i-1}, ..., y_1x_1) = P(x_i|y_i)
 \end{equation}
 
-That is, the probability of observing the word $ x_i $ depends only on the current hidden
-state $ y_i $, its label (e.g. PER, LOC, ORG, etc.). So, by making this assumption, we are
-essentialy stating that if we know a token's label, we can reliably predict what are the 
-probabilities that this token takes any value in the vocabulary. This is, of course, a very
+That is, the probability of observing the word $ x_i $ depends only on the current label
+$ y_i $, or hidden state (e.g. PER, LOC, ORG, etc.). So, by making this assumption, we are
+essentialy stating that if we know a token's assigned label, we can reliably predict what are the 
+probabilities that this token takes any value in a vocabulary. This is, of course, a very
 simplistic assumption and many models (such as CRFs) try to overcome this issue, but this 
-step is necessary if we want to get a closed form estimator for our generative model. So,
-we now introduce the \textit{Emission Matrix}...
-
-
-With Bayes theorem, we can write the probability $ P(Y|X) $ as:
-
-\begin{equation}
-P(Y|X) = \frac{P(X|Y) P(Y)}{P(X)}
-\end{equation}
-
-A Hidden Markov 
-Model keeps the Markov assumption
-
-makes two assumptions. First, the probability 
-of being in a given state depends only on a fixed number of previous states, this is known as the 
-Markov assumption. That is:
-
-
-
-
-
-
-we only need to know a limited number of previous states to determine
-all future states. k
-
-we can predict
-
-
-
-. These can be meteorological phenomena, 
-demographical processes or 
-
-DNA sequences of nucleobases
-
-
-
-
-The Hidden Markov Model (HMM) differs from the Markov Model in that it
-does not observe the states directly, but rather a probabilistic function of those 
-states. For example in NER, the words are observed, however the Named Entity labels
-associated with these words are not. A Hidden Markov Model makes two assumptions. First, the probability 
-of being in a given state depends only on a fixed number of previous states, this is known as the 
-Markov assumption. That is:
-
-\begin{equation}
-P(y_i|y_{i-1}x_{i-1}, y_{i-2}x_{i-2}, ..., y_1x_1) = P(y_i|y_{i-1}, y_{i-2},..., y_{i-k})
-\end{equation}
-
-Second, the probability of a word depends only on its assigned label. That means tokens
-are independent once we know their their correct label. That is:
-
-\begin{equation}
-P(x_i|y_{i-1}x_{i-1}, ..., y_1x_1) = P(x_i|y_i)
-\end{equation}
-
-
-Formally, we want to compute the most probable
-sequence of labels $ Y = \{y_1, y_2, ..., y_n\} $ for a sequence of observed tokens
-$ X = \{x_1, x_2, ..., x_n\} $ as we saw in Equation~\ref{eq:1}. With Bayes theorem, we 
-can write $ P(Y|X) $ as:
+step is necessary if we want to get a closed form estimator for our generative model (IS THAT SO?). 
+To model the observation probability distributions $ P(x_i|y_i) $, we assume again that 
+the probabilities are time invariant and that $ x_i $ takes its value from a fixed vocabulary 
+with size $ V $. We introduce an \textit{Emission Matrix} $ V \times K $ to hold these 
+probabilities where each cell $ V_{i,j} $ represents the probability that, given the $ Y_i $,
+we observed the word $ X_j $. Now, to calculate the probability of observing a vector of labels 
+$ Y $ given a sequence of observations $ X $ can be calculated with Bayes' theorem:
 
 \begin{equation}
 P(Y|X) = \frac{P(X|Y) P(Y)}{P(X)}
 \end{equation}
 
-Since $ P(X) $ is the same for all label sequences $ Y $, we can simply maximize
-the probability $ P(X|Y) P(Y) $, that is equivalent to the joint distribution 
-$ P(X, Y) $. 
-
-
-With these assumptions, the probability $ P(Y|X) $ can be approximated by the expression:
+And we get the conditional likelihood:
 
 \begin{equation}
-P(Y|X) \propto \prod_{i=k+1}^{n} P(y_i|y_{i-1}, y_{i-2}, ..., y_{i-k}) P(x_i|y_i)
+\mathcal{L}(Y|X; \theta) = v_0 \prod_{a, b} \theta_{a, b}^{\eta_{a, b}} \prod_{b, c} \psi_{b, c}^{\mu_{b, c}}
+\mathcal{l}(Y|X; \theta) = ln v_0 \sum_{a, b} \theta_{a, b} ln(\eta_{a, b}) \sum_{b, c} \mu_{b, c} ln(\psi_{b, c})
 \end{equation}
 
-In fact, we can get much better results on the NER task by looking at trigrams
-or quadrigrams ($ k = 2 $ or $ k = 3 $) instead of bigrams as with a regular HMM. 
-Some label assignments are highly improbable, such as single token named entities 
-separated by a common word. These kinds of patterns can be perceived by a higher order HMM.
+Parameters $ \theta $ and $ \psi $ are independent, so the procedure to find parameters $ \theta_{a,b} $ 
+remains the same and we can employ the same procedure used on (REFERENCE) to find parameters $ \psi $,
+what yields:
 
-All relevant probabilities can be estimated through maximum likelihood estimation from the relative
-frequencies of labels and features in the corpus. The best sequence of labels can be computed 
+\begin{equation}
+\psi_{b, c} = \frac{\mu_{a, b}}{\sum_{c'}\mu_{b, c'}}
+\end{equation}
+
+That is the expected number of times we observed word $ X $ when we were at state $ Y $. A number
+that is also very easy to obtain in $ O(n) $ time. With that we conclude the parameter estimation
+for the Hidden Markov Model when have access to labeled data. If we only have unlabeled data we
+can do the parameter estimation with the Baum-Welch algorithm, though the results are much less
+reliable on the sequence labelling task.
+
+The last task we need to do is calculating the most probable sequence of labels given a sequence of
+observations. To obtain this sequence we employ the Viterbi algorithm, which is explained in Appendix
+(REF). For higher order Hidden Markov Models the best sequence of labels can be computed 
 with a variable state Viterbi approach \cite{Li2000}. However, as we increase $ k $, this computation 
 becomes exponentially more expensive. The beam-search strategy may be employed for a faster 
 search, but we found that for $ k \leq 4 $, the Viterbi algorithm is still viable.
@@ -1076,33 +1050,6 @@ HMM based taggers have been successfully applied in many NLP and WDE tasks
 interpretable, making them a good choice for a first approximation. However, these models 
 are highly dependent on the right selection of features, what may outweigh the benefit of a 
 small training cost.
-
-\subsection{Self training} 
-\label{sssec:self_training}
-
-In the task of NER on HTML, there are useful features related to the HTML
-structure that can help in identifying named entities. In a given website, named
-entities tend to occur inside the same HTML tags. The HTML tag feature or other
-HTML features could easily be incorporated in the HMM. However, these 
-features are only useful inside a single website and they cannot be generalized, 
-because different websites use distinct HTML templates. 
-Therefore, we propose a self-training strategy to obtain probabilities for
-these HTML features. It is implemented like this:
-
-\begin{itemize}
-\item Train the HMM without any HTML features.
-\item Compute labels for a website with the trained HMM.
-\item Use the computed labels as a proxy for the actual labels in the 
-website and estimate HTML feature frequencies for this website alone.
-\item Recompute the labels now using the HTML feature probabilities.
-\end{itemize}
-
-In theory, this strategy could be used with any sequence tagger, however
-retraining a classifier with new features can become prohibitively expensive.
-This strategy is only possible because the computation of HTML feature
-frequencies can be performed very quickly. This adds very little overhead 
-to the original HMM and improves precision and recall by a considerable 
-margin.
 
 \subsection{Linear Chain Conditional Random Fields}
 
@@ -1321,7 +1268,33 @@ How to do it? ADAM. SGD. Minibatch.
 
 \chapter{Sequence Labeling on HTML}
 
-Self training for HMMs
+\section{Self training} 
+\label{sssec:self_training}
+
+In the task of NER on HTML, there are useful features related to the HTML
+structure that can help in identifying named entities. In a given website, named
+entities tend to occur inside the same HTML tags. The HTML tag feature or other
+HTML features could easily be incorporated in the HMM. However, these 
+features are only useful inside a single website and they cannot be generalized, 
+because different websites use distinct HTML templates. 
+Therefore, we propose a self-training strategy to obtain probabilities for
+these HTML features. It is implemented like this:
+
+\begin{itemize}
+\item Train the HMM without any HTML features.
+\item Compute labels for a website with the trained HMM.
+\item Use the computed labels as a proxy for the actual labels in the 
+website and estimate HTML feature frequencies for this website alone.
+\item Recompute the labels now using the HTML feature probabilities.
+\end{itemize}
+
+In theory, this strategy could be used with any sequence tagger, however
+retraining a classifier with new features can become prohibitively expensive.
+This strategy is only possible because the computation of HTML feature
+frequencies can be performed very quickly. This adds very little overhead 
+to the original HMM and improves precision and recall by a considerable 
+margin.
+
 
 Soft attention
 

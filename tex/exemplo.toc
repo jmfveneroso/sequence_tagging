@@ -29,14 +29,14 @@
 \contentsline {subsection}{\numberline {4.3.2}Glove}{36}{subsection.4.3.2}
 \contentsline {subsection}{\numberline {4.3.3}Elmo}{36}{subsection.4.3.3}
 \contentsline {subsection}{\numberline {4.3.4}Other embeddings and some thoughts}{36}{subsection.4.3.4}
-\contentsline {section}{\numberline {4.4}Numerical Optimization}{36}{section.4.4}
-\contentsline {chapter}{\chapternumberline {5}Sequence Labeling on HTML}{37}{chapter.5}
-\contentsline {chapter}{\chapternumberline {6}Experiments}{39}{chapter.6}
-\contentsline {section}{\numberline {6.1}Experiment 1: No features}{40}{section.6.1}
-\contentsline {section}{\numberline {6.2}Experiment 2: All features}{41}{section.6.2}
-\contentsline {chapter}{\chapternumberline {7}Related Work}{43}{chapter.7}
-\contentsline {chapter}{\chapternumberline {8}Conclusion}{47}{chapter.8}
-\contentsline {chapter}{Bibliography}{49}{section*.7}
+\contentsline {section}{\numberline {4.4}Numerical Optimization}{37}{section.4.4}
+\contentsline {chapter}{\chapternumberline {5}Sequence Labeling on HTML}{39}{chapter.5}
+\contentsline {chapter}{\chapternumberline {6}Experiments}{41}{chapter.6}
+\contentsline {section}{\numberline {6.1}Experiment 1: No features}{42}{section.6.1}
+\contentsline {section}{\numberline {6.2}Experiment 2: All features}{43}{section.6.2}
+\contentsline {chapter}{\chapternumberline {7}Related Work}{45}{chapter.7}
+\contentsline {chapter}{\chapternumberline {8}Conclusion}{49}{chapter.8}
+\contentsline {chapter}{Bibliography}{51}{section*.7}
 \ppgcc@toc@switchto \ppgcc@appendixname 
 \ppgcc@toc@recover 
-\contentsline {appendix}{\chapternumberline {A}HTML sentence segmenter}{55}{appendix.A}
+\contentsline {appendix}{\chapternumberline {A}HTML sentence segmenter}{57}{appendix.A}

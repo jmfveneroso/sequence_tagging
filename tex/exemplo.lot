@@ -13,9 +13,9 @@
 \addvspace {10pt}
 \addvspace {10pt}
 \addvspace {10pt}
-\contentsline {table}{\numberline {6.1}{\ignorespaces Model descriptions}}{39}{table.6.1}
-\contentsline {table}{\numberline {6.2}{\ignorespaces Precision, recall and F1 in the NER on HTML dataset for models that incorporate no features}}{40}{table.6.2}
-\contentsline {table}{\numberline {6.3}{\ignorespaces Precision, recall and F1 in the NER on HTML dataset for models that incorporate all features}}{41}{table.6.3}
+\contentsline {table}{\numberline {6.1}{\ignorespaces Model descriptions}}{41}{table.6.1}
+\contentsline {table}{\numberline {6.2}{\ignorespaces Precision, recall and F1 in the NER on HTML dataset for models that incorporate no features}}{42}{table.6.2}
+\contentsline {table}{\numberline {6.3}{\ignorespaces Precision, recall and F1 in the NER on HTML dataset for models that incorporate all features}}{43}{table.6.3}
 \addvspace {10pt}
 \addvspace {10pt}
 \addvspace {10pt}
