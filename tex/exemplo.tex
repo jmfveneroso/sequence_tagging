@@ -37,6 +37,9 @@
 \usepackage{multirow}
 \usepackage[cal=boondox]{mathalfa}
 
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
+
 \DeclareMathOperator*{\argmax}{arg\,max\,}
 \renewcommand{\arraystretch}{1.2}
 
@@ -812,234 +815,269 @@ methods on the Named Entity Recognition for the web task.
 
 \subsection{Hidden Markov Models}
 
-The Hidden Markov Model is an expanded Markov Chain where the sequence of observed states
-depends on an underlying sequence of hidden states. A Markov Chain is a stochastic 
-model for describing sequences, where the sequences have the Markov Property. That is, 
-considering a discrete sequence of states $ X = \{x_1, x_2, ..., x_n\} $ in which each observed
-state $ x_i $ s.t. $ i \in (1, n) $ takes its value from a limited set of possible
-states $ S = \{s_1, s_2, ..., s_k \} $. Sequence $ X $ only satisfies the Markov property if:
+The \textit{Hidden Markov Model} is an expanded \textit{Markov Chain} where the sequence of observed states
+depends on an underlying sequence of hidden states. A \textit{Markov Chain} is a stochastic 
+model for describing sequences, when the described sequences have the \textit{Markov Property}. That is, 
+consider a sequence $ X = \{x_1, x_2, \ldots, x_n\} $ in which each observed
+state $ x_i, \forall i \in [1, n] $ takes its value from a set of $ m $ possible states
+$ \{S_1, S_2, \ldots, S_m \} $. Sequence $ X $ only satisfies the \textit{Markov Property} if:
 
 \begin{equation}
-P(y_i|y_{i-1}x_{i-1}, y_{i-2}x_{i-2}, ..., y_1x_1) = P(y_i|y_{i-1}, y_{i-2},..., y_{i-k})
+P(x_i|x_{i-1}, x_{i-2}, \ldots, x_1) = P(x_i|x_{i-1}, x_{i-2}, \ldots, x_{i-k})
 \end{equation}
 
-Namely, the current state $ x_i $ only depends on a limited number of previous states $ k $.
-When $ k = 1, k = 2, ... $ the Markov Chain is said to be of first order, second order, and so on.
-What the Markov assumption means is that the entire history of states in the sequence is 
-encoded in a limited number of previous states at any time. Thus, by knowing a limited number of 
-previous states, we can make as accurate predictions about future states as we would make by 
-knowing all the sequence history. Therefore, conditioned on this limited set of previous states, 
+The probability of observing state $ x_i $ at time $ i $ depends only on the $ k $ previous observed states.
+When $ k = 1, k = 2, \ldots $ the \textit{Markov Chain} is said to be of first order, second order, and so on.
+What the \textit{Markov Assumption} means is that, at any time, the entire history of observed states in the 
+sequence is encoded in a limited number of previous states. So, by knowing a limited number of 
+previous states, we can make as accurate predictions about the future as we would make by 
+knowing all the sequence history. Conditioned on this limited set of previous states, 
 the future and past states are independent. 
 
 Because of our present interest in describing sequence labeling models, 
-we only considered discrete time Markov Chains in our explanation, when in fact there are also 
-continuous-time Markov Chains (http://www.columbia.edu/~ks20/stochastic-I/stochastic-I-CTMC.pdf), 
-but they are hardly useful on text modelling since words and characters in a text are 
-countable and therefore discrete.
+we only consider \textit{Discrete-Time Markov Chains}, 
+when, in fact, there are also 
+\textit{Continuous-Time Markov Chains}~\footnote{http://www.columbia.edu/~ks20/stochastic-I/stochastic-I-CTMC.pdf}.
+These models are hardly useful on text modelling tasks because words and characters in a text are 
+always countable and therefore discrete. We also consider \textit{Markov Chains} to be of 
+first order (i.e. $ k = 1 $) in the following derivations, without loss of generality, to simplify 
+the notation.
 
-A Markov Chain can represent a wide range of phenomena such as daily temperatures in a region, 
+A \textit{Markov Chain} can represent a wide range of phenomena such as daily temperatures in a region, 
 closing prices of a stock in the financial market, yearly demographic growth, or words in a text. 
-Nevertheless, it always represents a simplification of reality to make the sequences mathematically 
-treatable. The extent to which this simplification will hurt our predictions depend of course on the 
-nature of the studied phenomena. However, it must be said that there are Markov Chain variations that try to
-overcome these limitations such as (CITE time-homogeneous MCs, MC with memory), as well as other models
-that will be presented later in this chapter.
+Nevertheless, it represents a simplification of reality that makes sequences mathematically 
+treatable. The extent to which this simplification will hurt our predictions depends on the 
+nature of the studied phenomena. 
 
 % The wife had discovered that the husband was carrying on an intrigue with a  French girl, who had been a  governess in their family
 % 0   1    2   3          4    5   6       7   8        9  10 11       12   13 14     15    16  17  18   19 20        21 22    23
 
-To see why the Markov assumption may introduce a problem on text related tasks, consider the following
-sentence: "The wife had discovered that the husband was carrying on an intrigue with a French 
-girl, who had been a governess in their family". To understand to which entities the passages 
-"governess" and "in their family" relate to, we need to keep track of distant relations in the text
-that would not be captured by a window $ k $ of size three or four. Yet, this limitation is of lesser
-significance in the \textit{Named Entity Recognition} task, because we can complement the model with
-features that make up for the lack of knowledge provided by a longer context. 
-In practice, considering more than three or four previous states at any time makes 
-parameter esimation unreliable for the reasons explained in the beginning of the chapter, also 
-when $ k $ increases, the cost for decoding the optimal sequence of states becomes prohibitively 
-high in terms of computation time. And, as we will see later, Markov Chains of second and third order 
-are fairly adequate models for sequence labeling tasks. 
+To see why the \textit{Markov Assumption} may introduce a problem on text related tasks, consider the following
+sentence: \textit{"The wife had discovered that the husband was carrying on an intrigue with a French 
+girl, who had been a governess in their family"}. To understand which entities are related to the passages 
+\textit{"governess"} and \textit{"in their family"}, we need to keep track of distant relations in the text
+that would not be captured by a \textit{Markov Model} of second or third order. We could consider
+employing a \textit{Markov Model} of higher order to overcome this limitation, however,
+considering more than three or four states at any time makes parameter estimation unreliable 
+because each combination of states becomes increasingly more uncommon in the training set. Also, 
+when the considered number of states increases, the cost for predicting the optimal sequence 
+of states quickly becomes prohibitively high. 
+There are some \textit{Markov Chain} variations that try to address this problem such as 
+(CITE time-homogeneous MCs, MC with memory), as well as the other models presented later 
+in this chapter.
+Nevertheless, this limitation is of lesser significance in 
+the context of \textit{Named Entity Recognition}, because we can complement 
+the model with features that make up for the lack of knowledge that would be provided 
+by a longer context. 
 
-Next comes the problem of parameter estimation. At this time we have made no restrictions
-on the form taken by the transition probabilities $ P(s_a|s_b) $ from state $ s_a $ to $ s_b $.
-Besides the \textit{Markov Assumption}, it is usual to consider them to be time invariant. That is:
+We still have made no restrictions on the form taken by the transition 
+probabilities $ P(x_i=S_b|x_{i-1}=S_a) $ besides the \textit{Markov Assumption}.
+It is usual to consider these probabilities to be time invariant.
 
 \begin{equation}
-P(y_{i+1} = s_a |y_{i} = s_b) = P(y_i = s_a |y_{i-1} = s_b)
+P(x_{i+1} = S_b |x_{i} = S_a) = P(x_i = S_b |x_{i-1} = S_a)
 \end{equation}
 
-Given states $ s_a $ and $ s_b $, the probability $ P(y_{i+1} = s_a |y_{i} = s_b) $ of
-going from $ s_a $ to $ s_b $ on timestep $ i $ is the same as in any other timestep.
-With that statement, all parameters in our model can be described by a transition 
-matrix of size $ k \times k $ where the row $ i $ holds the probabilities of going from state
-$ s_i $ to the states $ s_j $ represented by each column index $ j $, including itself.
-Naturally, the probabilities of each row $ i $ must sum up to one since they represent
-the entire scope of transition possibilities starting from state $ S_i $.
-For example, Equation \ref{eq:matrix} describes a $ 2 \times 2 $ transition matrix $ T' $ 
-with states $ {T'_0, T'_1} $ where there is a 0.3 chance of staying in $ T'_0 $ if we 
-start in $ T'_0 $ and a 0.7 chance of going from $ T'_0 $ to $ T'_1 $. Likewise there
-is a 0.6 chance of staying in $ T'_1 $ if we start in $ T'_1 $ and a 0.4 chance 
-of going from $ T'_1 $ to $ T'_0 $ in any timestep.
+That is, given states $ S_a $ and $ S_b $, the probability of going from $ S_a $ 
+to $ S_b $ on timestep $ i $ is the same as in any other timestep. 
+The graph in Figure~\ref{fig:markov_graph} describes the transitions
+for a \textit{Time Invariant Markov Chain} example with only two 
+states (Name, Word), that models a sequence of words that can be either
+names or common words. The edges in this graph represent the transition
+probabilities between states.
+
+\begin{figure}
+\centering
+\begin{tikzpicture}[->,shorten >=1pt,auto,node distance=2.8cm]
+  \tikzstyle{every state}=[]
+
+  \node[state] (A)              {$ Name $};
+  \node[state] (B) [right of=A] {$ Word $};
+
+  \path (A) edge [loop above] node {0.3} (A)
+            edge [bend left]  node {0.7} (B)
+        (B) edge [bend left]  node {0.4} (A)
+            edge [loop above] node {0.6} (B);
+\end{tikzpicture}
+\caption{Graph describing the transitions in a Markov Chain example.}
+\label{fig:markov_graph}
+\end{figure}
+
+With the \textit{Time Invariance Assumption}, all parameters in our model can be described 
+by a $ m \times m $ transition matrix $ \theta $ where each element $ \theta_{a, b} $ with
+row $ a $ and column $ b $ holds the probability of going from state $ S_a $ to $ S_b $.
+Naturally, the probabilities of row $ \theta_{a, *} $ must sum up to one since they represent
+the entire scope of transition possibilities starting from state $ S_a $.
+Equation \ref{eq:transition_matrix} describes a $ 2 \times 2 $ transition matrix 
+$ Z $ for the same \textit{Markov Chain} example described in Figure~\ref{fig:markov_graph}.
 
 \begin{equation}
-T' = 
+Z = 
 \begin{bmatrix}
     0.3 & 0.7 \\
     0.4 & 0.6 \\
 \end{bmatrix}
-\label{eq:matrix}
+\label{eq:transition_matrix}
 \end{equation}
 
-If vector $ v_i $ of size $ k \times 1 $ represents the probabilities of being in each 
-state at a given timestep $ i $, then: 
+If we know the transition matrix $ \theta$ for a \textit{Markov Chain}, we can easily calculate 
+the probabilities of being in each state at time $ t $. Consider that $ \rho_t $ is a vector of 
+size $ m $ (i.e. the number of possible states) with the probabilities for each state
+at time $ t $. Then:
 
 \begin{equation}
-v_{i+1} = v_i \cdot \theta
+\rho_{t+1} = \rho_t \cdot \theta
 \end{equation}
 
-is the probability of being in each state at the next timestep. And, for an arbitrary
-number of timesteps $ t $:
+And, for an arbitrary number of timesteps $ t \geq 0 $:
 
 \begin{equation}
-v_{t} = v_0 \cdot \theta^t
+\rho_{t} = \rho_0 \cdot \theta^t
 \end{equation}
 
-DESCRIBE STARTING PROBABILITIES FOR HIGHER ORDER MMs 
+Where $ \rho_0 $ is the vector of starting probabilities for each state. If we
+know nothing about the initial conditions of our \textit{Markov Chain} we can simply 
+assign the same probability to each state. 
 
-Where $ v_t $ is a $ k \times 1 $ vector with the probabilities of being in each state
-at timestep $ t $ and $ v_0 $ is the starting probability of being in each state. If we
-know nothing about the initial conditions we can simply attribute the same probability 
-to every state. Now, given a transition matrix $ \theta $, to obtain the likelihood 
-$ \mathcal{L(Y; \theta)} $ of a sequence of observed states $ Y = \{ y_1, y_2, ..., y_n \} $,
-we need only calculate the product of all transitions, which are known from the data:
+The probability of observing a sequence of states $ X = \{ x_1, x_2, ..., x_n \} $
+with an initial state $ x_0 $ is:
 
 \begin{equation}
-P(Y) = P(y_0) \prod_{i=1}^{n} P(y_i|y_{i-1}) \\
-\mathcal{L}(Y; \theta) = v_0 \prod_{i=1}^{n} \theta_{y_i, y_{i-1}}
+P(X) = P(x_0) \prod_{t=1}^{n} P(x_t|x_{t-1}) \\
 \end{equation}
 
-We can write $ \mathcal{L}(Y; \theta) $ in another form by defining $ \eta_{a,b} $
-to be the count of transitions from $ a $ to $ b $ in the sequence $ X $. This way:
+Now, to obtain the likelihood $ \mathcal{L(X; \theta)} $ we need only replace the
+probabilities with the respective parameters in our model:
 
 \begin{equation}
-\mathcal{L}(Y; \theta) = v_0 \prod_{a, b} \theta_{a, b}^{\eta_{a, b}}
+\mathcal{L}(X; \theta) = \rho_0 \prod_{t=1}^{n} \theta_{x_t, x_{t-1}}
+\end{equation}
+
+By defining $ \eta_{a,b} $ to be the count of transitions from $ a $ to $ b $ in 
+$ X $. We can write the likelihood as:
+
+\begin{equation}
+\mathcal{L}(X; \theta) = \rho_0 \prod_{a, b} \theta_{a, b}^{\eta_{a, b}}
 \label{eq:hmm_likelihood}
 \end{equation}
 
-However, this expression shows only half the truth, because not all the parameters
-$ \theta_{a, b} $ are free since every row in the transition matrix must sum up to one.
-To introduce this constraint in the likelihood calculation, we must choose a column
-$ B $ arbitrarily for which the values $ \theta_{a, b=B} $ will be determined by the
-remaining values in each corresponding row. This way, by choosing $ B=0 $ 
-Equation~\ref{eq:hmm_likelihood} becomes:
+Next we want to obtain the maximum likelihood estimator for the transition matrix $ \hat\theta $.
+The likelihood function is always positive, so finding the set of parameters 
+that maximizes the log likelihood $ \mathcal{l}(X; \theta) $ is equivalent to finding 
+the parameters that maximize the likelihood itself. With the log likelihood, we transform the 
+product over transition probabilities into a sum of logarithms, which is easier to work with.
 
 \begin{equation}
-\begin{array}{l}
-\mathcal{L}(Y; \theta) = v_0 \prod_{a, b \neq 0} \theta_{a, b}^{\eta_{a, b}} 
-\prod_{a, b = 0} (1 - \sum_{b' \neq 0} \theta_{a, b'})^{\eta_{a, b}} \\
-\mathcal{l}(Y; \theta) = ln v_0 \sum{a, b \neq 0} \eta_{a, b} ln(\theta_{a, b}) +
-\sum{a, b = 0} \eta_{a, b} ln(1 - \sum_{b' \neq 0} \theta_{a, b'})
-\end{array}
-\label{eq:hmm_likelihood}
+\mathcal{l}(X; \theta) = log(\rho_0) \sum_{a, b} \eta_{a, b} \cdot log(\theta_{a, b})
 \end{equation}
 
-The likelihood function $ \mathcal{L}(Y; \theta) $ is always positive, so finding the parameters 
-that maximize $ \mathcal{l}(Y; \theta) $ is identical to maximizing the likelihood itself, with the
-benefit of transforming a product over transition probabilities into a sum of logarithms. Next, we must
-calculate the derivatives for the log likelihood in order to find the maximum:
+This way, we want to find $ \hat\theta $ such that:
 
 \begin{equation}
-\begin{array}{l}
-\frac{\partial \mathcal{l}(Y; \theta)}{\partial \theta_{a, b}} = 
-\frac{\eta_{a, b}}{\theta_{a, b}} - \frac{\eta_{a, 0}}{1 - \sum_{b' \neq 0} \theta_{a, b'}} = 0 \\
-\frac{\eta_{a, b}}{\theta_{a, b}} = \frac{\eta_{a, 0}}{1 - \sum_{b' \neq 0} \theta_{a, b'}} \\
-\frac{\theta_{a, b}}{1 - \sum_{b' \neq 0} \theta_{a, b'}} = \frac{\eta_{a, b}}{\eta_{a, 0}}
-\end{array}
+\hat\theta = \argmax_{\theta} \mathcal{l}(X; \theta)
 \end{equation}
 
-Therefore, knowing that $ \eta_{a, b} \propto \theta_{a, b} $:
+However, if we try to optimize this function as it is, we will find that
+$ \hat\theta_{a, b} = \infty, \forall a, b $. This happens because every row in 
+the transition matrix  must sum up to one so the degrees of freedom for the model 
+are actually $ m(m-1) $ and not $ m^2 $. This means that:
 
 \begin{equation}
-\theta_{a, b} = \frac{\eta_{a, b}}{\sum_{b'}\eta_{a, b'}}
+\sum_{b} \theta_{a, b} = 1, \forall a \in [1, m]
 \end{equation}
 
-% By making $ \frac{\partial\mathcal{l}(Y; \theta)}{\theta_{a, b}} = 0 $, we can find the maximum value
-% for $ \mathcal{l}(Y; \theta) $. To ascertain that this is a global maximum we take the second 
-% derivative:
-% 
-% \begin{equation}
-% \frac{\partial^2 \mathcal{l}(Y; \theta)}{\partial \theta_{a, b}^2} = 
-% \frac{-K(a, b, X)}{\theta_{a, b}^2} - \frac{n - K(a, b, X)}{(1 - \theta_{a, b})^2}
-% \end{equation}
-% 
-% Observe that the partial second derivatives are always negative, what makes this function strictly 
-% concave, therefore if there is a maximum value, it is a global maximum. Finally:
-% 
-% \begin{equation}
-% \begin{array}{l}
-% \frac{\partial \mathcal{n}(Y; \theta)}{\partial \theta_{a, b}} = 0 \\
-% \frac{K(a, b, X)}{\theta_{a, b}} - \frac{n - K(a, b, X)}{1 - \theta_{a, b}} = 0 \\
-% theta_{a, b} = \frac{K(a, b, X)}{n}
-% \end{array}
-% \end{equation}
+A way to incorporate this constraint in our optimization problem is with the aid of
+\textit{Lagrange Multipliers}. So we define the \textit{Lagrangian}:
 
-We get a closed form expression for the maximum likelihood estimator $ theta_{a, b} $.
+\begin{equation}
+Lag(\theta, \lambda) = \mathcal{l}(X; \theta) - \sum_{a} \lambda_{a} \cdot \left( \sum_{b} \theta_{a, b} - 1 \right)
+\end{equation}
+
+Taking the derivatives of $ Lag(\theta, \lambda) $ relative to $ \theta_{a, b} $ and making 
+them equal to zero we get:
+
+\begin{eqnarray}
+\frac{\partial Lag(\theta, \lambda)}{\partial \theta_{a, b}} & = & \frac{\eta_{a, b}}{\theta_{a, b}} - \lambda_a = 0 \\
+\theta_{a, b} & = & \frac{\eta_{a, b}}{\lambda_a} \\
+\end{eqnarray}
+
+And finally, by using the constrain equations $ \sum_b \theta_{a, b} = 1 $, we find that:
+
+\begin{eqnarray}
+\sum_b \frac{\eta_{a, b}}{\lambda_a} = 1 \\
+\lambda_a = \sum_b \eta_{a, b} \\
+\theta_{a, b} & = & \frac{\eta_{a, b}}{\sum_{b'} \eta_{a, b'}} \\
+\end{eqnarray}
+
+Yielding a closed form expression for the maximum likelihood estimator $ \hat\theta_{a, b} $.
 What is really convenient, since this is the average number of transitions from state $ a $ to state
-$ b $ in sequence $ X $. A value that can be easily obtained with $ O(n) $ time complexity. So
-far, we assumed all states $ X $ are observable, but in NER, only the words 
-are observed, while the Named Entity labels associated with these words are not. That is why we need
-another layer of complexity. The Hidden Markov Model (HMM) differs from the Markov Chain in that it 
+$ b $ in sequence $ X $. A value that can be easily obtained in $ O(n) $ time complexity. 
+
+So far, we have assumed that all states $ X $ are observable, but in \textit{NER}, only the words 
+are observed, while the \textit{Named Entity} labels associated with these words are not. That is why we need
+another layer of complexity. The \textit{Hidden Markov Model (HMM)} differs from the \textit{Markov Chain} in that it 
 does not observe the states $ X $ directly, but rather a probabilistic function of these states. 
 
-With the Hidden Markov Model we want to predict a sequence of labels $ Y = \{y_1, y_2, ..., y_n\} $ 
-(i.e. our Markov Chain) from a sequence of observed states $ X = \{x_1, x_2, ..., x_n\} $
-(i.e. the words in the text). So we make an additional assumption:
+With the \textit{Hidden Markov Model} we want to predict a sequence of labels $ Y = \{y_1, y_2, ..., y_n\} $ 
+(i.e. the \textit{Markov Chain}) from a sequence of observed states $ X = \{x_1, x_2, ..., x_n\} $
+(i.e. the words in a text). So we make an additional assumption:
 
 \begin{equation}
 P(x_i|y_{i-1}x_{i-1}, ..., y_1x_1) = P(x_i|y_i)
 \end{equation}
 
-That is, the probability of observing the word $ x_i $ depends only on the current label
-$ y_i $, or hidden state (e.g. PER, LOC, ORG, etc.). So, by making this assumption, we are
-essentialy stating that if we know a token's assigned label, we can reliably predict what are the 
-probabilities that this token takes any value in a vocabulary. This is, of course, a very
-simplistic assumption and many models (such as CRFs) try to overcome this issue, but this 
-step is necessary if we want to get a closed form estimator for our generative model (IS THAT SO?). 
-To model the observation probability distributions $ P(x_i|y_i) $, we assume again that 
+That is, the probability of observing word $ x_i $ depends only on the current label
+$ y_i $, the hidden state (e.g. PER, LOC, ORG, etc.). By making this assumption, we are
+stating that if we know a token's assigned label, then we can reliably predict what are the 
+probabilities that this token takes any value in a vocabulary. This is a very
+simplistic assumption and many models (such as Conditional Random Fields) try to overcome this issue, 
+but this step is necessary if we want to get a closed form estimator for our model. 
+To model the emission probability distributions $ P(x_i|y_i) $, we assume again that 
 the probabilities are time invariant and that $ x_i $ takes its value from a fixed vocabulary 
-with size $ V $. We introduce an \textit{Emission Matrix} $ V \times K $ to hold these 
-probabilities where each cell $ V_{i,j} $ represents the probability that, given the $ Y_i $,
-we observed the word $ X_j $. Now, to calculate the probability of observing a vector of labels 
-$ Y $ given a sequence of observations $ X $ can be calculated with Bayes' theorem:
+with size $ V $. Similar to the \textit{Transition Matrix}, we introduce a $ V \times K $ \textit{Emission Matrix} 
+$ \mu $ where each cell $ \mu_{a,b} $ represents the probability that, 
+given label $ a $, we will observe the word $ b $. 
+
+Now, the probability of observing a vector of labels $ Y $ given a sequence of 
+words $ X $ can be calculated with Bayes' theorem:
 
 \begin{equation}
 P(Y|X) = \frac{P(X|Y) P(Y)}{P(X)}
 \end{equation}
 
-And we get the conditional likelihood:
+Since $ P(X) $ is invariant for every sequence of labels $ Y $, we can simply 
+optimize in terms of the joint probability $ P(X, Y) $:
 
 \begin{equation}
-\mathcal{L}(Y|X; \theta) = v_0 \prod_{a, b} \theta_{a, b}^{\eta_{a, b}} \prod_{b, c} \psi_{b, c}^{\mu_{b, c}}
-\mathcal{l}(Y|X; \theta) = ln v_0 \sum_{a, b} \theta_{a, b} ln(\eta_{a, b}) \sum_{b, c} \mu_{b, c} ln(\psi_{b, c})
+P(Y|X) \propto P(X|Y) P(Y) = P(X, Y)
 \end{equation}
 
-Parameters $ \theta $ and $ \psi $ are independent, so the procedure to find parameters $ \theta_{a,b} $ 
-remains the same and we can employ the same procedure used on (REFERENCE) to find parameters $ \psi $,
-what yields:
+And we get:
 
 \begin{equation}
-\psi_{b, c} = \frac{\mu_{a, b}}{\sum_{c'}\mu_{b, c'}}
+\mathcal{L}(Y|X; \theta) \propto \rho_0 
+\prod_{a \in L, b \in L} \theta_{a, b}^{\eta_{a, b}} 
+\prod_{c \in L, d \in V} \mu_{c, d}^{\eta_{c, d}}
 \end{equation}
 
-That is the expected number of times we observed word $ X $ when we were at state $ Y $. A number
-that is also very easy to obtain in $ O(n) $ time. With that we conclude the parameter estimation
-for the Hidden Markov Model when have access to labeled data. If we only have unlabeled data we
-can do the parameter estimation with the Baum-Welch algorithm, though the results are much less
-reliable on the sequence labelling task.
+The parameters $ \theta $ and $ \mu $ are independent, so the procedure to find
+$ \hat\theta $ remains the same. Also, we can employ the same procedure we used 
+to find $ \hat\theta $ on \textit{Markov Chains} to find $ \hat\mu $ for
+\textit{Hidden Markov Models}. This way we will find that:
 
-The last task we need to do is calculating the most probable sequence of labels given a sequence of
-observations. To obtain this sequence we employ the Viterbi algorithm, which is explained in Appendix
+\begin{equation}
+\mu_{c, d} = \frac{\eta_{c, d}}{\sum_{d'}\eta_{d, c'}}
+\end{equation}
+
+This is the expected number of times we observed word $ d $ when we were at the state $ c $. A number
+that is also easy to obtain in $ O(n) $ time. With that, we conclude the maximum likelihood parameter 
+estimation for the \textit{Hidden Markov Model}. This procedure presupposes that we have labeled 
+data, since we need to observe the correct labels $ Y $ to calculate $ \hat\theta $ and $ \hat\mu $. 
+If we only have unlabeled data, we can do the parameter estimation with the Baum-Welch algorithm, 
+though the results are much less reliable on the sequence labelling task. 
+
+The last task we need to do is to calculate the most likely sequence of labels given a sequence of
+observations. To obtain this sequence exactly we can employ the Viterbi algorithm, which is explained in Appendix
 (REF). For higher order Hidden Markov Models the best sequence of labels can be computed 
 with a variable state Viterbi approach \cite{Li2000}. However, as we increase $ k $, this computation 
 becomes exponentially more expensive. The beam-search strategy may be employed for a faster 
