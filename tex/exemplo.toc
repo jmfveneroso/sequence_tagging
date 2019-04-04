@@ -5,38 +5,39 @@
 \contentsline {chapter}{List of Figures}{xix}{section*.4}
 \contentsline {chapter}{List of Tables}{xxi}{section*.5}
 \contentsline {chapter}{\chapternumberline {1}Introduction}{1}{chapter.1}
-\contentsline {chapter}{\chapternumberline {2}Problem Definition}{5}{chapter.2}
-\contentsline {section}{\numberline {2.1}Information Extraction in the Web}{6}{section.2.1}
-\contentsline {section}{\numberline {2.2}Named Entity Recognition}{9}{section.2.2}
-\contentsline {section}{\numberline {2.3}Researcher Name Extraction}{11}{section.2.3}
-\contentsline {chapter}{\chapternumberline {3}Dataset}{15}{chapter.3}
-\contentsline {section}{\numberline {3.1}Data Description}{16}{section.3.1}
-\contentsline {section}{\numberline {3.2}Differences between NER-on-HTML and ConLL-2003}{17}{section.3.2}
-\contentsline {section}{\numberline {3.3}Dictionary}{19}{section.3.3}
-\contentsline {section}{\numberline {3.4}Features}{20}{section.3.4}
-\contentsline {chapter}{\chapternumberline {4}Sequence Labeling Methods for NER}{23}{chapter.4}
-\contentsline {section}{\numberline {4.1}Classical Methods}{24}{section.4.1}
-\contentsline {subsection}{\numberline {4.1.1}Hidden Markov Models}{24}{subsection.4.1.1}
-\contentsline {subsection}{\numberline {4.1.2}Linear Chain Conditional Random Fields}{30}{subsection.4.1.2}
-\contentsline {section}{\numberline {4.2}Neural Network Architectures}{30}{section.4.2}
-\contentsline {subsection}{\numberline {4.2.1}BI-LSTM-CRF}{33}{subsection.4.2.1}
-\contentsline {subsection}{\numberline {4.2.2}CNN character representations}{34}{subsection.4.2.2}
-\contentsline {subsection}{\numberline {4.2.3}LSTM character representations}{35}{subsection.4.2.3}
-\contentsline {subsection}{\numberline {4.2.4}Network training}{35}{subsection.4.2.4}
-\contentsline {section}{\numberline {4.3}Word Embeddings}{36}{section.4.3}
-\contentsline {subsection}{\numberline {4.3.1}Word2Vec}{36}{subsection.4.3.1}
-\contentsline {subsection}{\numberline {4.3.2}Glove}{36}{subsection.4.3.2}
-\contentsline {subsection}{\numberline {4.3.3}Elmo}{36}{subsection.4.3.3}
-\contentsline {subsection}{\numberline {4.3.4}Other embeddings and some thoughts}{36}{subsection.4.3.4}
-\contentsline {section}{\numberline {4.4}Numerical Optimization}{36}{section.4.4}
-\contentsline {chapter}{\chapternumberline {5}Sequence Labeling on HTML}{37}{chapter.5}
-\contentsline {section}{\numberline {5.1}Self training}{37}{section.5.1}
-\contentsline {chapter}{\chapternumberline {6}Experiments}{39}{chapter.6}
-\contentsline {section}{\numberline {6.1}Experiment 1: No features}{40}{section.6.1}
-\contentsline {section}{\numberline {6.2}Experiment 2: All features}{41}{section.6.2}
-\contentsline {chapter}{\chapternumberline {7}Related Work}{43}{chapter.7}
-\contentsline {chapter}{\chapternumberline {8}Conclusion}{47}{chapter.8}
-\contentsline {chapter}{Bibliography}{49}{section*.7}
+\contentsline {chapter}{\chapternumberline {2}Problem Definition}{3}{chapter.2}
+\contentsline {section}{\numberline {2.1}Information Extraction in the Web}{4}{section.2.1}
+\contentsline {section}{\numberline {2.2}Named Entity Recognition}{7}{section.2.2}
+\contentsline {section}{\numberline {2.3}Researcher Name Extraction}{9}{section.2.3}
+\contentsline {chapter}{\chapternumberline {3}Dataset}{13}{chapter.3}
+\contentsline {section}{\numberline {3.1}Data Description}{14}{section.3.1}
+\contentsline {section}{\numberline {3.2}Differences between NER-on-HTML and ConLL-2003}{15}{section.3.2}
+\contentsline {section}{\numberline {3.3}Dictionary}{17}{section.3.3}
+\contentsline {section}{\numberline {3.4}Features}{18}{section.3.4}
+\contentsline {chapter}{\chapternumberline {4}Sequence Labeling Methods for NER}{21}{chapter.4}
+\contentsline {section}{\numberline {4.1}Classical Methods}{22}{section.4.1}
+\contentsline {subsection}{\numberline {4.1.1}Hidden Markov Models}{22}{subsection.4.1.1}
+\contentsline {subsection}{\numberline {4.1.2}Maximum Entropy Models and Linear Chain Conditional Random Fields}{28}{subsection.4.1.2}
+\contentsline {section}{\numberline {4.2}Neural Network Architectures}{34}{section.4.2}
+\contentsline {subsection}{\numberline {4.2.1}BI-LSTM-CRF}{38}{subsection.4.2.1}
+\contentsline {subsection}{\numberline {4.2.2}CNN character representations}{39}{subsection.4.2.2}
+\contentsline {subsection}{\numberline {4.2.3}LSTM character representations}{40}{subsection.4.2.3}
+\contentsline {subsection}{\numberline {4.2.4}Word Embeddings}{40}{subsection.4.2.4}
+\contentsline {subsection}{\numberline {4.2.5}Technical Concerns}{42}{subsection.4.2.5}
+\contentsline {chapter}{\chapternumberline {5}Sequence Labeling on HTML}{43}{chapter.5}
+\contentsline {section}{\numberline {5.1}Self training for Hidden Markov Models}{43}{section.5.1}
+\contentsline {section}{\numberline {5.2}Attentions Models}{45}{section.5.2}
+\contentsline {subsection}{\numberline {5.2.1}Hard Attention}{46}{subsection.5.2.1}
+\contentsline {subsection}{\numberline {5.2.2}Soft Attention}{46}{subsection.5.2.2}
+\contentsline {subsection}{\numberline {5.2.3}Dataset split}{46}{subsection.5.2.3}
+\contentsline {section}{\numberline {5.3}F1 Optimization}{46}{section.5.3}
+\contentsline {chapter}{\chapternumberline {6}Experiments}{47}{chapter.6}
+\contentsline {section}{\numberline {6.1}Technical specifications}{47}{section.6.1}
+\contentsline {section}{\numberline {6.2}Experiment 1: No features}{48}{section.6.2}
+\contentsline {section}{\numberline {6.3}Experiment 2: All features}{49}{section.6.3}
+\contentsline {chapter}{\chapternumberline {7}Related Work}{51}{chapter.7}
+\contentsline {chapter}{\chapternumberline {8}Conclusion}{55}{chapter.8}
+\contentsline {chapter}{Bibliography}{57}{section*.7}
 \ppgcc@toc@switchto \ppgcc@appendixname 
 \ppgcc@toc@recover 
-\contentsline {appendix}{\chapternumberline {A}HTML sentence segmenter}{55}{appendix.A}
+\contentsline {appendix}{\chapternumberline {A}HTML sentence segmenter}{63}{appendix.A}

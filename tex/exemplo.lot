@@ -5,17 +5,18 @@
 \addvspace {10pt}
 \addvspace {10pt}
 \addvspace {10pt}
-\contentsline {table}{\numberline {3.1}{\ignorespaces Description of the data files in the NER-on-HTML dataset}}{16}{table.3.1}
-\contentsline {table}{\numberline {3.2}{\ignorespaces Description of the CoNLL-2003 English dataset}}{17}{table.3.2}
-\contentsline {table}{\numberline {3.3}{\ignorespaces Thirty most frequent words for the ConLL-2003 dataset and the NER-on-HTML dataset}}{19}{table.3.3}
-\contentsline {table}{\numberline {3.4}{\ignorespaces Gazetteer coverage in each data file}}{19}{table.3.4}
-\contentsline {table}{\numberline {3.5}{\ignorespaces Features used in the NER-on-HTML dataset}}{21}{table.3.5}
+\contentsline {table}{\numberline {3.1}{\ignorespaces Description of the data files in the NER-on-HTML dataset}}{14}{table.3.1}
+\contentsline {table}{\numberline {3.2}{\ignorespaces Description of the CoNLL-2003 English dataset}}{15}{table.3.2}
+\contentsline {table}{\numberline {3.3}{\ignorespaces Thirty most frequent words for the ConLL-2003 dataset and the NER-on-HTML dataset}}{17}{table.3.3}
+\contentsline {table}{\numberline {3.4}{\ignorespaces Gazetteer coverage in each data file}}{17}{table.3.4}
+\contentsline {table}{\numberline {3.5}{\ignorespaces Features used in the NER-on-HTML dataset}}{19}{table.3.5}
+\addvspace {10pt}
+\contentsline {table}{\numberline {4.1}{\ignorespaces Model descriptions}}{41}{table.4.1}
 \addvspace {10pt}
 \addvspace {10pt}
-\addvspace {10pt}
-\contentsline {table}{\numberline {6.1}{\ignorespaces Model descriptions}}{39}{table.6.1}
-\contentsline {table}{\numberline {6.2}{\ignorespaces Precision, recall and F1 in the NER on HTML dataset for models that incorporate no features}}{40}{table.6.2}
-\contentsline {table}{\numberline {6.3}{\ignorespaces Precision, recall and F1 in the NER on HTML dataset for models that incorporate all features}}{41}{table.6.3}
+\contentsline {table}{\numberline {6.1}{\ignorespaces Model descriptions}}{47}{table.6.1}
+\contentsline {table}{\numberline {6.2}{\ignorespaces Precision, recall and F1 in the NER on HTML dataset for models that incorporate no features}}{48}{table.6.2}
+\contentsline {table}{\numberline {6.3}{\ignorespaces Precision, recall and F1 in the NER on HTML dataset for models that incorporate all features}}{49}{table.6.3}
 \addvspace {10pt}
 \addvspace {10pt}
 \addvspace {10pt}
