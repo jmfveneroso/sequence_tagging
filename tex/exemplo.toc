@@ -1,4 +1,4 @@
-\select@language {english}
+\babel@toc {english}{}
 \contentsline {chapter}{Acknowledgments}{xi}{chapter*.1}
 \contentsline {chapter}{Resumo}{xv}{chapter*.2}
 \contentsline {chapter}{Abstract}{xvii}{chapter*.3}
@@ -39,7 +39,7 @@
 \contentsline {section}{\numberline {7.1}Information Extraction}{57}{section.7.1}
 \contentsline {section}{\numberline {7.2}Named Entity Recognition}{60}{section.7.2}
 \contentsline {chapter}{\chapternumberline {8}Conclusion}{61}{chapter.8}
-\contentsline {chapter}{Bibliography}{63}{section*.7}
+\contentsline {chapter}{Bibliography}{63}{chapter*.6}
 \ppgcc@toc@switchto \ppgcc@appendixname 
 \ppgcc@toc@recover 
 \contentsline {appendix}{\chapternumberline {A}HTML sentence segmenter}{69}{appendix.A}

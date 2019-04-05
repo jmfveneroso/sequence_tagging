@@ -1891,28 +1891,66 @@ can be computed by direct summation"
 
 This makes the usage of the F-score as a utility function impractical for large datasets trained in 
 batches. However, with a few simplifications we can replace our loss function and instead 
-maximize the F-measure in terms of expected utility. We take the method proposed by Jasche to 
-approximately maximize the F-measure of a classifier based on a logistical regression 
-model and apply it to our neural architectures. Then, the optimization objective becomes:
-
-\begin{equation}
-F_\alpha(\theta) = \frac{A(\theta)}{\alpha n_{pos} + (1-\alpha) m_{pos}(\theta)}
-\end{equation}
-
-Which resembles the F-measure in terms of a triple (A,B,C):
+maximize the F-measure in terms of the expected utility. We take the method proposed by Jasche (CITE) to 
+approximately maximize the F-measure of a classifier based on a logistical regression model and 
+apply it to our neural architectures. The F-measure function can be calculated in terms of a triple (A,B,C):
 
 \begin{equation}
 F_\alpha(A, B, C) = \frac{A}{A + \alpha B + (1-\alpha) C}
 \end{equation}
 
-that is equivalent to the $ \alpha $-weighted harmonic mean defined in (CITE FSCORE FORMULA HERE).
-A is the number of true positives, B is the numberof false negatives, and C is the number of false
-positives.
+This is equivalent to the $ \alpha $-weighted harmonic mean defined in (CITE FSCORE FORMULA HERE).
+A is the number of true positives, B is the number of false negatives, and C is the number of false
+positives. Also, consider that:
 
-WE MAKE A SIMPLIFICATION THAT EACH LABEL IS A EITHER POSITIVE OR NEGATIVE INSTEAD OF GROUPS OF LABELS.
+\begin{eqnarray}
+n_{pos} = A + B \\
+m_{pos} = A + C
+\end{eqnarray}
+
+That is, $ n_{pos} $ is the number of positive examples in the dataset (true positives plus missed positives) 
+and $ m_{pos} $ is the number of positive examples that were predicted (true positives plus false positives).
+With this, we can rewrite $ F_\alpha(A, B, C) $ as:
+
+\begin{equation}
+F_\alpha(A, B, C) = \frac{A}{\alpha n_pos + (1-\alpha) m_pos}
+\end{equation}
+
+Now, Jasche propose the optimization objective:
+
+\begin{equation}
+\tilde{F}_\alpha(\hat{y}, y) = \frac{\tilde{A}(\hat{y}, y)}{\alpha \tilde{n}_{pos} + (1-\alpha) \tilde{m}_{pos}(\theta)}
+\end{equation}
+
+For simplicity sake, we consider that we are dealing with a binary classification problem
+with \textit{False} and \textit{True} labels. Then, $ \hat{y_i} $ is the label 
+prediction made by our classifier for example $ i $ and $ \theta_i $ is the probability
+that example $ i $ should take a \textit{True} label. Then, considering $ n $ examples:
+
+\begin{eqnarray}
+\tilde{A}(y, \hat{y}) = \sum_{i=1}^n I_{y = \hat{y} = 1} \cdot \theta_i  \\
+\tilde{m}_{pos} = \sum_{i=1}^n \theta_i \\
+\tilde{n}_{pos} = \sum_{i=1}^n I_{y=1} - \tilde{A}(y, \hat{y}) \\
+\end{eqnarray}
+
+With that, we have defined an optimization function that can be optimized with standard numerical optimization methods.
+Different from the actual F-measure employed on a sequence labeling problem, we consider that each label here 
+is independent and belongs to a different entity. Further work is needed to resolve this simplification and to 
+adapt this optimization function to multi-label classification tasks.
 
 
 \chapter{Experiments}
+
+We conducted experiments to evaluate sequence labeling methods of named entity 
+recognition on HTML in the context of Web data extraction using the dataset 
+described in Section~\ref{sec:ner_dataset}. The tested models are described in
+Table~\ref{tab:models}.
+
+
+
+
+
+
 
 \section{Technical specifications}
 
@@ -1923,13 +1961,6 @@ GloVe 100-dimensional word embeddings \cite{Pennington2014} that were fine tuned
 In the case of NER on HTML, word embeddings work similarly to a gazetteer. Named entities 
 with the same type have similar embeddings, so good word embeddings can achieve exceptional 
 performance with little training and without a gazetteer. 
-
-
-
-We conducted experiments to evaluate sequence labeling methods of named entity 
-recognition on HTML in the context of Web data extraction using the dataset 
-described in Section~\ref{sec:ner_dataset}. The tested models are described in
-Table~\ref{tab:models}.
 
 \begin{table}[h]
   \small
