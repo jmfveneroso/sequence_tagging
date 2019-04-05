@@ -1374,7 +1374,10 @@ functioning of the human brain. They consist of a weighted graph of
 artificial neurons, which are functions that receive an input from other neurons or from an input vector
 and produce an output according to their activations. Neural networks are a general framework that can
 encompass other machine learning approaches. For example, a single layer neural network with a softmax
-activation function assumes the same form of a multinomial logistic classifier (PUT PICTURE HERE). 
+activation function is equivalent to a multinomial logistic classifier (PUT PICTURE HERE)
+Rosenblatt 1958). 
+
+% D. R. Cox. 1958. The regression analysis of binary sequences. Journal of the Royal Statistical Society, Series B (Methodological), 20(2):215¿242.
 
 An extension of the logistic classifier to a neural network with multiple layers can still be trained 
 the same way as the original model, that is, by minimizing the cross entropy. However, once we add multiple layers on top of
@@ -1758,51 +1761,155 @@ Now we need to find a way to combine the vectors at each timestep in a way that 
 the representations according to the similarity between HTML contexts. Essentialy, we want to compute a $ T \times T $ 
 attention matrix $ alpha $ where $ alpha_{i, j} $ is the weight attributed to the word representation $ h_j $ at timestep
 $ i $. In other words, $ alpha_t $ is measuring the amount of attention that we pay to all the words in 
-a sentence at timestep $ t $. With the $ \alpha $ matrix, we can calculate new representations $ c_i $ 
+a sentence at timestep $ t $. With the $ \alpha $ matrix, we can calculate new representations $ h'_i $ 
 for each timestep by performing a linear combination of the hidden states according to their 
 attention values:
 
 \begin{equation}
-c_i = \sum_{j} = \alpha_{i, j} h_j
+h'_i = \sum_{j} = \alpha_{i, j} h_j
 \end{equation}
 
-Also, the attention matrix is calculated by:
+Also, consider a set of $ n $ context vectors $ c_i $ that contain representations for the
+html features at timestep $ i $. This representation can be a binary feature vector,
+a dense vector or even the hidden states $ h_i $. The attention matrix is then calculated by:
 
 \begin{equation}
-\alpha_{i,j} = \frac{exp(A(h_i, h_j))}{\sum_k exp(A(h_i, h_k))}
+\alpha_{i,j} = \frac{exp(A(c_i, c_j))}{\sum_k exp(A(c_i, c_k))}
 \end{equation}
 
-Where $ A(h_i, h_j) $ is an attention function that computes the similarity between
-hidden states at timesteps $ i $ and $ j $ and outputs a real number. The exponentials are
-a softmax normalization function to make sure that $ 1 \geq \alpha_{i,j} \geq 0 $ and 
-$ \sum_{j} \alpha_{i, j} = 1 $. Now we propose two ways of defining the attention function
-$ A $. The hard attention function and the soft attention function. 
+Where $ A(c_i, c_j) $ is an attention function that computes the similarity between
+HTML contexts at timesteps $ i $ and $ j $ and outputs a real number. The exponentials are
+a softmax normalization function to ensure that $ 1 \geq \alpha_{i,j} \geq 0 $ and 
+$ \sum_{j} \alpha_{i, j} = 1 $. Now we propose two ways for defining the attention function
+$ A $. The hard attention function and the soft attention function. The overall architecture 
+for the attention mechanism in sequence labeling for HTML is described in 
+Figure~\ref{fig:attention_for_html}.
 
 \subsection{Hard Attention}
 
-The hard attention function computes a binary similarity that is either one when contexts
-are identical or zero when they are dissimilar. The attention function is then given by:
+The hard attention function is a binary similarity function that either outputs one when 
+contexts are identical or zero when they are different. This definition only makes sense
+when the contexts $ c_i $ at timestep $ i $ are discrete feature vectors, because otherwise 
+we would need a softer comparability criterion. So, if $ c_i = \{ f_{i,1}, f_{i,2}, ..., f_{i,m} \} $
+is a context vector where each feature $ f_{i,j} $ assumes a definite value from a discrete set
+$ \gamma_j $, we can define the attention function:
 
-% \begin{equation}
-% 
-% A(h_i, h_j) = (h_i = h_j)
-% 
-% \end{equation}
+\begin{equation}
+  A(c_i, c_j) = \begin{cases} 
+    1 \text{ if } f_{i,k} = f_{j,k} \forall k \in m \\ 
+    0 \text{ otherwise}
+  \end{cases}
+\end{equation}
+
+The combination of features must be sufficiently restrictive so that the mixture of hidden
+states does not introduce too much noise. We have determined experimentally that considering
+only three features: the enclosing HTML tag, its parent tag and the CSS class; is sufficient to 
+permit a consistent comparison between similar HTML contexts. Ideally, the choice of features
+could be performed automatically with the incorporation of a feed forward neural network in
+the comparison function and a softer similarity criterion. A possibility for doing this is 
+presented in the Soft Attention function.
 
 
 \subsection{Soft Attention}
 
+Different from the hard attention function, the soft attention function outputs a real number 
+that represents the degree of similarity between HTML contexts. Now, instead of considering
+discrete feature vectors we resort to dense vectorial representations for the HTML context.
+Similar to the way we extracted morphological features with characters representations in 
+(CITE HERE lstm-crf-cnn and lstm-crf-lstm), we can extract HTML structural features with
+DOM representations. To do this, consider a DOM tree (which is a directed graph),
+a word's HTML context can be represented by the path we take in this graph starting from the 
+root element as described in Figure~\ref{fig:html_graph}. If we consider the path for each
+word in our sequence, we can create HTML dense representations by training a matrix of fixed
+size embeddings for each HTML tag, then we can construct representations for these HTML 
+embeddings the same way we did with character embeddings. The possibility that we chose 
+is represented in Figure~\ref{fig:html_embeddings}. Since the vocabulary of HTML tags is 
+very reduced, there is no need to pretrain the embeddings in a larger corpus.
 
-\subsection{Dataset split}
+Now to measure the similarity between different HTML contexts, we resort to an attention
+function similar to the scaled dot product proposed by (CITE Attention is all you need). 
+That is:
+
+\begin{equation}
+  A(c_i, c_j) = \frac{W c_i \cdot W c_j}{\sqrt{n}}
+\end{equation}
+
+Where $ W $ is a weight matrix to be learned and $ \sqrt{n} $ is a normalization factor
+with $ n $ being the size of the contexts vectors $ c $. This function assumes a larger
+value when the contexts are similar and a smaller value otherwise. With the soft attention
+mechanism, our model can learn HTML context representations from the training data and
+generalize intuition such as: if some words happen together in a list then they probably 
+belong to the same class.
 
 
-Soft attention
+\subsection{Dataset split and Experimental Considerations}
 
-Hard attention
+In sequence labeling tasks, it is common to split the dataset in sentences and then train them
+in independent steps. However, if we want to make use of attention mechanisms to 
+perform the comparison of words in different HTML contexts, we want to compare the classes attributed 
+to words in different sentences that share a similar context. That is why splitting the dataset
+into sentences makes these mechanisms useless. To permit the comparison of words in different 
+sentences, we combined multiple sentences in a single training step and separated them with a
+segmentation token.
+
+Also, the attention matrix calculations can become incredibly burdensome when we consider large
+sentences or combinations of sentences. So, it becomes necessary to perform the matrix calculations
+in a Graphical Processing Unit. And with the addition of many more parameters to the model, the 
+risk of overfitting the training data becomes more salient. To prevent this problem from ocurring 
+it is of utmost importance to add dropout layers before and after the attention mechanism.
 
 \section{F1 Optimization} 
 
-F1 optimization
+Normally, we want to estimate model parameters by maximizing the likelihood or minimizing the
+cross entropy, which is equivalent when considering a softmax output layer. The likelihood is
+intimately associated with the accuracy of a model, but in information extraction tasks we 
+usually evaluate the performance of different models with other measures such as Precision, 
+Recall and the F-measure. For example, in the Named Entity Recognition task many times we can 
+get an accuracy that surpasses 90\% by simply labeling all tokens with an O (other) label, which
+is the most common label. However, the F-measure for such a model would be zero. 
+
+By maximizing the likelihood, we are essentialy increasing acccuracy with the expectation that this 
+will lead to an improvement of the F-measure, what is true. However, since we ultimately want to 
+maximize the F-measure, we could instead maximize an utility function that takes this into consideration. 
+Also, the choice of F-measure for most problem is usually the F1-score, but depending on the
+task, we may prefer more precision rather or more recall. Since usually there is a trade-off
+inherent to the maximization of both measures, it would be useful if we had an utility function that
+could take into consideration the particular precision and recall needs of a specific task.
+In the case of named entity extraction on HTML, we could argue that recall is slightly more
+important than precision, because when parsing a huge amount of data it is much easier to manually 
+filter false positives from the results than manually finding false negatives that were missed by 
+the classifier.
+
+Nevertheless:
+
+"while the F-measure of a classifier evaluated on a single supervised instance is well defined, the
+overall F-measure on a larger dataset is not a function of the F-measure evaluated on each instance
+in the dataset. This is in contrast to ordinary loss/utility, whose grand total (or average) on a dataset
+can be computed by direct summation"
+
+% http://www.cs.columbia.edu/nlp/papers/2005/jansche_05b.pdf
+
+This makes the usage of the F-score as a utility function impractical for large datasets trained in 
+batches. However, with a few simplifications we can replace our loss function and instead 
+maximize the F-measure in terms of expected utility. We take the method proposed by Jasche to 
+approximately maximize the F-measure of a classifier based on a logistical regression 
+model and apply it to our neural architectures. Then, the optimization objective becomes:
+
+\begin{equation}
+F_\alpha(\theta) = \frac{A(\theta)}{\alpha n_{pos} + (1-\alpha) m_{pos}(\theta)}
+\end{equation}
+
+Which resembles the F-measure in terms of a triple (A,B,C):
+
+\begin{equation}
+F_\alpha(A, B, C) = \frac{A}{A + \alpha B + (1-\alpha) C}
+\end{equation}
+
+that is equivalent to the $ \alpha $-weighted harmonic mean defined in (CITE FSCORE FORMULA HERE).
+A is the number of true positives, B is the numberof false negatives, and C is the number of false
+positives.
+
+WE MAKE A SIMPLIFICATION THAT EACH LABEL IS A EITHER POSITIVE OR NEGATIVE INSTEAD OF GROUPS OF LABELS.
 
 
 \chapter{Experiments}
@@ -1963,6 +2070,8 @@ in performance between different neural models become less noticeable.
 
 % Getting simple structured information out of text.
 
+\section{Information Extraction}
+
 In the last 20 years, the astonishing growth of public information in the Web has 
 led to the development of a number of different approaches to the problem of Web 
 data extraction. Traditionally, the task was solved by designing special purpose
@@ -2092,6 +2201,10 @@ as pointed by Schulz et al. \cite{Schulz2016}, it is difficult to compare the re
 achieved by competing tools, and many seem to rely excessively on heuristic methods.
 In that regard, the recent advancements in sequence taggers may provide more robust and
 flexible extraction tools.
+
+\section{Named Entity Recognition}
+
+also briefly state attention and F1
 
 
 \chapter{Conclusion}

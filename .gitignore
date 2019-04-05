@@ -13,3 +13,4 @@ MNIST_tflearn_checkpoints
 imdb.pkl
 **/*.swp
 **/*.swo
+tex/*.pdf
