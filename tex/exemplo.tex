@@ -1963,35 +1963,21 @@ the model features. Table~\ref{fig:hmm_no_features} shows
   \begin{center}
     \begin{tikzpicture}
       \begin{axis}[
-        title={Hidden Markov Models without Features},
-        % ylabel={Value},
-        xmin=0, xmax=5,
+        title={HMMs without Features},
+        xmin=-0.5, xmax=5.5,
         ymin=0, ymax=1,
-        xtick={0,5},
-        ytick={0,5},
-        % set space between adjacent bars to zero
+        xtick={1,...,4},
+        ytick={0,0.2,...,1},
         ybar=0pt,
-        % adjust bar width so the bars are not overlapping with the bars
-        % of another x value
-        % (this depends on the chosen plot `width', `xmin' and `xmax' values
         bar width=7pt,
-        % to show each x value
         xtick distance=1,
-        % set `xmin' and `xmax' values manually so the bars aren't clipped
-        % set the tick length of the `xticks' to zero ...
         xtick style={
-            % (I this key has to be prefixed by `/pgfplots`, because
-            %  normally here are just expected tikz keys)
             /pgfplots/major tick length=0pt,
         },
-        % but show them *between* the x values together with the grid
-        extra x ticks={-0.5,0.5,...,10.5},
+        extra x ticks={-0.5,0.5,...,5.5},
         extra x tick labels=\empty,
         extra x tick style={
             grid=major,
-            % reset the tick length to the default value
-            % (which otherwise would be the same as for the normal ticks
-            %  which is set to zero in this case --> see above)
             xtick style={
                 /pgfplots/major tick length=4pt,
             },
@@ -2002,13 +1988,13 @@ the model features. Table~\ref{fig:hmm_no_features} shows
         legend pos=north east,
       ]
 
-      \addplot[ybar, fill=blue, fill opacity=0.3,] coordinates {
+      \addplot[ybar, color=blue, fill=blue, fill opacity=0.3,] coordinates {
         (1,0.181)(2,0.637)(3,0.653)(4,0.551)
       };
-      \addplot[ybar, fill=red, fill opacity=0.3,] coordinates {
+      \addplot[ybar, color=red, fill=red, fill opacity=0.3,] coordinates {
         (1,0.776)(2,0.458)(3,0.527)(4,0.468)
       };
-      \addplot[ybar, fill=green, fill opacity=0.3,] coordinates {
+      \addplot[ybar, color=green, fill=green, fill opacity=0.3,] coordinates {
         (1,0.294)(2,0.533)(3,0.583)(4,0.506)
       };
       \legend{Precision, Recall, F1};
