@@ -146,6 +146,10 @@ class HiddenMarkov:
     if self.use_features:
       for i in range(1,1+self.num_features):
         which_features[i] = 1
+        if i != 1 and i != 2:
+          which_features[i] = 0
+      which_features[3] = 0
+      which_features[4] = 0
 
     self.train_features(X, Y, which_features)
     self.train_transitions(X, Y)

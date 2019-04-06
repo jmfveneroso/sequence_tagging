@@ -1,4 +1,4 @@
-\babel@toc {english}{}
+\select@language {english}
 \contentsline {chapter}{Acknowledgments}{xi}{chapter*.1}
 \contentsline {chapter}{Resumo}{xv}{chapter*.2}
 \contentsline {chapter}{Abstract}{xvii}{chapter*.3}
@@ -32,14 +32,16 @@
 \contentsline {subsection}{\numberline {5.2.3}Dataset split and Experimental Considerations}{50}{subsection.5.2.3}
 \contentsline {section}{\numberline {5.3}F1 Optimization}{50}{section.5.3}
 \contentsline {chapter}{\chapternumberline {6}Experiments}{53}{chapter.6}
-\contentsline {section}{\numberline {6.1}Technical specifications}{53}{section.6.1}
-\contentsline {section}{\numberline {6.2}Experiment 1: No features}{54}{section.6.2}
-\contentsline {section}{\numberline {6.3}Experiment 2: All features}{55}{section.6.3}
-\contentsline {chapter}{\chapternumberline {7}Related Work}{57}{chapter.7}
-\contentsline {section}{\numberline {7.1}Information Extraction}{57}{section.7.1}
-\contentsline {section}{\numberline {7.2}Named Entity Recognition}{60}{section.7.2}
-\contentsline {chapter}{\chapternumberline {8}Conclusion}{61}{chapter.8}
-\contentsline {chapter}{Bibliography}{63}{chapter*.6}
+\contentsline {section}{\numberline {6.1}Simple Baseline}{53}{section.6.1}
+\contentsline {section}{\numberline {6.2}Hidden Markov Models}{54}{section.6.2}
+\contentsline {section}{\numberline {6.3}Technical specifications}{55}{section.6.3}
+\contentsline {section}{\numberline {6.4}Experiment 1: No features}{56}{section.6.4}
+\contentsline {section}{\numberline {6.5}Experiment 2: All features}{57}{section.6.5}
+\contentsline {chapter}{\chapternumberline {7}Related Work}{59}{chapter.7}
+\contentsline {section}{\numberline {7.1}Information Extraction}{59}{section.7.1}
+\contentsline {section}{\numberline {7.2}Named Entity Recognition}{62}{section.7.2}
+\contentsline {chapter}{\chapternumberline {8}Conclusion}{63}{chapter.8}
+\contentsline {chapter}{Bibliography}{65}{section*.7}
 \ppgcc@toc@switchto \ppgcc@appendixname 
 \ppgcc@toc@recover 
-\contentsline {appendix}{\chapternumberline {A}HTML sentence segmenter}{69}{appendix.A}
+\contentsline {appendix}{\chapternumberline {A}HTML sentence segmenter}{71}{appendix.A}

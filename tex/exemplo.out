@@ -31,12 +31,14 @@
 \BOOKMARK [2][-]{subsection.5.2.3}{5.2.3 Dataset split and Experimental Considerations}{section.5.2}% 31
 \BOOKMARK [1][-]{section.5.3}{5.3 F1 Optimization}{chapter.5}% 32
 \BOOKMARK [0][-]{chapter.6}{6 Experiments}{}% 33
-\BOOKMARK [1][-]{section.6.1}{6.1 Technical specifications}{chapter.6}% 34
-\BOOKMARK [1][-]{section.6.2}{6.2 Experiment 1: No features}{chapter.6}% 35
-\BOOKMARK [1][-]{section.6.3}{6.3 Experiment 2: All features}{chapter.6}% 36
-\BOOKMARK [0][-]{chapter.7}{7 Related Work}{}% 37
-\BOOKMARK [1][-]{section.7.1}{7.1 Information Extraction}{chapter.7}% 38
-\BOOKMARK [1][-]{section.7.2}{7.2 Named Entity Recognition}{chapter.7}% 39
-\BOOKMARK [0][-]{chapter.8}{8 Conclusion}{}% 40
-\BOOKMARK [0][-]{chapter*.6}{Bibliography}{}% 41
-\BOOKMARK [0][-]{appendix.A}{A HTML sentence segmenter}{}% 42
+\BOOKMARK [1][-]{section.6.1}{6.1 Simple Baseline}{chapter.6}% 34
+\BOOKMARK [1][-]{section.6.2}{6.2 Hidden Markov Models}{chapter.6}% 35
+\BOOKMARK [1][-]{section.6.3}{6.3 Technical specifications}{chapter.6}% 36
+\BOOKMARK [1][-]{section.6.4}{6.4 Experiment 1: No features}{chapter.6}% 37
+\BOOKMARK [1][-]{section.6.5}{6.5 Experiment 2: All features}{chapter.6}% 38
+\BOOKMARK [0][-]{chapter.7}{7 Related Work}{}% 39
+\BOOKMARK [1][-]{section.7.1}{7.1 Information Extraction}{chapter.7}% 40
+\BOOKMARK [1][-]{section.7.2}{7.2 Named Entity Recognition}{chapter.7}% 41
+\BOOKMARK [0][-]{chapter.8}{8 Conclusion}{}% 42
+\BOOKMARK [0][-]{section*.7}{Bibliography}{}% 43
+\BOOKMARK [0][-]{appendix.A}{A HTML sentence segmenter}{}% 44
