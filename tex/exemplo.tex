@@ -20,6 +20,15 @@
   ]{hyperref}
 \usepackage[square]{natbib}
 
+\usepackage{adjustbox}
+\usepackage{array}
+
+\newcolumntype{R}[2]{
+    >{\adjustbox{angle=#1,lap=\width-(#2)}\bgroup}
+    l
+    <{\egroup}
+}
+\newcommand*\rot{\multicolumn{1}{R{45}{1em}}}
 
 \usepackage{booktabs} % For formal tables
 \usepackage[ruled]{algorithm2e} % For algorithms
@@ -43,6 +52,8 @@
 
 \DeclareMathOperator*{\argmax}{arg\,max\,}
 \renewcommand{\arraystretch}{1.2}
+
+\usepackage{filecontents}
 
 \begin{document}
 
@@ -1930,7 +1941,9 @@ the current word. Table~\ref{tab:nb_and_maxent} shows a comparison between these
   \begin{center}
     \begin{tabular}{ lllllll }
       \toprule
-      Model & Precision & Recall & F1 & Precision & Recall & F1 \\
+      \multirow{2}{*}{Model} & \multicolumn{3}{c}{Validation} & \multicolumn{3}{c}{Test} \\
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
       \midrule
       Gazetteer Matching     & 0.847 & 0.285 & 0.427 & 0.871 & 0.328 & 0.477          \\
       Naive Bayes            & 0.172 & 0.851 & 0.287 & 0.181 & 0.776 & 0.294          \\
@@ -1957,15 +1970,27 @@ a baseline to compare how much better we can get as we increase the model comple
 
 There are a couple of parameters that need to be considered when we employ \textit{Hidden Markov Models}
 to a sequence labeling task. First, the number of previous states (the order of the HMM) and, second, 
-the model features. Table~\ref{fig:hmm_no_features} shows 
+the model features. 
+
+\subsection{HMM order}
+
+Table~\ref{fig:hmm_no_features} shows performance of \textit{HMMs} up to the third 
+order in the validation and test sets of the NER on HTML dataset. We can see that considering label
+dependencies over multiple timesteps increases the classifier performance by a considerable margin 
+relative to the \textit{Naive Bayes} model even without the addition of any features. That is, the 
+second order \textit{HMM} (HMM-2) achieved an F1-score of 0.583 at the task, while
+the \textit{Naive Bayes} classifier that incorporated all features achieved only 0.537 F1-score. Nevertheless,
+we already observe a relaive decline in performance with the third order \textit{HMM} (0.506 F1-score), 
+suggesting that increasing the order of the \textit{HMM} is not always advantegeous.
 
 \begin{figure}[h!]
   \begin{center}
     \begin{tikzpicture}
       \begin{axis}[
         title={HMMs without Features},
-        xmin=-0.5, xmax=5.5,
+        xmin=0.5, xmax=4.5,
         ymin=0, ymax=1,
+        xticklabels={NB,HMM-1,HMM-2,HMM-3},
         xtick={1,...,4},
         ytick={0,0.2,...,1},
         ybar=0pt,
@@ -1982,7 +2007,6 @@ the model features. Table~\ref{fig:hmm_no_features} shows
                 /pgfplots/major tick length=4pt,
             },
         },
-        legend pos=north west,
         ymajorgrids=true,
         grid style=dashed,
         legend pos=north east,
@@ -2001,41 +2025,702 @@ the model features. Table~\ref{fig:hmm_no_features} shows
        
       \end{axis}
     \end{tikzpicture}
-    \caption{Angle strategy for delimiting our three groups of interest: Top, Center and Bottom - with pivot at the origin.}
+    \caption{
+      Performance of the Naive Bayes classifier and Hidden Markov Models without 
+      features besides the current word on the test set of the NER on HTML dataset.
+    }
     \label{fig:hmm_no_features}
   \end{center}
 \end{figure}
 
-HMMs
-How does feature selection impact the HMM performance?
+\subsection{Feature selection}
 
-How does HMM size impact performance?
+In the previous section, we considered a \textit{Naive Bayes} classifier that incorporated all the
+features regardless of their correlations, eventhough we know that correlated features may 
+hurt the performance of such a classifier. Table~\ref{tab:feature_correlation} presents a feature 
+correlation matrix based on the Cramér's V measure~\footnote{
+Dpython implementation
+% https://en.wikipedia.org/wiki/Cram%C3%A9r%27s_V
+% https://github.com/shakedzy/dython/blob/master/dython/nominal.py
+}. 
 
-How does the self-training strategy impact performance?
+\begin{table}[h]
+  \tiny
+  \begin{center}
+    \begin{tabular}{ lccccccccccc }
+      \toprule
+           & \rot{Word} & \rot{Exact Match} & \rot{Partial Match} & \rot{Email} & \rot{Number} & \rot{Honorific} 
+	   & \rot{URL} & \rot{Capitalized} & \rot{Punctuation} & \rot{HTML Tag} & \rot{CSS Class} \\
+      \midrule
+      Word          & 1.00 & \textbf{0.60} & \textbf{0.94} & \textbf{1.00} & \textbf{1.00}  & \textbf{1.00} & 0.00 & \textbf{0.84} & \textbf{1.00}  & 0.25 & 0.00 \\
+      Exact Match   & -    & 1.00  & 0.19  & -0.02 & -0.07 & -0.04 & 0.00 & 0.15  & -0.05 & 0.07 & 0.22 \\
+      Partial Match & -    & -     & 1.00  & -0.11 & -0.35 & -0.09 & 0.00 & -0.01 & 0.45  & 0.04 & 0.17 \\
+      Email         & -    & -     & -     & 1.00  & -0.02 & -0.02 & 0.00 & -0.12 & -0.05 & 0.03 & 0.27 \\
+      Number        & -    & -     & -     & -     & 1.00  & -0.07 & 0.00 & -0.36 & -0.16 & 0.09 & 0.34 \\
+      Honorific     & -    & -     & -     & -     & -     & 1.00  & 0.00 & 0.15  & -0.08 & 0.02 & 0.11 \\
+      URL           & -    & -     & -     & -     & -     & -     & 1.00 & 0.00  & 0.00  & 0.00 & 0.00 \\
+      Capitalized   & -    & -     & -     & -     & -     & -     & -    & 1.00  & -0.48 & 0.07 & 0.28 \\
+      Punctuation   & -    & -     & -     & -     & -     & -     & -    & -     & 1.00  & 0.04 & 0.11 \\
+      HTML Tag      & -    & -     & -     & -     & -     & -     & -    & -     & -     & 1.00 & \textbf{0.64} \\
+      CSS Class     & -    & -     & -     & -     & -     & -     & -    & -     & -     & -    & 1.00 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Feature correlation matrix}
+  \label{tab:feature_correlation}
+\end{table}
+
+The current word is strongly correlated with most features besides the URL feature, and the ones related to 
+the HTML structure. That shows there is not a lot of information gain from these features. To understand how
+this can help or hurt the \textit{Hidden Markov Model} performance we test the model using two groups 
+of features:
+
+\begin{description}
+  \item[Group A] Current word, Exact Match, Partial Match, URL, Capitalized
+  \item[Group B] All features except HTML Tag and CSS Class
+\end{description}
+
+Table~\ref{tab:hmm_features} compares the performance of \textit{Hidden Markov Models} using the features from
+Group A and Group B. The Group A model performed better in all criteria showing that the selection of features
+is of the utmost importance for the application of \textit{HMMs} to the sequence labeling problem.
+
+\begin{figure}[h!]
+  \begin{center}
+    \tiny
+    \begin{tikzpicture}
+      \pgfplotsset{small}
+      \begin{axis}[
+        title={Group A},
+        xmin=0.5, xmax=3.5,
+        ymin=0, ymax=1,
+        xticklabels={HMM-1,HMM-2,HMM-3},
+        xtick={1,...,3},
+        ytick={0,0.2,...,1},
+        ybar=0pt,
+        bar width=7pt,
+        xtick distance=1,
+        xtick style={
+            /pgfplots/major tick length=0pt,
+        },
+        extra x ticks={-0.5,0.5,...,5.5},
+        extra x tick labels=\empty,
+        extra x tick style={
+            grid=major,
+            xtick style={
+                /pgfplots/major tick length=4pt,
+            },
+        },
+        ymajorgrids=true,
+        grid style=dashed,
+      ]
+
+      \addplot[ybar, color=blue, fill=blue, fill opacity=0.3,] coordinates {
+        (1,0.819)(2,0.823)(3,0.812)
+      };
+      \addplot[ybar, color=red, fill=red, fill opacity=0.3,] coordinates {
+        (1,0.792)(2,0.802)(3,0.785)
+      };
+      \addplot[ybar, color=green, fill=green, fill opacity=0.3,] coordinates {
+        (1,0.805)(2,0.812)(3,0.798)
+      };
+      \legend{};
+       
+      \end{axis}
+    \end{tikzpicture}
+    ~
+    \begin{tikzpicture}
+      \pgfplotsset{small}
+      \begin{axis}[
+        title={Group B},
+        xmin=0.5, xmax=3.5,
+        ymin=0, ymax=1,
+        xticklabels={HMM-1,HMM-2,HMM-3},
+        xtick={1,...,3},
+        ytick={0,0.2,...,1},
+        ybar=0pt,
+        bar width=7pt,
+        xtick distance=1,
+        xtick style={
+            /pgfplots/major tick length=0pt,
+        },
+        extra x ticks={-0.5,0.5,...,5.5},
+        extra x tick labels=\empty,
+        extra x tick style={
+            grid=major,
+            xtick style={
+                /pgfplots/major tick length=4pt,
+            },
+        },
+        ymajorgrids=true,
+        grid style=dashed,
+        % legend pos=north east,
+	legend style={at={(1.5,0.8)},anchor=east},
+      ]
+
+      \addplot[ybar, color=blue, fill=blue, fill opacity=0.3,] coordinates {
+        (1,0.826)(2,0.820)(3,0.791)
+      };
+      \addplot[ybar, color=red, fill=red, fill opacity=0.3,] coordinates {
+        (1,0.684)(2,0.724)(3,0.668)
+      };
+      \addplot[ybar, color=green, fill=green, fill opacity=0.3,] coordinates {
+        (1,0.748)(2,0.769)(3,0.724)
+      };
+      \legend{Precision, Recall, F1};
+       
+      \end{axis}
+    \end{tikzpicture}
+
+    \caption{Hidden Markov Models trained with the features in Group A and Group B.}
+    \label{fig:hmm_all_features}
+  \end{center}
+\end{figure}
+
+\subsection{Self-training strategy}
+
+In the next experiment, we want to understand if the self-training strategy from 
+Section~\ref{sec:self_training} is effective for improving the performance of 
+\textit{HMMs}. Figure~\ref{fig:hmm_self_training} compares the performance of \textit{HMMs}
+up to third order with features from \textit{Group A} and with the self-training 
+strategy for the \textit{HTML Tag} and the \textit{CSS Class} features in addition to the 
+\textit{Group A} features. The self-trained models show a marked improvement in comparison
+to the models with no self-training at the test set except for the third order \textit{HMM}.
+With this, we conclude that the best \textit{HMM} for the name extraction task is a 
+second-order \textit{HMM} using \textit{Group A} features and the self-training strategy. This
+model achieves an \textit{F1} of 0.879. The detailed results for all HMMs is presented in
+Table~\ref{tab:hmm_results}.
+
+\begin{figure}[h!]
+  \begin{center}
+    \tiny
+    \begin{tikzpicture}
+      \pgfplotsset{small}
+      \begin{axis}[
+        title={Group A},
+        xmin=0.5, xmax=3.5,
+        ymin=0, ymax=1,
+        xticklabels={HMM-1,HMM-2,HMM-3},
+        xtick={1,...,3},
+        ytick={0,0.2,...,1},
+        ybar=0pt,
+        bar width=7pt,
+        xtick distance=1,
+        xtick style={
+            /pgfplots/major tick length=0pt,
+        },
+        extra x ticks={-0.5,0.5,...,5.5},
+        extra x tick labels=\empty,
+        extra x tick style={
+            grid=major,
+            xtick style={
+                /pgfplots/major tick length=4pt,
+            },
+        },
+        ymajorgrids=true,
+        grid style=dashed,
+      ]
+
+      \addplot[ybar, color=blue, fill=blue, fill opacity=0.3,] coordinates {
+        (1,0.819)(2,0.823)(3,0.812)
+      };
+      \addplot[ybar, color=red, fill=red, fill opacity=0.3,] coordinates {
+        (1,0.792)(2,0.802)(3,0.785)
+      };
+      \addplot[ybar, color=green, fill=green, fill opacity=0.3,] coordinates {
+        (1,0.805)(2,0.812)(3,0.798)
+      };
+      \legend{};
+       
+      \end{axis}
+    \end{tikzpicture}
+    ~
+    \begin{tikzpicture}
+      \pgfplotsset{small}
+      \begin{axis}[
+        title={Self-Training Strategy},
+        xmin=0.5, xmax=3.5,
+        ymin=0, ymax=1,
+        xticklabels={HMM-1,HMM-2,HMM-3},
+        xtick={1,...,3},
+        ytick={0,0.2,...,1},
+        ybar=0pt,
+        bar width=7pt,
+        xtick distance=1,
+        xtick style={
+            /pgfplots/major tick length=0pt,
+        },
+        extra x ticks={-0.5,0.5,...,5.5},
+        extra x tick labels=\empty,
+        extra x tick style={
+            grid=major,
+            xtick style={
+                /pgfplots/major tick length=4pt,
+            },
+        },
+        ymajorgrids=true,
+        grid style=dashed,
+        % legend pos=north east,
+	legend style={at={(1.5,0.8)},anchor=east},
+      ]
+
+      \addplot[ybar, color=blue, fill=blue, fill opacity=0.3,] coordinates {
+        (1,0.880)(2,0.888)(3,0.774)
+      };
+      \addplot[ybar, color=red, fill=red, fill opacity=0.3,] coordinates {
+        (1,0.850)(2,0.864)(3,0.750)
+      };
+      \addplot[ybar, color=green, fill=green, fill opacity=0.3,] coordinates {
+        (1,0.865)(2,0.879)(3,0.762)
+      };
+      \legend{Precision, Recall, F1};
+       
+      \end{axis}
+    \end{tikzpicture}
+
+    \caption{Hidden Markov Models trained with the features in Group A and Group B.}
+    \label{fig:hmm_self_training}
+  \end{center}
+\end{figure}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllllll }
+      \toprule
+      \multirow{2}{*}{Model} & \multicolumn{3}{c}{Validation} & \multicolumn{3}{c}{Test} \\
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
+      \midrule
+      \midrule
+      HMM-1                           & 0.693 & 0.581 & 0.632 & 0.637 & 0.458 & 0.533 \\
+      HMM-2                           & 0.703 & 0.630 & 0.665 & 0.653 & 0.527 & 0.583 \\
+      HMM-3                           & 0.616 & 0.618 & 0.617 & 0.551 & 0.468 & 0.506 \\
+      HMM-1 (Group A)                 & 0.813 & 0.816 & 0.814 & 0.819 & 0.792 & 0.805 \\
+      HMM-2 (Group A)                 & 0.787 & 0.820 & 0.803 & 0.823 & 0.802 & 0.812 \\
+      HMM-3 (Group A)                 & 0.774 & 0.816 & 0.795 & 0.812 & 0.785 & 0.798 \\
+      HMM-1 (Group B)                 & 0.730 & 0.714 & 0.722 & 0.826 & 0.684 & 0.748 \\
+      HMM-2 (Group B)                 & 0.720 & 0.710 & 0.715 & 0.820 & 0.724 & 0.769 \\
+      HMM-3 (Group B)                 & 0.721 & 0.702 & 0.711 & 0.791 & 0.667 & 0.724 \\
+      HMM-1 (Group A) + Self-Training & 0.752 & 0.876 & 0.810 & 0.880 & 0.851 & 0.865 \\
+      HMM-2 (Group A) + Self-Training & 0.784 & 0.892 & 0.835 & \textbf{0.888} & 0.864 & \textbf{0.879} \\
+      HMM-3 (Group A) + Self-Training & 0.789 & 0.891 & 0.837 & 0.774 & 0.750 & 0.762 \\
+      HMM-1 (Group B) + Self-Training & 0.747 & 0.906 & 0.819 & 0.866 & 0.867 & 0.866 \\
+      HMM-2 (Group B) + Self-Training & 0.771 & 0.912 & 0.835 & 0.885 & \textbf{0.869} & 0.877 \\
+      HMM-3 (Group B) + Self-Training & 0.788 & 0.917 & 0.847 & 0.826 & 0.803 & 0.814 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{All \textit{Hidden Markov Models}}
+  \label{tab:hmm_results}
+\end{table}
 
 
-CRF
-How does feature selection impact the Linear Chain CRF performance?
+\section{Conditional Random Fields}
 
-How do word embeddings affect CRF performance?
+Linear \textit{Chain Conditional Random Fields} provide a much more flexible way to incorporate 
+features in our model in comparison to \textit{Hidden Markov Models}. When considering the application
+of this class of models to the \textit{Name Extraction Task}, we want to understand how the feature
+selection impacts the performance of our model and if pretrained word embeddings can help improving
+its performance.
+
+\subsection{No Features}
+
+Figure~\ref{fig:crf_without_features} shows a comparison between the \textit{Maximum Entropy Model}
+that assumes label independence, the best \textit{Hidden Markov Model} from the previous section without features
+and a \textit{Linear Chain CRF} at the name extraction task. The \textit{Maxent} and \textit{CRF} use 
+one-hot representations of the words. Also, different from \textit{HMMs} the discriminative models resort to numerical 
+optimization methods, therefore their parameters may vary between different runs, so we present the average result 
+for each measure over five runs.
+
+\begin{figure}[h!]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        title={CRF without Features},
+        xmin=0.5, xmax=3.5,
+        ymin=0, ymax=1,
+        xticklabels={Maxent,HMM-2,CRF},
+        xtick={1,...,3},
+        ytick={0,0.2,...,1},
+        ybar=0pt,
+        bar width=7pt,
+        xtick distance=1,
+        xtick style={
+            /pgfplots/major tick length=0pt,
+        },
+        extra x ticks={-0.5,0.5,...,5.5},
+        extra x tick labels=\empty,
+        extra x tick style={
+            grid=major,
+            xtick style={
+                /pgfplots/major tick length=4pt,
+            },
+        },
+        ymajorgrids=true,
+        grid style=dashed,
+        legend pos=north west,
+      ]
+
+      \addplot[ybar, color=blue, fill=blue, fill opacity=0.3,] coordinates {
+        (1,0.335)(2,0.653)(3,0.795)
+      };
+      \addplot[ybar, color=red, fill=red, fill opacity=0.3,] coordinates {
+        (1,0.508)(2,0.527)(3,0.710)
+      };
+      \addplot[ybar, color=green, fill=green, fill opacity=0.3,] coordinates {
+        (1,0.404)(2,0.583)(3,0.750)
+      };
+      \legend{Precision, Recall, F1};
+       
+      \end{axis}
+    \end{tikzpicture}
+    \caption{
+      Performance of the Maximum Entropy classifier, second-order Hidden Markov Models and 
+      Linear Chain CRFs without features besides the current word on the test set of the NER on HTML dataset.
+    }
+    \label{fig:hmm_no_features}
+  \end{center}
+\end{figure}
+
+The \textit{CRF} model shows a significant improvement in comparison to the other models that used no features,
+achieving an F1-score of 0.750. Next we proceed to understand if the addition of features can improve this
+performance further.
 
 
-Neural Networks
+\subsection{Feature Selection}
 
-How does the CRF layer impact performance? LSTM-CRF
+To allow comparison between the \textit{HMMs} from the last section we consider \textit{CRFs} using features
+from \textit{Group A} and \textit{Group B}. Figure~\ref{fig:} shows a comparison between the best \textit{HMM}
+for each group of features and the \textit{CRF}.
 
-How do the CRF layer impact performance? LSTM-CRF
+\begin{figure}[h!]
+  \begin{center}
+    \tiny
+    \begin{tikzpicture}
+      \pgfplotsset{small}
+      \begin{axis}[
+        title={Group A},
+        xmin=0.5, xmax=2.5,
+        ymin=0, ymax=1,
+        xticklabels={HMM-2,CRF},
+        xtick={1,...,2},
+        ytick={0,0.2,...,1},
+        ybar=0pt,
+        bar width=7pt,
+        xtick distance=1,
+        xtick style={
+            /pgfplots/major tick length=0pt,
+        },
+        extra x ticks={-0.5,0.5,...,5.5},
+        extra x tick labels=\empty,
+        extra x tick style={
+            grid=major,
+            xtick style={
+                /pgfplots/major tick length=4pt,
+            },
+        },
+        ymajorgrids=true,
+        grid style=dashed,
+      ]
 
-How do word embeddings impact performance?
+      \addplot[ybar, color=blue, fill=blue, fill opacity=0.3,] coordinates {
+        (1,0.823)(2,0.845)
+      };
+      \addplot[ybar, color=red, fill=red, fill opacity=0.3,] coordinates {
+        (1,0.802)(2,0.775)
+      };
+      \addplot[ybar, color=green, fill=green, fill opacity=0.3,] coordinates {
+        (1,0.812)(2,0.808)
+      };
+      \legend{};
+       
+      \end{axis}
+    \end{tikzpicture}
+    ~
+    \begin{tikzpicture}
+      \pgfplotsset{small}
+      \begin{axis}[
+        title={Group B},
+        xmin=0.5, xmax=2.5,
+        ymin=0, ymax=1,
+        xticklabels={HMM-2,CRF},
+        xtick={1,...,2},
+        ytick={0,0.2,...,1},
+        ybar=0pt,
+        bar width=7pt,
+        xtick distance=1,
+        xtick style={
+            /pgfplots/major tick length=0pt,
+        },
+        extra x ticks={-0.5,0.5,...,5.5},
+        extra x tick labels=\empty,
+        extra x tick style={
+            grid=major,
+            xtick style={
+                /pgfplots/major tick length=4pt,
+            },
+        },
+        ymajorgrids=true,
+        grid style=dashed,
+        % legend pos=north east,
+	legend style={at={(1.5,0.8)},anchor=east},
+      ]
 
-What attention is better?
+      \addplot[ybar, color=blue, fill=blue, fill opacity=0.3,] coordinates {
+        (1,0.820)(2,0.870)
+      };
+      \addplot[ybar, color=red, fill=red, fill opacity=0.3,] coordinates {
+        (1,0.724)(2,0.786)
+      };
+      \addplot[ybar, color=green, fill=green, fill opacity=0.3,] coordinates {
+        (1,0.769)(2,0.826)
+      };
+      \legend{Precision, Recall, F1};
+       
+      \end{axis}
+    \end{tikzpicture}
 
-How the training time increases as we add complexity?
+    \caption{Linear Chain Conditional Random Fields trained with the features in Group A and Group B.}
+    \label{fig:crf_all_features}
+  \end{center}
+\end{figure}
 
+As expected, the \textit{CRF} is more robust to variations in the feature selection. It performs
+similar to the second-order \textit{HMM} in \textit{Group A} and slightly better in \textit{Group B}, though
+it tends towards an increase in precision rather than recall. The \textit{CRF} is marginally better than
+the \textit{HMM}, however, when we consider the self-trained \textit{HMM-2}, it still shows a better overall 
+performance. There are two things that could still be tried to improve the \textit{CRF} performance. First,
+the \textit{CRF} allows for a more flexible feature selection, so we could try adding any imaginable feature,
+since feature correlation is not impeditive in this case. Second, we could try developing a self-training 
+strategy for \textit{CRFs} similar to the one employed on \textit{HMMs}. However, \textit{Neural Networks} 
+showed a superior performance in many NLP tasks, so we prefered to try a \textit{Neural Network}-based approach 
+next. Table~\ref{tab:crf_results} presents the detailed results for \textit{CRFs} at the name extraction
+task in the validation and test sets.
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllllll }
+      \toprule
+      \multirow{2}{*}{Model} & \multicolumn{3}{c}{Validation} & \multicolumn{3}{c}{Test} \\
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
+      \midrule
+      \midrule
+      CRF                    & 0.806 & 0.805 & 0.806 & 0.795 & 0.710 & 0.750 \\
+      CRF (Group A)          & 0.857 & 0.875 & 0.866 & 0.845 & 0.775 & 0.808 \\
+      CRF (Group B)          & 0.881 & 0.903 & 0.892 & \textbf{0.870} & \textbf{0.786} & \textbf{0.826} \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{All \textit{Conditional Random Fields}}
+  \label{tab:crf_results}
+\end{table}
+
+\section{Neural Networks}
+
+There are multiple \textit{Neural Network Architectures} that are suitable for solving 
+\textit{Sequence Labeling} tasks. A model that has recently had remarkable success at 
+solving these types of tasks is the BI-LSTM-CRF discussed in Section~\ref{sec:lstm_crf},
+so we start our investigation by determining if it is also suited for the researcher
+name extraction task. Additionaly, we want to determine if the CNN-based or LSTM-based
+character representations can help improving the LSTM-CRF performance. We also want to
+test if the Hard-Attention and Soft-Attention mechanisms for incorporating HTML structural
+features provides any improvement. Finally, we want to understand if the F-score optimization
+function can help controlling how much the model values precision in detriment of recall and
+vice versa.
+
+
+\subsection{Bi-LSTM-CRF with Glove-300 Embeddings}
+
+One of the advantages of deep neural
+networks is the fact that they can usually work without any feature engineering. 
+Figure~\ref{fig:bi_lstm_crf} compares the performance of a \textit{BI-LSTM-CRF} on the test
+set of the researcher name extraction task with the best \textit{HMM} and \textit{CRF} 
+without features.
+
+\begin{figure}[h!]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        title={Bi-LSTM-CRF},
+        xmin=0.5, xmax=3.5,
+        ymin=0, ymax=1,
+        xticklabels={HMM-2,CRF,Bi-LSTM-CRF},
+        xtick={1,...,3},
+        ytick={0,0.2,...,1},
+        ybar=0pt,
+        bar width=7pt,
+        xtick distance=1,
+        xtick style={
+            /pgfplots/major tick length=0pt,
+        },
+        extra x ticks={-0.5,0.5,...,5.5},
+        extra x tick labels=\empty,
+        extra x tick style={
+            grid=major,
+            xtick style={
+                /pgfplots/major tick length=4pt,
+            },
+        },
+        ymajorgrids=true,
+        grid style=dashed,
+        legend pos=north west,
+      ]
+
+      \addplot[ybar, color=blue, fill=blue, fill opacity=0.3,] coordinates {
+        (1,0.653)(2,0.795)(3,0.909)
+      };
+      \addplot[ybar, color=red, fill=red, fill opacity=0.3,] coordinates {
+        (1,0.527)(2,0.710)(3,0.865)
+      };
+      \addplot[ybar, color=green, fill=green, fill opacity=0.3,] coordinates {
+        (1,0.583)(2,0.750)(3,0.886)
+      };
+      \legend{Precision, Recall, F1};
+       
+      \end{axis}
+    \end{tikzpicture}
+    \caption{
+      Performance of the Bi-LSTM-CRF in comparison with the second-order Hidden Markov Models and 
+      Linear Chain CRFs without features.
+    }
+    \label{fig:hmm_no_features}
+  \end{center}
+\end{figure}
+
+The Bi-LSTM-CRF improves the performance of earlier models by a significant margin, though the
+comparison is not completely fair, since we fed the model with Glove-300 word embeddings. However,
+these pretrained embeddings are general to any language related task, so their incorporation in
+does not require a lot of additional effort. Without any feature engineering, the Bi-LSTM-CRF model
+already achieves an F1-score of 0.886, surpassing the best model up to this point (the HMM-2 with
+self-training, which achieved 0.879 F1-score).
+
+
+\subsection{Character Representations}
+
+Morphological features can help identifying named entities. We presented in Section~\ref{sec:char_representations}
+two methods for incorporating character representations in \textit{Recurrent Neural Networks}, the \textit{CNN-based}
+method, and the \textit{LSTM-based} method. In Table~\ref{tab:char_reps}, we compare the performance of
+\textit{CNN} and \textit{LSTM} representations with the plain \textit{Bi-LSTM-CRF}.
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllllll }
+      \toprule
+      Model & Precision & Recall & F1 \\
+      \midrule
+      Bi-LSTM-CRF                        & 0.909 (0.008) & 0.865 (0.020) & 0.886 (0.011) \\
+      Bi-LSTM-CRF + CNN chars            & 0.921 (0.006) & 0.881 (0.005) & 0.901 (0.002) \\
+      Bi-LSTM-CRF + LSTM chars           & 0.920 (0.007) & 0.886 (0.031) & 0.902 (0.019) \\
+      Bi-LSTM-CRF (Group B)              & 0.921 (0.008) & 0.883 (0.022) & 0.901 (0.008) \\
+      Bi-LSTM-CRF (Group B) + CNN chars  & 0.922 (0.006) & 0.868 (0.033) & 0.894 (0.018) \\
+      Bi-LSTM-CRF (Group B) + LSTM chars & 0.913 (0.005) & 0.855 (0.021) & 0.883 (0.012) \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Bi-LSTM-CRF with Character Representations}
+  \label{tab:char_reps}
+\end{table}
+
+The character representations improved the \textit{F1-score} by ~1.3 points. Also, both the 
+\textit{CNN-based} and the \textit{LSTM-based} representations have a similar performance, yet 
+the \textit{LSTM-based} representations are slightly better, owing probably to the fact that they 
+can represent prefixes and suffixes while the \textit{CNN-based} filters are position 
+invariant. 
+
+We also present the results for these models using the features from \textit{Group B}. The
+addition of features improves the performance of the plain \textit{Bi-LSTM-CRF}, but hurts the 
+performance of the models with character representations.
+
+
+\subsection{Attention Mechanisms}
+
+The \textit{Self-Training} strategy for \textit{HMMs} showed that there is a lot to gain
+from incorporating features related to the HTML structure in our models. The hard and soft
+attention mechanisms proposed in Section~\ref{sec:attention} are two ways to do that. We 
+compare the performance of the \textit{Bi-LSTM-CRF} with \textit{LSTM-based} character 
+representations with the same model using a Hard Attention layer and a Soft Attention 
+layer in Table~\ref{tab:attention}.
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllllll }
+      \toprule
+      Model & Precision & Recall & F1 \\
+      \midrule
+      Bi-LSTM-CRF + LSTM chars           & 0.920 (0.007) & 0.886 (0.031) & 0.902 (0.019) \\
+      ... + Hard Attention               & 0.925 (0.007) & 0.890 (0.011) & 0.907 (0.005) \\
+      ... + Soft Attention               & 0.884 (0.025) & 0.849 (0.021) & 0.866 (0.013) \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Hard and Soft Attention}
+  \label{tab:attention}
+\end{table}
+
+The \textit{Hard Attention} layer improved the original model by roughly 0.5 F1-score with the
+bonus of reducing variance significantly. However,
+the \textit{Soft Attention} actually hurt the performance significantly, what demands further 
+explanation. The reason for this is probably that the \textit{Hard Attention} only captures if
+the HTML context between two tags is exactly the same, but it does not look at what is this 
+context. What the \textit{Hard Attention} layer learns is essentialy how much it can trust 
+predictions made for words in the same HTML context, no matter what this context is. The 
+\textit{Soft Attention} layer, however, also learns features about the HTML context, so
+it can learn for example to look more at words that happen inside a <div> tag. This would not 
+be problematic if all documents came from the same website, however, since this is not the case,
+we cannot trust specific HTML configurations to be meaningful outside the document where they
+happen. This does not mean that the \textit{Soft Attention} layer is useless, but for it to grasp
+abstract structural patterns that could be useful, we would probably need a much larger dataset.
+
+
+\subsection{Word Embeddings}
+
+Up to this point, all neural architectures used Glove-300 pretrained word embeddings. However, the
+choice of embeddings is of great importance to the success of neural sequence models. In fact, most
+recent developments to the \textit{Named Entity Recognition} models come from the incorporation of 
+better word embeddings rather than from different neural architectures. We considered three sets of
+pretrained word embeddings in our experiments: Glove-300, Word2Vec-300 and Elmo.
+
+Different from Glove-300 and Word2Vec-300, which are static, Elmo embeddings are context dependent and
+need to be calculated for the specific dataset. This adds significant overhead to the model training.
+
+(SPECIFY AWS MACHINE WHICH RUN THE MODEL HERE)
+
+Table~\ref{tab:word_embeddings} compares the performance of different sets of word embeddings in the
+\textit{Bi-LSTM-CRF} model with \textit{LSTM-based} character representations.
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllllll }
+      \toprule
+      Model & Precision & Recall & F1 \\
+      \midrule
+      Bi-LSTM-CRF + LSTM chars + Glove    & 0.920 (0.007) & 0.886 (0.031) & 0.902 (0.019) \\
+      Bi-LSTM-CRF + LSTM chars + Word2Vec & 0.899 (0.011) & 0.831 (0.028) & 0.864 (0.019) \\
+      Bi-LSTM-CRF + LSTM chars + Elmo     & 0.720 (0.033) & 0.885 (0.062) & 0.794 (0.043) \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Word Embeddings}
+  \label{tab:attention}
+\end{table}
+
+As the results in Conll-2003 show, Glove-300 embeddings are superior to Word2Vec at the \textit{Named Entity Recognition}
+task. However the \textit{ELMO} embeddings showed a very poor performance, contrasting to the great improvements
+it showed in many NLP tasks, including NER. This is probably due to the fact that the pretrained \textit{Language Model} 
+that generates the \textit{ELMO} embeddings has been trained on plain text, which is too different from the type of HTML
+that we are dealing with.
+
+\subsection{F-score Maximization}
 
 F-score maximization
 
 How does the precision and recall changes as we vary the alpha?
+
 
 
 Heuristic Filtering Strategy
