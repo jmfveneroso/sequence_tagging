@@ -170,9 +170,9 @@ if sys.argv[1] == 'hmm':
   hmm = HiddenMarkov(
     timesteps, 
     naive_bayes=naive_bayes,
-    use_gazetteer=False,
-    use_features=False,
-    self_train=False
+    use_gazetteer=True,
+    use_features=True,
+    self_train=True
   )
   hmm.fit(X, Y)
 

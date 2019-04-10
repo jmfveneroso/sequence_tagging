@@ -7,28 +7,39 @@ def f(a, p, r):
 
 values = []
 
+def key_fn(val): 
+    return val[2] 
+
 for l in sys.stdin:
   l = l.strip().split()
 
-  p1, r1, p2, r2 = l
+  _, p2, r2, _, _, p1, r1, _ = l
+  if float(p2) < 0.1: continue
 
+  a = 0.8
   x = [float(p1), float(r1)]
-  x.append(f(0.2, p1, r1)) 
-  x.append(f(0.5, p1, r1)) 
-  x.append(f(0.8, p1, r1)) 
-
+  x.append(float('%.4f'%f(a, p1, r1)))
+  x.append(0)
   x += [float(p2), float(r2)]
-  x.append(f(0.2, p2, r2)) 
-  x.append(f(0.5, p2, r2)) 
-  x.append(f(0.8, p2, r2)) 
+  x.append(float('%.4f'%f(a, p2, r2)))
+  x.append(0)
+
+  # x.append(f(0.5, p2, r2)) 
+  # x.append(f(0.8, p2, r2)) 
 
   values.append(x)
 
-values = np.array(values)
+values.sort(key=key_fn, reverse=True)
+# print(values)
 
-values = values[15:,:]
+for v in values:
+  print('\t'.join([str(v_) for v_ in v]))
+
+values = np.array(values[:2])
+print(values)
 
 mean = np.mean(values, axis=0)
 std = np.std(values, axis=0)
 
 print('\t'.join(['%.4f'%m + ' (' + '%.4f' % std[i] + ')' for i, m in enumerate(mean)]))
+print('\t'.join(['%.4f'%m for i, m in enumerate(mean)]) + '\t' + '\t'.join(['%.4f'%m for i, m in enumerate(std)]))

@@ -417,14 +417,6 @@
   Autonomous Agents, ACM}, \ppgccbibpagesstring {} \ppgccpagedoformat
   {190}-\ppgccpagedoformat {}-\ppgccpagedoformat {197}.
 
-\bibitem[Pennington et~al.\@, 2014]{Pennington2014}
-\ppgccbibauthordoformat {Pennington, J.\ppgccbibauthorsep {} Socher,
-  R.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Manning, C.~D.}
-  (\ppgccyeardoformat {2014}).
-\newblock \ppgccbibtitledoformat {Glove: Global vectors for word
-  representation}.
-\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {In EMNLP}.
-
 \bibitem[Rabiner, 1990]{Rabiner1990}
 \ppgccbibauthordoformat {Rabiner, L.~R.} (\ppgccyeardoformat {1990}).
 \newblock \ppgccbibtitledoformat {Readings in speech recognition}.

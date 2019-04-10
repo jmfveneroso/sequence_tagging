@@ -144,12 +144,16 @@ class HiddenMarkov:
       which_features[i] = 1
 
     if self.use_features:
-      for i in range(1,1+self.num_features):
-        which_features[i] = 1
-        if i != 1 and i != 2:
-          which_features[i] = 0
-      which_features[3] = 0
-      which_features[4] = 0
+      # for i in range(1,1+self.num_features):
+      #   which_features[i] = 1
+      #   # if i != 1 and i != 2:
+      #   #   which_features[i] = 0
+      # which_features[3] = 0
+      # which_features[4] = 0
+      which_features[1] = 1
+      which_features[2] = 1
+      which_features[8] = 1
+      which_features[9] = 1
 
     self.train_features(X, Y, which_features)
     self.train_transitions(X, Y)
@@ -240,6 +244,7 @@ class HiddenMarkov:
     Y = self.get_predictions(X)
     which_features = [0] * self.num_features 
     which_features += [1] * self.num_secondary_features
+    # which_features[-2] = 0
     self.train_features(X, Y, which_features)
 
   def predict(self, X):

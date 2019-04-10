@@ -8,7 +8,7 @@ from model.cnn import masked_conv1d_and_max
 import numpy as np
 from IPython.display import clear_output, display
 import time
-from model.data_loader import DL, NerOnHtml, Conll2003
+from model.data_loader import DL, NerOnHtml, Conll2003, Conll2003Person
 from model.metrics import evaluate
 from model.model import SequenceModel
 
@@ -62,6 +62,7 @@ class Estimator:
 
   def get_dict(self, features, labels, train):
     ((words, nwords), (chars, nchars)), (f_vector, html, (css_chars, css_lengths)) = features
+    # ((words, nwords), (chars, nchars)) = features
     return {
       'inputs/words:0': words,
       'inputs/nwords:0': nwords,
@@ -88,6 +89,7 @@ class Estimator:
       try:
         features, labels = sess.run(next_el)
         ((words_, nwords_), (chars, nchars)), _ = features
+        # ((words_, nwords_), (chars, nchars)) = features
   
         target = [
           'output/loss:0', 
@@ -150,6 +152,7 @@ class Estimator:
         saver = tf.train.Saver()
       self.dataset = NerOnHtml(self.params)
       # self.dataset = Conll2003(self.params)
+      # self.dataset = Conll2003Person(self.params)
   
       for epoch in range(self.params['current_epoch'], self.params['epochs']):
         _, _ = self.run_epoch(sess, 'train', epoch_num=epoch, train=True)
@@ -167,6 +170,7 @@ class Estimator:
       _ = self.restore(sess)
       self.dataset = NerOnHtml(self.params)
       # self.dataset = Conll2003(self.params)
+      # self.dataset = Conll2003Person(self.params)
       
       for name in ['train', 'valid', 'test']:
         _, (p, t, w) = self.run_epoch(sess, name)

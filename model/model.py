@@ -19,6 +19,7 @@ class SequenceModel:
       'word_embeddings': 'glove', # glove, elmo. TODO: bert.
       'model': 'lstm_crf', # lstm_crf, html_attention, self_attention, transformer, crf
       'use_features': False, 
+      'f_score_alpha': 0.5,
     }
     params = params if params is not None else {}
     self.params.update(params)
@@ -43,7 +44,7 @@ class SequenceModel:
       self.nwords        = tf.placeholder(tf.int32,   shape=(None,),            name='nwords'      )
       self.chars         = tf.placeholder(tf.string,  shape=(None, None, None), name='chars'       )
       self.nchars        = tf.placeholder(tf.int32,   shape=(None, None),       name='nchars'      )
-      self.features      = tf.placeholder(tf.float32, shape=(None, None, 7),    name='features'    )
+      self.features      = tf.placeholder(tf.float32, shape=(None, None, 4),    name='features'    )
       self.html          = tf.placeholder(tf.string,  shape=(None, None, None), name='html'        )
       self.css_chars     = tf.placeholder(tf.string,  shape=(None, None, None), name='css_chars'   )
       self.css_lengths   = tf.placeholder(tf.int32,   shape=(None, None),       name='css_lengths' )
@@ -95,7 +96,7 @@ class SequenceModel:
           m_pos_tilde = tf.squeeze(tf.slice(probs, [0, 0, 1], [-1, -1, 1]), axis=-1)
           m_pos_tilde = tf.reduce_sum(m_pos_tilde, axis=-1, name='m_pos_tilde') 
 
-          alpha = 0.5
+          alpha = float(self.params['f_score_alpha'])
           divisor = alpha * n_pos + (1 - alpha) * m_pos_tilde
           loss = tf.divide(a_tilde, divisor)
           loss = tf.reduce_mean(-loss, name='loss')
@@ -137,13 +138,13 @@ class SequenceModel:
       raise Exception('No word embeddings were selected.')
 
     embs = [word_embs]
-    if char_embs in ['cnn', 'lstm']:
-      char_embs = get_char_representations(
-        self.chars, self.nchars, 
-        self.params['chars'], mode=char_embs,
-        training=self.training
-      )
-      embs.append(char_embs)
+    # if char_embs in ['cnn', 'lstm']:
+    #   char_embs = get_char_representations(
+    #     self.chars, self.nchars, 
+    #     self.params['chars'], mode=char_embs,
+    #     training=self.training
+    #   )
+    #   embs.append(char_embs)
 
     if use_features: 
       embs.append(self.features)

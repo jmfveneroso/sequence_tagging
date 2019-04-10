@@ -332,10 +332,11 @@ class NerOnHtml:
     chars = [pad_array(c, b'<pad>', max(lengths)) for c in chars]
     
     # Feature vector. 
-    features = [[float(f) for f in s[2][:2] + s[2][4:9]] for s in sentence]
+    # features = [[float(f) for f in s[2][:2] + s[2][4:10]] for s in sentence]
+    features = [[float(f) for f in s[2][:2] + s[2][7:9]] for s in sentence]
 
     # HTML features.
-    html_features = [[f.encode() for f in s[2][:2] + s[2][4:9]] for s in sentence]
+    html_features = [[f.encode() for f in s[2][10:]] for s in sentence]
     html_features = [pad_array(f, b'<pad>', 3) for f in html_features]
 
     # CSS Chars.
@@ -412,6 +413,83 @@ class NerOnHtml:
           '<pad>',
           ('<pad>', 0)
         )
+      ), 
+      'O'
+    )
+  
+    dataset = tf.data.Dataset.from_generator(
+      functools.partial(self.generator_fn, filename, training=training),
+      output_types=types, output_shapes=shapes
+    )
+  
+    if training:
+      dataset = dataset.shuffle(15000)
+ 
+    return dataset.padded_batch(self.params['batch_size'], shapes, defaults)
+
+class Conll2003Person:
+  def __init__(self, params=None):
+    self.params = {
+      'batch_size': 1,
+      'datadir': 'data/conll2003_person',
+      'dataset_mode': ('sentences', 'document', 'batch')[0]
+    }
+    self.set_params(params)
+
+  def set_params(self, params=None):
+    params = params if params is not None else {}
+    self.params.update(params)
+
+  def parse_sentence(self, sentence):
+    # Encode in Bytes for Tensorflow.
+    words = [s[0] for s in sentence]
+    tags = [s[1].encode() for s in sentence]
+
+    # Chars.
+    chars = [[c.encode() for c in w] for w in words]
+    lengths = [len(c) for c in chars]
+    chars = [pad_array(c, b'<pad>', max(lengths)) for c in chars]
+    
+    words = [s[0].encode() for s in sentence]    
+    return (
+      (
+        (words, len(words)), (chars, lengths)
+      ),
+      tags
+    )
+    
+  def generator_fn(self, filename, training=False):
+    sentences = get_sentences(Path(self.params['datadir'], filename))
+
+    sentences = prepare_dataset(
+      sentences, mode=self.params['dataset_mode'], 
+      label_col=3, training=training
+    )
+
+    for s in sentences:
+      yield self.parse_sentence(s)
+        
+  def input_fn(self, filename, training=False):
+    shapes = (
+      (
+        ([None], ()), # (words, nwords)
+        ([None, None], [None]), # (chars, nchars)  
+      ),
+      [None] # tags
+    )
+  
+    types = (
+      (
+        (tf.string, tf.int32),
+        (tf.string, tf.int32),  
+      ),  
+      tf.string
+    )
+  
+    defaults = (
+      (
+        ('<pad>', 0),
+        ('<pad>', 0), 
       ), 
       'O'
     )
