@@ -99,6 +99,18 @@
   Understanding Conference (MUC-7): Proceedings of a Conference Held in
   Fairfax, Virginia, April 29 - May 1, 1998}.
 
+\bibitem[Collobert et~al.\@, 2011]{Collobert2011}
+\ppgccbibauthordoformat {Collobert, R.\ppgccbibauthorsep {} Weston,
+  J.\ppgccbibauthorsep {} Bottou, L.\ppgccbibauthorsep {} Karlen,
+  M.\ppgccbibauthorsep {} Kavukcuoglu, K.\ppgccbibauthorlastsep {}
+  \ppgccbibauthorand {} Kuksa, P.} (\ppgccyeardoformat {2011}).
+\newblock \ppgccbibtitledoformat {Natural language processing (almost) from
+  scratch}.
+\newblock \ppgccbibjournaldoformat {J. Mach. Learn. Res.}, \ppgccvolumedoformat
+  {12}:\ppgccpagedoformat {2493}-\ppgccpagedoformat {}-\ppgccpagedoformat
+  {2537}.
+\newblock ISSN \ppgccissndoformat {1532-4435}.
+
 \bibitem[Crescenzi et~al.\@, 2001]{Crescenzi2001}
 \ppgccbibauthordoformat {Crescenzi, V.\ppgccbibauthorsep {} Mecca,
   G.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Merialdo, P.}
@@ -176,30 +188,28 @@
   \ppgccbibpagesstring {} \ppgccpagedoformat {31}-\ppgccpagedoformat
   {}-\ppgccpagedoformat {36}.
 
-\bibitem[Furche et~al.\@, 2012a]{Furche2012a}
-\ppgccbibauthordoformat {Furche, T.\ppgccbibauthorsep {} Gottlob,
-  G.\ppgccbibauthorsep {} Grasso, G.\ppgccbibauthorsep {} Gunes,
-  O.\ppgccbibauthorsep {} Guo, X.\ppgccbibauthorsep {} Kravchenko,
-  A.\ppgccbibauthorsep {} Orsi, G.\ppgccbibauthorsep {} Schallhart,
-  C.\ppgccbibauthorsep {} Sellers, A.\ppgccbibauthorlastsep {}
-  \ppgccbibauthorand {} Wang, C.} (\ppgccyeardoformat {2012a}).
-\newblock \ppgccbibtitledoformat {Diadem: Domain-centric, intelligent,
-  automated data extraction methodology}.
-\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
-  21st International Conference on World Wide Web}, WWW '12 Companion,
-  \ppgccbibpagesstring {} \ppgccpagedoformat {267}-\ppgccpagedoformat
-  {}-\ppgccpagedoformat {270}, New York, NY, USA. ACM.
-
-\bibitem[Furche et~al.\@, 2012b]{Furche2012}
+\bibitem[Furche et~al.\@, 2012]{Furche2012}
 \ppgccbibauthordoformat {Furche, T.\ppgccbibauthorsep {} Gottlob,
   G.\ppgccbibauthorsep {} Grasso, G.\ppgccbibauthorsep {} Orsi,
   G.\ppgccbibauthorsep {} Schallhart, C.\ppgccbibauthorlastsep {}
-  \ppgccbibauthorand {} Wang, C.} (\ppgccyeardoformat {2012b}).
+  \ppgccbibauthorand {} Wang, C.} (\ppgccyeardoformat {2012}).
 \newblock \ppgccbibtitledoformat {{AMBER: Automatic Supervision for
   Multi-Attribute Extraction}}.
 \newblock \ppgccbibjournaldoformat {arXiv preprint}, \ppgccvolumedoformat
   {1210}({\ppgccnumberdoformat {5984}}):\ppgccpagedoformat
   {1}-\ppgccpagedoformat {}-\ppgccpagedoformat {22}.
+
+\bibitem[Grishman et~al.\@, 2002]{Grishman2002}
+\ppgccbibauthordoformat {Grishman, R.\ppgccbibauthorsep {} Huttunen,
+  S.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Yangarber, R.}
+  (\ppgccyeardoformat {2002}).
+\newblock \ppgccbibtitledoformat {Information extraction for enhanced access to
+  disease outbreak reports}.
+\newblock \ppgccbibjournaldoformat {Journal of Biomedical Informatics},
+  \ppgccvolumedoformat {35}({\ppgccnumberdoformat {4}}):\ppgccpagedoformat {236
+  }--\ppgccpagedoformat { 246}.
+\newblock ISSN \ppgccissndoformat {1532-0464}.
+\newblock Sublanguage - Zellig Harris Memorial.
 
 \bibitem[Grishman \ppgccciteauthorand {} Sundheim, 1996]{Grishman1996}
 \ppgccbibauthordoformat {Grishman, R. \ppgccbibauthorand {} Sundheim, B.}
@@ -277,6 +287,17 @@
   tagging}.
 \newblock \ppgccbibjournaldoformat {CoRR}, \ppgccvolumedoformat
   {abs/1508.01991}.
+
+\bibitem[Katiyar \ppgccciteauthorand {} Cardie, 2018]{Katyar2018}
+\ppgccbibauthordoformat {Katiyar, A. \ppgccbibauthorand {} Cardie, C.}
+  (\ppgccyeardoformat {2018}).
+\newblock \ppgccbibtitledoformat {Nested named entity recognition revisited}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  2018 Conference of the North American Chapter of the Association for
+  Computational Linguistics: Human Language Technologies, Volume 1 (Long
+  Papers)}, \ppgccbibpagesstring {} \ppgccpagedoformat {861}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {871}, New Orleans, Louisiana. Association for
+  Computational Linguistics.
 
 \bibitem[Kr{\"{u}}pl et~al.\@, 2005]{Krupl2005}
 \ppgccbibauthordoformat {Kr{\"{u}}pl, B.\ppgccbibauthorsep {} Herzog,
@@ -406,6 +427,19 @@
   \ppgccbibpagesstring {} \ppgccpagedoformat {591}-\ppgccpagedoformat
   {}-\ppgccpagedoformat {598}, San Francisco, CA, USA. Morgan Kaufmann
   Publishers Inc.
+
+\bibitem[Mikolov et~al.\@, 2013]{Mikolov2013}
+\ppgccbibauthordoformat {Mikolov, T.\ppgccbibauthorsep {} Sutskever,
+  I.\ppgccbibauthorsep {} Chen, K.\ppgccbibauthorsep {} Corrado,
+  G.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Dean, J.}
+  (\ppgccyeardoformat {2013}).
+\newblock \ppgccbibtitledoformat {Distributed representations of words and
+  phrases and their compositionality}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  26th International Conference on Neural Information Processing Systems -
+  Volume 2}, NIPS'13, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {3111}-\ppgccpagedoformat {}-\ppgccpagedoformat {3119}, USA. Curran
+  Associates Inc.
 
 \bibitem[Muslea et~al.\@, 1999]{Muslea1999}
 \ppgccbibauthordoformat {Muslea, I.\ppgccbibauthorsep {} Minton,

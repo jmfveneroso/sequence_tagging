@@ -1,0 +1,31 @@
+\select@language {english}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {2.1}{\ignorespaces Named Entity Recognition as a sequence labeling task.}}{11}{figure.2.1}
+\contentsline {figure}{\numberline {2.2}{\ignorespaces Example of a faculty directory}}{14}{figure.2.2}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Word Frequencies on ConLL-2003 and NER-on-HTML}}{23}{figure.3.1}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {4.1}{\ignorespaces Graph describing the transitions in a Markov Chain example.}}{28}{figure.4.1}
+\contentsline {figure}{\numberline {4.2}{\ignorespaces HMM VS MEMM}}{36}{figure.4.2}
+\contentsline {figure}{\numberline {4.3}{\ignorespaces Graph describing the label bias problem.}}{37}{figure.4.3}
+\contentsline {figure}{\numberline {4.4}{\ignorespaces RNN for NER}}{40}{figure.4.4}
+\contentsline {figure}{\numberline {4.5}{\ignorespaces LSTM Cell}}{41}{figure.4.5}
+\contentsline {figure}{\numberline {4.6}{\ignorespaces Bidirectional LSTM-CRF}}{42}{figure.4.6}
+\contentsline {figure}{\numberline {4.7}{\ignorespaces CNN based character representations}}{43}{figure.4.7}
+\contentsline {figure}{\numberline {4.8}{\ignorespaces LSTM based character representations}}{44}{figure.4.8}
+\addvspace {10pt}
+\addvspace {10pt}
+\contentsline {figure}{\numberline {6.1}{\ignorespaces Performance of the Naive Bayes classifier and Hidden Markov Models without features besides the current word on the test set of the NER on HTML dataset. }}{57}{figure.6.1}
+\contentsline {figure}{\numberline {6.2}{\ignorespaces Hidden Markov Models trained with the features in Group A and Group B.}}{59}{figure.6.2}
+\contentsline {figure}{\numberline {6.3}{\ignorespaces Hidden Markov Models trained with the features in Group A and Group B.}}{60}{figure.6.3}
+\contentsline {figure}{\numberline {6.4}{\ignorespaces Performance of the Maximum Entropy classifier, second-order Hidden Markov Models and Linear Chain CRFs without features besides the current word on the test set of the NER on HTML dataset. }}{61}{figure.6.4}
+\contentsline {figure}{\numberline {6.5}{\ignorespaces Linear Chain Conditional Random Fields trained with the features in Group A and Group B.}}{62}{figure.6.5}
+\contentsline {figure}{\numberline {6.6}{\ignorespaces Performance of the Bi-LSTM-CRF in comparison with the second-order Hidden Markov Models and Linear Chain CRFs without features. }}{63}{figure.6.6}
+\contentsline {figure}{\numberline {6.7}{\ignorespaces Precision, Recall and F-scores as we vary $ \alpha $ for the Bi-LSTM-CRF with LSTM character representations optimizing the expected F-score function directly }}{67}{figure.6.7}
+\addvspace {10pt}
+\addvspace {10pt}
+\addvspace {10pt}
