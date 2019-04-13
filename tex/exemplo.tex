@@ -825,7 +825,7 @@ method should at least beat the dictionary exact matching approach.
 \section{Comparison with CoNLL-2003}
 \label{sec:conll_comparison}
 
-The CoNLL-2003 dataset was introduced in the \textit{Named Entity Recognition} 
+The CoNLL-2003 dataset introduced in the \textit{Named Entity Recognition} 
 shared-task in 2003 is still one of the most popular NER datasets, being used to attest 
 the performance of state-of-the-art sequence labeling systems. 
 The English data is composed of news stories extracted from the Reuters Corpus, and 
@@ -859,13 +859,14 @@ state-of-the-art models, it is to be expected that models trained in this datase
 be able to extract the same named entities in other documents with reasonable 
 effectiveness. However, this is hardly the case. By intuition, we know that tabular HTML 
 documents, such as faculty listings, are very different from plain text. But now, having a
-labeled dataset for NER on HTML, we can esimate how different they really are.
+labeled dataset for NER on HTML, we can understand how different they really are.
 
-We trained a LSTM-CRF classifier, a close to state-of-the-art deep learning approach to 
-sequence labeling introduced by~\cite{Huang2015}, using the CoNLL-2003 training set. We
-relabeled the dataset, so the classifier only extracts person entities (PER labels), and
+We trained a LSTM-CRF classifier, a close to state-of-the-art sequence labeling model
+introduced by~\cite{Huang2015}, using the CoNLL-2003 training set. We
+relabeled the dataset, so that the classifier only extracts person entities (PER labels), and
 we used the trained classifier to extract person entities from the NER-on-HTML test set.
-Table~\ref{tab:conll_to_ner_on_html} describes the results obtained with this classifier.
+Table~\ref{tab:conll_to_ner_on_html} describes the results obtained with this classifier
+in the CoNLL-2003 test set and the NER-on-HTML test set.
 
 \begin{table}[h]
   \small
@@ -876,7 +877,7 @@ Table~\ref{tab:conll_to_ner_on_html} describes the results obtained with this cl
       \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} &
       \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
       \midrule
-      0.953 & 0.966 & 0.960 & 0.282 & 0.258 & 0.269 \\
+      0.969 & 0.931 & 0.950 & 0.282 & 0.258 & 0.269 \\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -887,15 +888,12 @@ Table~\ref{tab:conll_to_ner_on_html} describes the results obtained with this cl
   \label{tab:conll_to_ner_on_html}
 \end{table}
 
+The very low $ F_1 $-score obtained in the NER-on-HTML test set is even worse than our
+baseline. It shows that a sequence model trained for plain text does not necessarily perform 
+very well in a HTML extraction task. Also, most public NER datasets are entirely composed of 
+plain text documents. 
 
-In this section, we present a brief 
-comparison between the ConLL-2003 English dataset and the NER-on-HTML dataset to 
-understand how documents from both sources differ, and why this difference may be 
-responsible for the observed drop of performance when we apply NER systems trained 
-in news corpora to HTML extraction tasks.
-
-
-
+Lets consider some differences between both datasets.
 The number of documents in the NER-on-HTML dataset is much smaller: only 145 against 
 1393. However, the number of sentences in the NER-on-HTML 
 dataset is higher: 43870 against 22137. Also, the number of tokens in the NER-on-HTML 
@@ -904,16 +902,20 @@ the HTML documents relevant to the researcher name extraction task are longer th
 stories and, more importantly, they are composed of much shorter sentences when compared 
 to the text from news corpora (~3.46 words per sentence in NER-on-HTML versus ~13.62 
 words per sentence in ConLL-2003). This attests to the fact that HTML provides far 
-less context to be made use by sequence models than plain text. This means that the 
-sequence models must make use of information other than textual context to perform
-well.
+less context to be made use by sequence models. This means that the models must 
+make use of information that is not present in the text.
 
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=0.75\textwidth]{pics/word_frequencies}
-  \caption{Word Frequencies on ConLL-2003 and NER-on-HTML}
-  \label{fig:word_frequencies}
-\end{figure}
+Another aspect that differs among NER datasets is the word distributions. Word frequencies
+tend to vary considerably in documents with different topics. Table~\ref{tab:frequent_words}
+shows the ten most frequent words for each dataset, including punctuation signs. 
+The CoNLL-2003 English dataset contains a more generic selection of terms whereas the 
+subject of the NER-on-HTML becomes evident with words such as "professor" and "university" 
+happening with a high frequency in the corpus. Finally, Figure~\ref{fig:word_frequency_plot}
+plots the word frequencies for the hundred most frequent words in the CoNLL-2003 and 
+the NER-on-HTML datasets. In both plots we have a few very frequent words and a long tail of
+infrequent words. Most named entities are located in this long tail, therefore a good sequence
+labeling method needs to be able to handle effectively tokens that it has seen only a couple of 
+times before or even tokens that were never seen before.
 
 \begin{table}[h]
   \small
@@ -935,22 +937,53 @@ well.
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Thirty most frequent words for the ConLL-2003 dataset and the NER-on-HTML dataset}
-  \label{tab:conll}
+  \caption{Ten most frequent words for the ConLL-2003 dataset and the NER-on-HTML dataset.}
+  \label{tab:frequent_words}
 \end{table}
 
-The word frequency distributions for the hundred most frequenct words in both datasets 
-are described in Figure~\ref{fig:word_frequencies}. Their shape is rather similar, 
-presenting a small number of very frequent words and a long tail of words that happen 
-only once or twice in the dataset. This long tail is where most named entities are located.
-To allow further comparison between both datasets, we present the ten most frequent words 
-(including punctuation signs) for each dataset in Table~\ref{tab:frequent_words}. As 
-expected, the ConLL-2003 contains more generic terms whereas the subject of the NER-on-HTML
-becomes evident with words such as "professor" and "university" happening with a high
-frequency in the corpus. Also, punctuation signs are relatively more frequent in the 
-NER-on-HTML owing to the factual tabular structure of the HTML texts present in the 
-collection. 
+\begin{figure}[h!]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        title={Word frequencies},
+        xmin=0, xmax=100,
+        ymin=0, ymax=12000,
+        ylabel={Frequency},
+        xlabel={Words (most to least frequent)},
+        ymajorgrids=true,
+        grid style=dashed,
+        legend pos=north east,
+        % scaled y ticks=false,
+      ]
 
+      \addplot[color=blue, color=blue] coordinates {
+        (0,12310)(1,10876)(2,10874)(3,5502)(4,5405)(5,5129)(6,4731)(7,4226)(8,4225)(9,4223)(10,3239)(11,3115)(12,2694)(13,2339)(14,2109)(15,1866)(16,1845)(17,1679)(18,1593)(19,1342)(20,1267)(21,1264)(22,1232)(23,1212)(24,1166)(25,1146)(26,1113)(27,1082)(28,1057)(29,984)(30,973)(31,920)(32,867)(33,841)(34,804)(35,796)(36,786)(37,786)(38,780)(39,768)(40,754)(41,738)(42,656)(43,645)(44,643)(45,636)(46,591)(47,584)(48,579)(49,567)(50,558)(51,546)(52,545)(53,524)(54,523)(55,517)(56,512)(57,510)(58,486)(59,486)(60,474)(61,470)(62,470)(63,457)(64,448)(65,444)(66,442)(67,441)(68,419)(69,415)(70,413)(71,405)(72,402)(73,386)(74,377)(75,375)(76,369)(77,358)(78,354)(79,348)(80,346)(81,340)(82,338)(83,328)(84,327)(85,325)(86,320)(87,319)(88,310)(89,308)(90,300)(91,296)(92,293)(93,292)(94,291)(95,289)(96,278)(97,272)(98,271)(99,271)
+      };
+      \addplot[color=red, color=red] coordinates {
+        (0,10439)(1,8140)(2,3655)(3,3641)(4,3484)(5,3345)(6,2499)(7,2456)(8,1611)(9,1315)(10,1053)(11,1046)(12,1006)(13,963)(14,897)(15,863)(16,849)(17,838)(18,773)(19,749)(20,720)(21,713)(22,695)(23,668)(24,652)(25,626)(26,602)(27,593)(28,581)(29,580)(30,569)(31,553)(32,539)(33,527)(34,520)(35,499)(36,492)(37,490)(38,469)(39,454)(40,446)(41,444)(42,429)(43,429)(44,422)(45,420)(46,419)(47,403)(48,403)(49,394)(50,390)(51,379)(52,379)(53,371)(54,362)(55,356)(56,355)(57,346)(58,342)(59,337)(60,324)(61,318)(62,314)(63,311)(64,298)(65,297)(66,288)(67,282)(68,279)(69,265)(70,263)(71,259)(72,259)(73,258)(74,258)(75,254)(76,250)(77,245)(78,243)(79,236)(80,236)(81,235)(82,234)(83,232)(84,225)(85,219)(86,218)(87,215)(88,212)(89,212)(90,210)(91,209)(92,208)(93,208)(94,205)(95,198)(96,197)(97,196)(98,191)(99,191)
+      };
+      \legend{CoNLL-2003, NER-on-HTML};
+       
+      \end{axis}
+    \end{tikzpicture}
+    \caption{
+      Word frequencies plot for the CoNLL-2003 dataset and the NER-on-HTML dataset.
+    }
+    \label{fig:word_frequency_plot}
+  \end{center}
+\end{figure}
+
+\section{Summary}
+
+In this chapter, we introduced the NER-on-HTML dataset and the researcher name extraction
+task. In Section~\ref{sec:data_description} we defined the data format for the training,
+validation and test data files. In Section~\ref{sec:evaluation} we discussed how to evaluate
+models with the Precision, Recall and F-scores. In Section~\ref{sec:dictionary}, we 
+introduced a dictionary of useful named entities for the researcher name extraction task and 
+established some baseline results. Finally, in Section~\ref{sec:conll_comparison} we
+compared the NER-on-HTML dataset with the popular CoNLL-2003 English dataset, showing why
+a new NER dataset is necessary to complete the researcher name extraction task and why most
+NER tasks in HTML will probably demand a specific dataset.
 
 
 \chapter{Sequence Labeling Methods for NER}

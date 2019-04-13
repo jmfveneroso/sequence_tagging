@@ -7,7 +7,7 @@
 \contentsline {figure}{\numberline {2.1}{\ignorespaces Named Entity Recognition as a sequence labeling task.}}{11}{figure.2.1}
 \contentsline {figure}{\numberline {2.2}{\ignorespaces Example of a faculty directory}}{14}{figure.2.2}
 \addvspace {10pt}
-\contentsline {figure}{\numberline {3.1}{\ignorespaces Word Frequencies on ConLL-2003 and NER-on-HTML}}{23}{figure.3.1}
+\contentsline {figure}{\numberline {3.1}{\ignorespaces Word frequencies plot for the CoNLL-2003 dataset and the NER-on-HTML dataset. }}{24}{figure.3.1}
 \addvspace {10pt}
 \contentsline {figure}{\numberline {4.1}{\ignorespaces Graph describing the transitions in a Markov Chain example.}}{28}{figure.4.1}
 \contentsline {figure}{\numberline {4.2}{\ignorespaces HMM VS MEMM}}{36}{figure.4.2}

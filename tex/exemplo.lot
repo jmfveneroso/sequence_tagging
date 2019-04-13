@@ -10,7 +10,7 @@
 \contentsline {table}{\numberline {3.3}{\ignorespaces DBLP dictionary coverage in each data file of the NER-on-HTML dataset.}}{21}{table.3.3}
 \contentsline {table}{\numberline {3.4}{\ignorespaces Description of the CoNLL-2003 English dataset}}{22}{table.3.4}
 \contentsline {table}{\numberline {3.5}{\ignorespaces Performance of the LSTM-CRF model trained with the CoNLL-2003 training set and tested in the NER-on-HTML test set. }}{22}{table.3.5}
-\contentsline {table}{\numberline {3.6}{\ignorespaces Thirty most frequent words for the ConLL-2003 dataset and the NER-on-HTML dataset}}{23}{table.3.6}
+\contentsline {table}{\numberline {3.6}{\ignorespaces Ten most frequent words for the ConLL-2003 dataset and the NER-on-HTML dataset.}}{23}{table.3.6}
 \addvspace {10pt}
 \contentsline {table}{\numberline {4.1}{\ignorespaces Model descriptions}}{45}{table.4.1}
 \addvspace {10pt}
