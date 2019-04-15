@@ -39,6 +39,16 @@
   {127}-\ppgccpagedoformat {}-\ppgccpagedoformat {141}.
 \newblock ISSN \ppgccissndoformat {10743227}.
 
+\bibitem[Baum et~al.\@, 1970]{Baum1970}
+\ppgccbibauthordoformat {Baum, L.~E.\ppgccbibauthorsep {} Petrie,
+  T.\ppgccbibauthorsep {} Soules, G.\ppgccbibauthorlastsep {}
+  \ppgccbibauthorand {} Weiss, N.} (\ppgccyeardoformat {1970}).
+\newblock \ppgccbibtitledoformat {A maximization technique occurring in the
+  statistical analysis of probabilistic functions of markov chains}.
+\newblock \ppgccbibjournaldoformat {Ann. Math. Statist.}, \ppgccvolumedoformat
+  {41}({\ppgccnumberdoformat {1}}):\ppgccpagedoformat {164}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {171}.
+
 \bibitem[Califf \ppgccciteauthorand {} Mooney, 1999]{Califf1999}
 \ppgccbibauthordoformat {Califf, M.~E. \ppgccbibauthorand {} Mooney, R.~J.}
   (\ppgccyeardoformat {1999}).
@@ -157,6 +167,14 @@
   \ppgccvolumedoformat {70}:\ppgccpagedoformat {301}-\ppgccpagedoformat
   {}-\ppgccpagedoformat {323}.
 \newblock ISSN \ppgccissndoformat {09507051}.
+
+\bibitem[{Forney}, 1973]{Forney1973}
+\ppgccbibauthordoformat {{Forney}, G.~D.} (\ppgccyeardoformat {1973}).
+\newblock \ppgccbibtitledoformat {The viterbi algorithm}.
+\newblock \ppgccbibjournaldoformat {Proceedings of the IEEE},
+  \ppgccvolumedoformat {61}({\ppgccnumberdoformat {3}}):\ppgccpagedoformat
+  {268}--\ppgccpagedoformat {278}.
+\newblock ISSN \ppgccissndoformat {0018-9219}.
 
 \bibitem[Freitag, 1998]{Freitag1998}
 \ppgccbibauthordoformat {Freitag, D.} (\ppgccyeardoformat {1998}).
@@ -371,14 +389,6 @@
 \newblock \ppgccbibtitledoformat {Information extraction using hidden markov
   models}.
 
-\bibitem[Li \ppgccciteauthorand {} Gray, 2000]{Li2000}
-\ppgccbibauthordoformat {Li, J. \ppgccbibauthorand {} Gray, R.~M.}
-  (\ppgccyeardoformat {2000}).
-\newblock \ppgccbibbtitledoformat {Image Segmentation and Compression Using
-  Hidden Markov Models}.
-\newblock Kluwer Academic Publishers, Norwell, MA, USA.
-\newblock ISBN \ppgccissndoformat {0792378997}.
-
 \bibitem[Liu \ppgccciteauthorand {} Nocedal, 1989]{Liu1989}
 \ppgccbibauthordoformat {Liu, D.~C. \ppgccbibauthorand {} Nocedal, J.}
   (\ppgccyeardoformat {1989}).
@@ -406,6 +416,14 @@
   bi-directional lstm-cnns-crf}.
 \newblock \ppgccbibjournaldoformat {CoRR}, \ppgccvolumedoformat
   {abs/1603.01354}.
+
+\bibitem[Manning \ppgccciteauthorand {} Sch\"{u}tze, 1999]{Manning1999}
+\ppgccbibauthordoformat {Manning, C.~D. \ppgccbibauthorand {} Sch\"{u}tze, H.}
+  (\ppgccyeardoformat {1999}).
+\newblock \ppgccbibbtitledoformat {Foundations of Statistical Natural Language
+  Processing}.
+\newblock MIT Press, Cambridge, MA, USA.
+\newblock ISBN \ppgccissndoformat {0-262-13360-1}.
 
 \bibitem[McCallum, 2005]{McCallum2005}
 \ppgccbibauthordoformat {McCallum, A.} (\ppgccyeardoformat {2005}).
