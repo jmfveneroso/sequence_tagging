@@ -1163,9 +1163,9 @@ consider that $ P(y_1|y_0) $ is the probability of $ y_1 $ given the initial vec
 probabilities $ \rho_0 $. 
 
 Now we know how to calculate the state probabilities for a Markov Chain at any timestep, but
-we still need to solve the problem of obtaining the transition matrix $ \theta $. A good
-choice is to obtain $ \theta $ directly from our labeled dataset through Maximum Likelihood 
-Estimation. The likelihood of our model is given by:
+we still need to solve the problem of obtaining the transition matrix $ \theta $. The usual
+choice is to obtain $ \theta $ such that it maximizes the probability of our labeled dataset 
+with Maximum Likelihood Estimation. The likelihood of our model is given by:
 
 \begin{equation}
 \mathcal{L}(\theta; Y) = \prod_{t=1}^{n} \theta_{y_t, y_{t-1}}
@@ -1208,15 +1208,15 @@ With the aid of Lagrange Multipliers, we can incorporate this set of constraints
 objective and optimize the Lagrangian:
 
 \begin{equation}
-Lag(\theta, \lambda) = \mathcal{l}(\theta; Y) - \sum_{a} \lambda_{a} \cdot \left( \sum_{b} \theta_{a, b} - 1 \right)
+\Lambda(\theta, \lambda) = \mathcal{l}(\theta; Y) - \sum_{a} \lambda_{a} \cdot \left( \sum_{b} \theta_{a, b} - 1 \right)
 \end{equation}
 
-Setting $ \frac{\partial Lag(\theta, \lambda)}{\partial \lambda_a} = 0 $ simply yields the initial set 
-of constraints, but by setting the partial derivatives $ \frac{\partial Lag(\theta, \lambda)}{\partial \theta_{a, b}} = 0 $,
+Setting $ \frac{\partial \Lambda(\theta, \lambda)}{\partial \lambda_a} = 0 $ simply yields the initial set 
+of constraints, but by setting the partial derivatives $ \frac{\partial \Lambda(\theta, \lambda)}{\partial \theta_{a, b}} = 0 $,
 we get:
 
 \begin{eqnarray}
-\frac{\partial Lag(\theta, \lambda)}{\partial \theta_{a, b}} & = & \frac{\eta_{a, b}}{\theta_{a, b}} - \lambda_a = 0 \\
+\frac{\partial \Lambda(\theta, \lambda)}{\partial \theta_{a, b}} & = & \frac{\eta_{a, b}}{\theta_{a, b}} - \lambda_a = 0 \\
 \theta_{a, b} & = & \frac{\eta_{a, b}}{\lambda_a}
 \end{eqnarray}
 
@@ -1358,9 +1358,9 @@ smoothed estimates:
 
 Where $ |L| $ is the number of labels and $ |V| $ is the size of the vocabulary.
 If we consider other prior distributions for the parameters, we get different smoothed probabilities, 
-but this already properly ensures that unobserved words will not receive a zero probability. The 
+but this already properly ensures that unobserved words will not receive a zero probability. The main
 shortcoming with Laplace Smoothing is that it gives too much probability mass to unseen words relative
-to other methods, nevertheless it performs well in practice.
+to other smoothing methods, but it performs well in practice.
 
 
 \subsection{Predicting sequences}
@@ -1374,7 +1374,7 @@ a beam-search strategy can be used. For decoding the labels for CRFs and Neural 
 Viterbi algorithm.
 
 
-\subsection{Summary}
+\subsection{Conclusion}
 
 HMM based taggers have been successfully applied in many NLP and WDE tasks such as in the works by
 \cite{Rabiner1990}, \cite{Leek1997} and \cite{Freitag2000}. The closed-form parameter estimation
@@ -1386,279 +1386,219 @@ the right selection of features, what may outweigh the benefit of a small traini
 \section{Conditional Random Fields}
 \label{sec:crf}
 
-(DISCUSS HOW UP TO THIS POINT WE HAVE BEEN WASTING MODELLING EFFORT ON MODELLING 
-THE JOINT DISTRIBUTION AND WE COULD GO DIRECTLY TO THE CONDITIONAL)
+With Hidden Markov Models, we tried to model the joint probability between 
+words and labels $ P(X, Y) $ and derive the conditional probability $ P(Y|X) $
+with Bayes Theorem. However, this is a waste of modelling effort,
+since we need to assume the shape of the prior distribution $ P(X) $, but we 
+only really care about the conditional problem. Thus, modelling $ P(Y|X) $ 
+instead of the joint distribution would presumably be a more direct and simple 
+approach. Also, to assure that the computation of $ P(X, Y) $ was feasible, we 
+needed to assume feature independence, what inhibits the use of overlapping 
+features that could potentially be useful in addition to words. Maximum Entropy
+models for sequence labeling were created to address these issues and, among 
+them, \textit{Linear Chain Conditional Random Fields} (CRF) stand out 
+as the discriminative analogue to HMMs. CRFs estimate the conditional probability 
+while HMMs, being generative models, estimate the joint probability.
 
-An example of Maxent classifier for sequence tagging: https://www.aclweb.org/anthology/W96-0213.
-
-% Good derivation of maxent classifier for NLP:
-% http://www.ai.mit.edu/courses/6.891-nlp/READINGS/adwait.pdf
-% https://repository.upenn.edu/cgi/viewcontent.cgi?article=1083&context=ircs_reports
-
-A \textit{Linear Chain Conditional Random Field} is the particular case of a 
-\textit{Conditional Random Field} where the labels are conditionally independent 
-given the previous observations. (THIS SENTENCE HAS TO BE CHECKED). It is the
-generalized case of a Maximum Entropy Markov Model, which is itself a combination of
-Maximum Entropy Classifier for sequences.
-
-The task of labeling sequences in \textit{Natural Language Processing} can be seen
-as a classification task where we want to predict a label $ y $, given a word and its 
-context, which we call jointly as $ x $. This context can be composed of any relevant 
-features extracted from the text, such as surrounding words, previous labels, and sentence 
-length. Because of its mathematical properties, the \textit{Maximum Entropy} framework provides 
-a compelling way for estimating the probability of a label given its linguistic context, that is
-$ P(Y|X) $.
-
-The concept of Information Entropy established by Shannon (CITE HERE, A mathematical 
-theory of communication) aims to quantify the
-amount of information expressed in a statistical distribution. Namely, the entropy $ H $ of
-a probability distribution X with a probability mass function $ p $ is given by:
-
-(THE ENTROPY HERE SHOULD BE THE JOINT ENTROPY BETWEEN WORDS AND TAGS)
+The concept of Information Entropy established by~\cite{Shannon1948}
+quantifies the amount of information expressed in a statistical distribution. 
+The entropy $ H $ of a random variable Z with a probability mass function 
+$ P $ is given by:
 
 \begin{equation}
-H(p) = \sum_{x \in X} p(x) \cdot log_2 \left( \frac{1}{p(x)} \right)
+H(Z) = \sum_{z \in Z} P(z) \cdot log \left( \frac{1}{P(z)} \right)
 \end{equation}
 
-In fact, the logarithm in the entropy function can be taken in any base. The change 
-of base will only provide a linear scaling of the same entropy function. In this case,
-$ H(p) $ is essentialy the expected number of bits necessary to encode the value of a
-single random outcome drawn from $ X $, that is $ E[log_2 \left( \frac{1}{p(X)} \right)] $.
-The more bits we need to encode the possible outcomes from a probability mass function, 
+The logarithm in the entropy function can be taken in any base. The change 
+of base will only provide a linear scaling of the same entropy function. When using base two,
+$ H(Z) $ is essentially the expected number of bits necessary to encode the value of a
+random outcome drawn from $ Z $, that is $ E \left[log \left( \frac{1}{P(Z)} \right) \right] $.
+The more bits we need to use to encode the possible outcomes of a probability mass function, 
 the more uncertain we are about the underlying distribution. For example, if an event has
 only one possible outcome, we always know the value of a random sample, therefore
-$ H(p) = 0 $ and the entropy is minimum. On the other end, if the probability distribution is
+$ H(Z) = 0 $ and the entropy is minimum. On the other end, if the probability distribution is
 uniform, all outcomes have the same probability, and therefore we are as uncertain as we can be
 and the entropy is maximum.
 
-The principle of maximum entropy (CITE HERE) [Jaynes, 1957, Good, 1963]
-states that, when we do not know exactly what probability 
+The principle of maximum entropy set forward by~\cite{Jaynes1957} states that, when we do not know exactly what probability 
 distribution generated a sample, the best estimate for the parameters of this probability
 distribution is the one that makes the least assumptions, or the one with maximum entropy. 
 This is the distribution that is closest to the uniform distribution. 
-
 A similar argument can be made to limit the number of free parameters in the model. That is,
 when comparing two models with similar predictive power, the one with the least degrees of 
-freedom should be prefered. However in practice, this is rarely taken into account.
+freedom should be preferred. 
 
 The principle of maximum entropy is similar to a principle in the philosophy of science called Occam's Razor, 
-that is, when there are two explanations for an outcome, the one that makes
+that states that, when there are two explanations for an outcome, the one that makes
 the least number of assumptions is the best. Which is a good rule of thumb for science in general,
-eventhough, ultimately nothing guarantees that the rules that explain reality will be simple.
+eventhough, ultimately, nothing guarantees that simpler models will be better.
 
-Naturally, if we 
-optimize the objective function without constraints, we will find that the \textit{Maximum Entropy} 
-estimator will yield an uniform distribution, meaning that we are no better than simply predicting 
-labels at random for our data. So, it becomes necessary to establish some constraints over
-our optimization problem.
+The task of labeling word sequences can be thought of as a classification task where 
+each label $ Y $ is predicted according to its context $ X $. The context is defined as 
+a vector of observations that expresses useful pieces of evidence such as: the last word 
+is an honorific, the current word is capitalized, the current word is "that", etc. And we
+define $ k $ binary feature functions $ f_i \; \forall i \in [1, k] $ such that:
 
-The choice of constraints is more or less arbitrary, but under the \textit{Maximum Entropy} 
-framework, there is a strong motivation for setting these constraints in a way that makes
+\begin{equation}
+  f_i(x, y) = \begin{cases} 
+    1 \text{ if } y = L \text{ and the feature is present in } x \\ 
+    0 \text{ otherwise}
+  \end{cases}
+\end{equation}
+
+So, at any position in the sequence, the truth statement of the feature functions can be
+determined in terms of the predicted label $ y $ and the context $ x $. But, different from
+HMMs, we do not assume that features are independent. Now, the \textit{Maximum Entropy} framework 
+provides a compelling way for estimating the probability of a label given its linguistic context, 
+that is $ P(Y|X) $. In the sequence labeling problem, we actually want to maximize the conditional 
+entropy:
+
+\begin{equation}
+H(Y|X) = - \sum_{x \in X, y \in Y} P(x, y) \cdot log \left( P(y|x) \right)
+\end{equation}
+
+But, it is usual to approximate $ P(x, y) $ with $ P(y|x)\tilde{P}(x) $, because
+the model prior $ P(x) $ is hard to normalize since the probability space of observations is
+usually too big, while the empirical prior $ \tilde{P}(x) $ is easy to obtain.
+However, if we maximize $ H(Y|X)$ subject to no restrictions, we will find that the 
+\textit{Maximum Entropy} estimator will yield an uniform distribution, meaning that we are 
+no better than simply predicting labels at random. So, it becomes necessary to establish 
+some constraints for the optimization problem. 
+
+The choice is more or less arbitrary, but under the \textit{Maximum Entropy} 
+framework, there is a strong motivation for setting the constraints in a way that makes
 the \textit{Maximum Entropy} estimator equivalent to the \textit{Maximum Likelihood} estimator
 for our model. By doing it, we can make sure that the model fits the data as tightly as possible
-(the maximum likelihood estimate), while making as few assumptions as it needs to 
-(the maximum entropy estimate). 
+(Maximum Likelihood), while making as few assumptions as it needs to (Maximum Entropy). 
+We can get this estimator by setting the constraints such that, given the $ k $ binary feature 
+functions that we determined earlier, there are also $ k $ constraints such that:
 
-If we set these constraints such that, given $ k $ binary feature functions $ f_i $,
-we have $ k $ constraints:
-
-\begin{eqnarray}
-E_{p(a,b)}[f_i] = \sum_{x} \tilde{p(a)} p(b|a) f_i(x) \\
-E_{\tilde{p(a,b)}}[f_i] = \sum_{x} \tilde{p}(x) f_i(x) \\
-E[f_i] = E_{\tilde{p(x)}}[f_i], \forall i \in \{ 1, 2, \dots, k \}
+\begin{equation}
+E_{P}[f_i] = E_{\tilde{P}}[f_i] \;\;\; \forall \; i \in [1, k]
 \label{eq:maxent_constraints}
-\end{eqnarray}
-
-On which $ E[f_i] $ is the model expectation of $ f_i $ and $ E[\hat{f_i}] $ is the 
-observed expectation $ f_i $. And we maximize the conditional entropy subject to these
-constraints:
-
-\begin{equation}
-H(p) = - \sum_{a, b} \tilde{p}(b) p(a|b) log p(a|b)
 \end{equation}
 
-Note that we use the simplification $ \tilde{p}(b) \approx p(b) $ suggested by 
-Berger et. al., because the probability space of $ p(b) $ is too big to allow 
-a simple calculation. (PAGE 12 of http://www.ai.mit.edu/courses/6.891-nlp/READINGS/adwait.pdf)
+Where $ E_{P}[f_i] $ is the model expectation of $ f_i $ and $ E_{\tilde{P}}[f_i] $ is the 
+empirical expectation of $ f_i $. Or more clearly:
 
-BERGER is here https://www.aclweb.org/anthology/J96-1002.
+\begin{align*}
+E_{P}[f_i]         = \sum_{x \in X, y \in Y} \tilde{P}(x)P(y|x) f_i(x, y) \\
+E_{\tilde{P}}[f_i] = \sum_{x \in X, y \in Y} \tilde{P}(x, y) f_i(x, y)
+\end{align*}
 
-We can once again resort to Lagrange Multipliers to transform this problem into an
-unconstrained optimization problem. The Lagrangian $ \Lambda $ takes the form:
+Additionally, we need to make sure that the probabilities sum up to one, so:
 
 \begin{equation}
-\Lambda(p, \theta, \theta_p, \lambda, \beta) = H(p) 
-+ \sum_{i}^n \lambda_i (E_{p(x)}[f_i] - E_{\tilde{p(x)}}[f_i]) 
-+ \beta (\sum_{x,y} \tilde{p}(x) p(y|x)) - 1
+\sum_{y} P(y|x) = 1 \;\;\; \forall \; x \in X
+\label{eq:maxent_constraints}
 \end{equation}
 
-Now we need to make set all derivatives equal to zero to find the point that maximizes
-the Lagrangian, and by consequence the conditional entropy subject to our constraints.
-The derivatives relative to $ \lambda $ and $ \beta $ simply yield the initial constraints.
-Now the the derivative relative to $ p $ is:
-
-\begin{eqnarray}
-\frac{\partial \Lambda}{\partial p} = -1 - log p(y|x) + \beta + \sum_i^n \lambda_i f_i(x, y) = 0 \\
-p(y|x) = exp(\sum_{i}^n \lambda_i f_i(x, y) + \beta + 1)
-\ref{eq:logistic_1}
-\end{eqnarray}
-
-Also, we know by our initial constraints that:
-
-\begin{eqnarray}
-\sum_y p(y|x) = 1 \\
-\sum_y exp(\sum_{i}^n \lambda_i f_i(x, y) + \beta + 1) = 1 \\
-e^\beta \cdot \sum_y exp(\sum_{i}^n \lambda_i f_i(x, y) + 1) = 1 \\
-e^\beta = \frac{1}{\sum_y exp(\sum_{i}^n \lambda_i f_i(x, y) + 1)} \\
-\end{eqnarray}
-
-By replacing $ \beta $ in Equation~\ref{eq:logistic_1} we finally get:
+We can optimize the conditional entropy subject to these constraints with Lagrangian 
+Multipliers by defining the Lagrangian:
 
 \begin{equation}
-p(y|x) = \frac{exp(\sum_{i}^n \lambda_i f_i(x, y))}{\sum_y exp(\sum_{i}^n \lambda_i f_i(x, y))}
+\Lambda(P, \lambda, \beta) = H(Y|X) + \sum_{i=1}^k \lambda_i (E_{P}[f_i] - E_{\tilde{P}}[f_i]) 
++ \sum_{x \in X} \beta_x \left( \sum_{y \in Y} P(y|x) - 1 \right)
+\end{equation}
+
+And solving the unconstrained optimization problem to obtain the maximum entropy 
+distribution:
+
+\begin{equation}
+P^{*} = \argmax_P \Lambda(P, \lambda, \beta)
+\end{equation}
+
+The derivatives relative to $ \lambda_i $ and $ \beta_x $ yield the initial constraints, but
+setting the derivative of $ P(y|x) $ to zero, we get:
+
+\begin{eqnarray}
+\frac{\partial \Lambda}{\partial P(y|x)} = -\tilde{P}(X) -\tilde{P}(X) \cdot log \; P(y|x) + \beta_x + \tilde{P}(X) \sum_{i=1}^k \lambda_i f_i(x, y) = 0 \\
+P(y|x) = exp \left( \frac{\beta_x}{\tilde{P}(x)} - 1 \right) \cdot exp \left( \sum_{i=1}^n \lambda_i f_i(x, y) \right)
+\label{eq:logistic_1}
+\end{eqnarray}
+
+By replacing $ P(y|x) $ in our initial probability constraints defined in Equation~\ref{eq:maxent_constraints},
+we get:
+
+\begin{eqnarray}
+\sum_y exp \left( \frac{\beta_x}{\tilde{P}(x)} - 1 \right) \cdot exp \left( \sum_{i=1}^n \lambda_i f_i(x, y) \right) = 1 \\
+exp \left( \frac{\beta_x}{\tilde{P}(x)} - 1 \right) = \frac{1}{\sum_y exp \left( \sum_{i=1}^n \lambda_i f_i(x, y) \right)} \\
+Z(x) \equiv \sum_y exp \left( \sum_{i=1}^n \lambda_i f_i(x, y) \right)
+\end{eqnarray}
+
+By replacing $ Z(x) $ in Equation~\ref{eq:logistic_1} we finally get:
+
+\begin{equation}
+P(y|x) = \frac{1}{Z(x)} \cdot exp \left( \sum_{i}^n \lambda_i f_i(x, y) \right)
 \label{eq:logistic_1}
 \end{equation}
 
-At this point, we know that the model that maximizes the conditional entropy subject to the constraints
-established in (REFERENCE TO CONSTRAINTS) has to belong to the parametric family described in 
-Equation~\ref{eq:logistic}. This equation describes a family of exponential probability models known as 
-logistic classifiers or maximum entropy classifiers, this is the unique solution to our optimization
-problem (CHECK APPENDIX).
-
-(SKETCH THE PROOF FOR UNICITY HERE)
-
-Furthermore, by maximizing the Lagrangian $ \Lambda $ we can find the optimal set of 
-parameters $ \lambda_i $ (a results granted by the Kuhn-Tucker theorem). This optimization
-problem is identical to maximizing the log likelihood:
-
-(THIS RESULT SHOULD BE BETTER EXPLORED)
+This defines a family of exponential functions with parameters $ \lambda $. To obtain the parameters
+that maximize the entropy of our model subject to the initial set of constraints, we can replace this
+definition back in the Lagrangian and optimize in terms of $ \lambda $. This yields the following
+optimization problem:
 
 \begin{equation}
-\mathcal{L}(Y|X; \theta) = log \prod_{x, y} p(y|x)^{\tilde{p}(x,y)} = \sum_{x, y} \tilde{p}(x,y) log p(y|x)
+\Lambda(\lambda) = \sum_{i=1}^k \lambda_i E[f_i(x, y)] - \sum_{x} \tilde{P}(x) \cdot log \; Z(x) 
 \end{equation}
 
-When the training samples are independent, maximizing the likelihood 
+Which is identical to the log-likelihood:
 
-And this is essentialy the same thing as maximizing the cross-entropy 
-(https://peterroelants.github.io/posts/cross-entropy-logistic/).
-Now, there is no closed form expression to find the optimal set of parameters $ \theta $ 
-that maximizes the likelihood / entropy, so we must resort to numerical optimization methods such 
-as Stochastic Gradient Descent or L-BFGS. 
+\begin{equation}
+\mathcal{l}(P) = \sum_{x, y} \tilde{P}(x, y) \cdot log \; P(y|x) 
+\end{equation}
 
-In the particular case of sequence labeling, the simplest conceivable classifier inside the Maximum Entropy
+With this, we conclude that a model with the parametric form defined in Equation~\ref{eq:logistic_1} 
+has identical maximum likelihood and maximum entropy estimators. Also, it can be proven that this 
+model is unique and its optimization function is concave~\cite{Brown1986}. The classifier based on this
+model is known as a logistic classifier or maximum entropy classifier. There is no closed-form expression
+for finding the optimal set of parameters, but we can obtain this optimal set with numerical optimization
+methods such as Stochastic Gradient Descent. Normally, this is achieved by minimizing the cross-entropy
+for the exponential model, which is identical to maximizing the likelihood.
+
+For the particular case of sequence labeling, the simplest conceivable classifier inside the Maximum Entropy
 Framework would be a multinomial logistic regression that decodes each label independently. That is, given
-a context $ x $ the classifier would predict a label $ y $ without taking in consideration any of the
+a context $ x $, the classifier would predict a label $ y $ without taking in consideration any of the
 previous or forward labels. This would be the discriminative analogue to the Naive Bayes model. However, 
-the independence assumption is too restrictive for most language related tasks. Maximum Entropy
-Markov Models (MEMM) try to overcome this problem by incorporating the insights obtained from Hidden Markov
-Models into the Maximum Entropy Models while preserving the flexibility of discriminative models.
+the independence assumption is too restrictive for most language related tasks. 
 
-
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=0.75\textwidth]{img/memm}
-  \caption{HMM VS MEMM}
-  \label{fig:memm}
-\end{figure}
-
-In MEMMs, we assume that the label probabilities are connected in a Markov Chain like in a HMM. However,
-in HMMs we have transition probabilities $ P(Y_t|Y_{t-1}) $ and emission probabilities $ P(X_t|Y_t) $,
-but in MEMMs we have a single transition function $ P(Y_t | Y_{t-1}, X_t) $ that combines evidence from
-the previous state $ Y_{t-1} $ and the observations $ X_t $. Observe that, with this model we do not care
-about the probability of the observations $ X_t $ in contrast to generative models, that model the joint
-probability $ P(x, y) $. Because of this, the feature vector $ X_t $ may contain overlapping and 
-non-independent features since there is no independence assumption. 
-
-In MEMMs, we have $ |Y| $ transition functions $ P_{y'}(y|x) = P(y|y', x) $, each constituting a 
-different model that has the exponential form:
-
-\begin{equation}
-P_{y_{t-1}}(y_t|x_t) = \frac{1}{Z(y_{t-1}, x_t)} exp(\sum_i(\lambda_i f_i(y_{t-1}, x_t)))
-\end{equation}
-
-Where $ Z(y', x) $ is a partition function that guarantees that the distribution over the next 
-states $ s $ sums to one, starting from the previous state $ s' $. That is, each exponential
-function is normalized locally in the context of the defining state $ s' $. Like the exponential
-models described earlier, this form is a unique distribution that maximizes the entropy 
-and the likelihood subject to the constraints that the expected value of each feature in the learned 
-distribution agrees with the expected value in the training set, starting from state $ s' $.
-
-We can calculate the probability for a sequence of labels by chaining the transition probabilities:
-
-\begin{equation}
-P(y*| x*) = \prod_{i=1} P_{y_{i}}(y_i|y_{i-1}, x_i)
-\label{eq:sequence_memm}
-\end{equation}
-
-And the most probable sequence can be easily calculated with the Viterbi algorithm, as we did in HMMs.
-Originally, the maximum entropy/likelihood parameters for the MEMM were calculated with Generalized
-Iterative Scaling algorithm, but this method has fallen out of favor in face of gradient based 
-numerical optimization methods such as SGD. 
-It is also possible to perform parameter estimation with incomplete labels by employing a variation 
-of the Baum-Welch algorithm.
-
-MEMMs provide a more flexible approach to the problem of sequence labeling in comparison with 
-HMMs, however they suffer from the label bias problem. To understand the label bias problem,
-consider the case where we have a MEMM named entity classifier that aims to label person names
-and locations in a sentence.
-
-\begin{figure}
-\centering
-\begin{tikzpicture}[->,shorten >=1pt,auto,node distance=2.8cm]
-  \tikzstyle{every state}=[]
-
-  \node[state] (A)              {$ Name $};
-  \node[state] (B) [right of=A] {$ Word $};
-
-  \path (A) edge [loop above] node {0.3} (A)
-            edge [bend left]  node {0.7} (B)
-        (B) edge [bend left]  node {0.4} (A)
-            edge [loop above] node {0.6} (B);
-\end{tikzpicture}
-\caption{Graph describing the label bias problem.}
-\label{fig:markov_graph}
-\end{figure}
-
-INSERT HERE EXPLANATION OF LABEL BIAS PROBLEM FOR SEQUENCE LABELING
-
-% 10 sentences in corpus where 9 times Summer Harris is a person and 1 time it is a location
-% 10 sentences in corpus where 1 time  Summer Hall is a person and 9 times it is a location
-
-Conditional Random Fields solve the label bias problem by jointly decoding the entire 
-sequence of labels. That is, instead of normalizing the transition probabilities at each timestep as
-described in Equation~\ref{eq:sequence_memm}, we normalize the probabilities for the entire
-sequence of labels, that is:
+Linear Chain Conditional Random Fields relax this assumption by jointly decoding the entire 
+sequence of labels. That is, it normalizes the probabilities for the entire
+sequence of labels and the feature functions also take the previous label in consideration. 
+The CRF equation is very similar to the generic maximum entropy equation derived earlier. The only difference being
+the assumptions about the feature functions and the joint decoding of label sequences. 
+For a sequence of contexts $ X $ and labels $ Y $ with size $ n $ and $ k $ feature functions, the 
+linear chain conditional random field is defined by:
 
 \begin{eqnarray}
-P(Y|X) = \frac{1}{Z(x)} \prod_{t=1}^{T} exp \left( \sum_{k=1}^{K} \theta_k f_k(y_{t-1}, y_t, X) \right) \\
-Z(x) = \sum_{Y} \prod_{t=1}^{T} exp \left( \sum_{k=1}^{K} \theta_k f_k(y_{t-1}, y_t, x) \right)
+P(Y|X) = \frac{1}{Z(x)} \prod_{t=1}^{n} exp \left( \sum_{k=1}^{k} \theta_k f_k(y_{t-1}, y_t, X) \right) \\
+Z(x) = \sum_{Y'} \prod_{t=1}^{n} exp \left( \sum_{i=1}^{k} \theta_k f_k(y_{t-1}, y_t, X) \right)
 \end{eqnarray}
 
-The space of label combinations $ y' $ is huge $ |Y|^n $, being $ n $ the sequence length.
+Where $ Y' $ is the set of all possible label combinations with size $ n $. This is a huge 
+combinatorial space with $ |Y|^n $ combinations, where $ |Y| $ is the number of possible labels.
+But this quantity can be calculated efficiently with the sum-product algorithm, because of the assumptions 
+regarding the feature functions. The most likely label sequence can be calculated with the Viterbi 
+algorithm, as was the case for HMMs. A thorough analysis of Conditional Random Fields that is not restricted
+to Linear Chains is given in~\cite{Sutton2012}.
 
-VERY GOOD TUTORIAL ON CRFs: https://homepages.inf.ed.ac.uk/csutton/publications/crftut-fnt.pdf
+\subsection{Conclusion}
 
-which is a sum over all possible label assignments $ Y $. The partition function can be efficiently
-and exactly calculated with the sum-product algorithm. Parameter estimation is usually done through 
-negative log likelihood minimization. The function can be optimized with techniques suitable for other 
-maximum entropy models such as L-BFGS \cite{Liu1989}. The most likely label sequences can be decoded 
-with the Viterbi algorithm, as was the case for HMMs.
-
-CRFs are more general than HMMs because the transitions from $ y_{t-1} $ to $ y_{t} $ can depend 
-on the whole vector of observations $ X $. This flexibility of feature functions allows for a wide range of
-possibilities. 
-
-Recently, Maximum Entropy Markov Models and Conditional Random Fields have been largely replaced
-by neural network based models. However, Conditional Random Fields are still employed as the output 
-layer of complex neural architectures.
+CRFs are more general than HMMs, because the transitions from $ y_{t-1} $ to $ y_{t} $ can depend 
+on the whole vector of observations $ X $ instead of being independent from $ X $. This flexibility of 
+feature functions, and the fact that CRFs model the conditional probability instead of the joint
+probability allows for a wide range of possibilities. In general, CRFs have performed better than HMMs
+in sequence labeling problems, but recently, pure CRF models have been largely replaced by neural networks.
+However, CRFs are still employed as the output layer of complex neural architectures and the maximum
+entropy framework is of great relevance to Neural Networks.
 
 
 \section{Neural Networks}
 \label{sec:neural_networks}
 
 The recent upsurge in the popularity of neural networks owes to the increasing computational 
-capacity brought by Graphical Processing Units and discoveries such as Deep Belief Networks 
-(CITE HINTON) in 2006 Autoencoders(?) and LSTMs (CITE HOCHREITER) in 1997 that helped overcome 
+capacity brought by Graphical Processing Units and discoveries such as fast learning algorithm for 
+Deep Belief Networks by~\cite{Hinton2006}, and LSTMs by~\cite{Hochreiter1997} that helped overcome 
 the limitations of earlier neural architectures. Deep neural architectures established new state 
 of the art results for problems ranging from computer vision to speech recognition.
 
@@ -1666,14 +1606,12 @@ Neural networks are a family of classification algorithms that were vaguely insp
 functioning of the human brain. They consist of a weighted graph of
 artificial neurons, which are functions that receive an input from other neurons or from an input vector
 and produce an output according to their activations. Neural networks are a general framework that can
-encompass other machine learning approaches. For example, a single layer neural network with a softmax
-activation function is equivalent to a multinomial logistic classifier (PUT PICTURE HERE)
-Rosenblatt 1958). 
-
-% D. R. Cox. 1958. The regression analysis of binary sequences. Journal of the Royal Statistical Society, Series B (Methodological), 20(2):215¿242.
+encompass other machine learning approaches. For example, as proven by~\cite{Cox1958}, a single layer 
+neural network with a softmax activation function (a perceptron) is equivalent to the multinomial logistic 
+classifier, that we already explored in the previous section.
 
 An extension of the logistic classifier to a neural network with multiple layers can still be trained 
-the same way as the original model, that is, by minimizing the cross entropy. However, once we add multiple layers on top of
+the same way we trained the original model, that is, by minimizing the cross entropy. However, once we add multiple layers on top of
 the logistic classifier, the optimization problem no longer retains its convexity. This means that 
 numerical optimization methods can get trapped on local minima and miss the best set of parameters
 for the model. For a long time, this limitation hindered the development of neural architectures. Nonetheless, 
@@ -1683,14 +1621,14 @@ finding a local optimum solves the parameter estimation problem sufficiently wel
 methods such as adding momentum to gradients can help the optimization algorithm avoid being trapped.
 
 The topic of neural networks is incredibly vast and cannot be properly discussed in this
-dissertation. For a thorough view of the field consult (CITE BENGIO DEEP ARCHITECTURES FOR AI).
+dissertation. For a thorough view of the field, consult~\cite{Bengio2009}.
 
 In contrast to earlier probabilistic models that were more statistically oriented, many improvements 
 to neural networks derive from empirical results obtained in specific applications. 
 In the probabilistic modelling of text, we are especially interested in the subclass of recurrent 
 neural networks (RNN).
 RNNs have been successfully employed on numerous NLP tasks such as
-language modelling, POS tagging, speech recognition and NER. In RNNs, some of the neuronal layer 
+language modelling, POS tagging, speech recognition and NER. In RNNs, some of the neural layer 
 activations become inputs to the same layer at the next timestep. Additionaly,
 different from feed-forward neural networks, RNNs can retain information in their internal state. 
 This characteristic can function as a memory cell, preserving long distance relationships across the chain,
@@ -1700,7 +1638,7 @@ timesteps.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.75\textwidth]{pics/rnn_network}
+  \includegraphics[width=0.5\textwidth]{pics/rnn_network}
   \caption{RNN for NER}
   \label{fig:rnn_network}
 \end{figure}
@@ -1714,10 +1652,10 @@ word embeddings or a combination of both.
 Finally, the RNN produces an output vector $ y_t $ representing the label for that 
 timestep. A common definition for an RNN cell is given by the equations:
 
-\begin{flalign*}
-h_t &= tanh(W_x x_t + W_h h_{t-1}) &\\
-y_t &= softmax(W_y h_t) &
-\end{flalign*}
+\begin{align*}
+h_t &= tanh(W_x x_t + W_h h_{t-1}) \\
+y_t &= softmax(W_y h_t)
+\end{align*}
 
 Where $ W_x $, $ W_h $ and $ W_y $ are weight matrices that can be trained with the 
 Backpropagation Through Time (BPTT) algorithm. On a sequence labeling task, $ W_y $ 
@@ -1729,11 +1667,15 @@ timestep, assuming independence between labels. Theoretically, RNNs are capable 
 and retaining long term dependencies with their internal state $ h_t $. However, in practice,
 it becomes difficult due to the vanishing gradient problem. 
 
-(INSERT EXPLANATION OF VANISHING GRADIENT PROBLEM HERE)
-
-Long short term memory networks (LSTM) were 
-introduced by Hochreiter and Schmidhuber \cite{Hochreiter1997} with this problem in mind and 
-have been popularized since then. 
+The vanishing gradient problem is one of the problems that we experience empirically that 
+constrain theoretically sound network designs. When training neural networks, the weight 
+updates are obtained from the partial derivatives of an error function 
+(e.g. the cross-entropy). As these error derivatives are propagated to higher layers with
+the chain rule, we have to multiply numbers that tend to get very small, so training becomes
+less effective. This problem is particularly critical for RNNs, because we have constantly 
+need to propagate weights through a relatively great number of timesteps.
+Long short term memory networks (LSTM) were by~\cite{Hochreiter1997} with this problem in mind and 
+they have been popularized since then. 
 
 LSTMs incorporate a memory cell $ c $ in the RNN definition and three gates to control 
 the flow of information that comes in and out of the memory cell.
@@ -1746,20 +1688,20 @@ our LSTM cell is provided in Figure~\ref{fig:lstm_cell}.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.75\textwidth]{pics/lstm_cell}
+  \includegraphics[width=0.5\textwidth]{pics/lstm_cell}
   \caption{LSTM Cell}
   \label{fig:lstm_cell}
 \end{figure}
 
 The equations for the LSTM cell are:
 
-\begin{flalign*}
-\Gamma_{i} &= \sigma(W_i \cdot [x_t,h_{t-1}] + b_i) &\\
-\Gamma_{f} &= \sigma(W_f \cdot [x_t,h_{t-1}] + b_f) &\\ 
-\Gamma_{o} &= \sigma(W_o \cdot [x_{t},h_{t-1}] + b_o) &\\
-c_t        &= \Gamma_{f} \ast c_{t-1} + \Gamma_{i} \ast tanh(W_c \cdot [x_{t},h_{t-1}] + b_c) &\\
-h_t        &= \Gamma_{o} \ast tanh(c_t) &
-\end{flalign*}
+\begin{align*}
+\Gamma_{i} &= \sigma(W_i \cdot [x_t,h_{t-1}] + b_i) \\
+\Gamma_{f} &= \sigma(W_f \cdot [x_t,h_{t-1}] + b_f) \\ 
+\Gamma_{o} &= \sigma(W_o \cdot [x_{t},h_{t-1}] + b_o) \\
+c_t        &= \Gamma_{f} \ast c_{t-1} + \Gamma_{i} \ast tanh(W_c \cdot [x_{t},h_{t-1}] + b_c) \\
+h_t        &= \Gamma_{o} \ast tanh(c_t)
+\end{align*}
 
 Where $ \sigma $ is the logistic sigmoid function. $ \Gamma_i $, $ \Gamma_f $, and $ \Gamma_o $ are the input,
 forget and output gates, respectively, and $ W_i $, $ W_f $, $ W_o $ are the weight 
@@ -1770,11 +1712,6 @@ $ x_{t} $ and the hidden vector from a previous timestep $ h_{t-1} $. Finally,
 $ A \ast B $ represents the element-wise multiplication of matrices $ A $ and $ B $
 and $ A \cdot B $ represents the dot product of $ A $ and $ B $.
 
-This implementation differs from the LSTM cell described in Huang et al. \cite{Huang2015}
-in that the gates $ \Gamma_i $ and $ \Gamma_f $ do not receive inputs from the previous 
-cell state $ c_{t-1} $ and the output gate $ \Gamma_{o} $ does not receive inputs from the current cell 
-state $ c_{t} $. This variation produces little difference in terms of model accuracy on
-the performed task, but it reduces model complexity.
 
 \subsection{BI-LSTM-CRF}
 \label{sssec:lstm_crf}
@@ -1788,17 +1725,16 @@ networks can then be concatenated at each timestep to produce output labels. Wit
 architecture, LSTM cells may use information from past and future timesteps to decide 
 the label at time $ t $.
 
-Huang et al. \cite{Huang2015} proposed a bidirectional LSTM with a CRF layer (BI-LSTM-CRF) on 
+\cite{Huang2015} proposed a bidirectional LSTM with a CRF layer (BI-LSTM-CRF) on 
 the output to tackle the sequence tagging problem. The main benefit of adding a CRF layer 
 in the neural sequence model is that the labels are jointly decoded for a whole sentence 
-instead of being predicted individually. Another possibility would be to use a beam search
-decoder to find an optimal sequence of labels. Predicted tags should be highly correlated 
+instead of being predicted individually. Predicted tags should be highly correlated 
 in a named entity recognition task, so it is desirable to predict sequences conjointly.
 The BI-LSTM-CRF is described in Figure~\ref{fig:bi_lstm_crf}.
 
 \begin{figure}[h]
   \centering
-  \includegraphics[width=0.75\textwidth]{pics/bi_lstm_crf}
+  \includegraphics[width=0.5\textwidth]{pics/bi_lstm_crf}
   \caption{Bidirectional LSTM-CRF}
   \label{fig:bi_lstm_crf}
 \end{figure}
@@ -1806,60 +1742,7 @@ The BI-LSTM-CRF is described in Figure~\ref{fig:bi_lstm_crf}.
 This architecture achieved an F1 score of 90.10 on the English data from the CoNLL-2003 
 NER shared task \cite{Sang2003}, in contrast to 85.17 for a bidirectional LSTM without 
 a CRF layer. 
-In our experiments, the LSTM-CRF architecture uses a bidirectional LSTM with 100 
-hidden states, no peepholes and input and output dropout layers with a dropout
-rate of 0.5. The dropout layers have proven to be very important to prevent overfitting 
-and allow better generalization.
 
-\subsection{CNN character representations}
-\label{sssec:lstm_crf_cnn}
-
-Ma and Hovy \cite{Ma2016} proposed to add a convolutional neural network (CNN) layer 
-on top of a bidirectional LSTM-CRF to encode character-level information. The CNN
-layer is described visually in Figure \ref{fig:cnn}.
-
-\begin{figure}[h]
-  \centering
-	  \includegraphics[width=0.75\textwidth]{pics/cnn}
-  \caption{CNN based character representations}
-  \label{fig:cnn}
-\end{figure}
-
-The convolutional neural network receives character embeddings as inputs. The character 
-representations generated by the CNN are combined with word level representations 
-and fed to the BI-LSTM-CRF described in section \ref{sssec:lstm_crf}.
-This architecture can learn morphological features that are very
-useful in the NER task, since similar named entities often present morphological similarities. 
-This architecture obtained an F1 score of 91.21 in the CoNLL2003 dataset. In our experiments, 
-the LSTM-CRF architecture with CNN character representations uses a one dimensional convolutional 
-neural network with 30 filters and a window size of three characters on top of the LSTM-CRF 
-architecture. The character embeddings fed to the CNN have 30 dimensions that are randomly 
-initialized.
-
-\subsection{LSTM character representations}
-
-Lample et al \cite{Lample2016} proposed to use a bidirectional LSTM to model character-level 
-representations on top of a BI-LSTM-CRF. Combining the forward and backward LSTM hidden states 
-to form the character representation, as described in Figure~\ref{fig:lstm_char}. 
-
-\begin{figure}[h]
-  \centering
-  \includegraphics[width=0.75\textwidth]{pics/lstm_char_representations}
-  \caption{LSTM based character representations}
-  \label{fig:lstm_char}
-\end{figure}
-
-This character representation is also combined with a word 
-representation and fed to a BI-LSTM-CRF network. 
-The forward state is expected to be a better representation of the suffix of 
-a token, and the backward state is expected to be a better representation of 
-the prefix of a token. This differentiates the architecture
-from the CNN based approach described in Section~\ref{sssec:lstm_crf_cnn}, because CNN filters 
-discover positional invariant features, while LSTMs can better represent 
-suffixes and prefixes. In our experiments, 
-the LSTM-CRF architecture with LSTM character representations was implemented with a bidirectional 
-LSTM with 25 hidden states, producing character representations of 
-size 50. The character embeddings have 30 dimensions that are randomly initialized.
 
 \subsection{Word Embeddings}
 
@@ -1869,20 +1752,21 @@ continuous space. That is, each word is represented by a vector of continuous fe
 often obtained with unsupervised clustering methods for words in large corpora. In comparison, one-hot encoded word 
 vectors, that were popular before the introduction of word embeddings, are vectors with one dimension per 
 word in the vocabulary (tipically a few hundred thousand dimensions) with 
-zeros in all positions except for the index relative to that word. Figure~\ref{fig:word_embeddings} 
-describes the difference between these two types of encodings. 
+zeros in all positions except for the index relative to that word. 
 
-There are many advantages to the use of word embeddings relative to other encodings. First, 
+There are many advantages to the use of word embeddings relative to one-hot encodings. First, 
 the number of weights learned by the sequence model is smaller because of the dimensionality
 reduction. Second, the mapping of words into feature vectors makes possible the comparison of similarity 
-between words according to their shared features. Finally, and most importantly, word embeddings 
+between words according to their shared features. Finally, word embeddings 
 can be pretrained without supervision on large corpora and be used on tasks for which there is 
-little labeled data. Pretrained word embeddings are a powerful form of transfer learning, what 
-means bootstrapping the learning of model parameters by first training it on a bigger dataset. 
-This is especially useful to the named entity recognition task, because named entitities that 
+little labeled data. 
+
+Pretrained word embeddings are a powerful form of transfer learning, bootstrapping the learning 
+of model parameters by first training it on a bigger dataset. 
+This is especially useful in NER, because named entities that 
 belong to the same class tend to have similar word embeddings. Thus, with good word embeddings, 
-a neural network can predict the correct label for a word that was never seen in training
-because of its similarity to other words that occurred in the training set.
+a neural network can predict the correct label for a word that was never seen during training
+because it is similar to other words that occurred in the training set.
 
 Pretrained word embeddings can also be further improved by fine tuning the feature values in the 
 specific problem of sequence labeling, by allowing backpropagation to alter the embeddings. However, 
@@ -1891,19 +1775,20 @@ noise to the word representations instead of improving the word representations.
 
 There are multiple methods that produce word embeddings, and most of the official implementations 
 also provide pretrained word embeddings for the English language. In this work, we explored
-three sets of pretrained embeddings: Word2Vec, Glove and Elmo (CITE HERE). A brief description 
-of these models is provided in Table~\ref{tab:word_embeddings}.
+three sets of pretrained embeddings: Word2Vec~\cite{Mikolov2013}, GloVe~\cite{Pennington2014} and 
+ELMo~\cite{Peters2018}. The characteristics of each set of embeddings is given in 
+Table~\ref{tab:word_embeddings}.
 
 \begin{table}[h]
   \small
   \begin{center}
-    \begin{tabular}{ ll }
+    \begin{tabular}{ lllll }
       \toprule
-      Model & Description \\
+      Model & Dimensions & Training Set & Tokens (billions) & Vocab. \\
       \midrule
-      Word2Vec & Regular HMM \\
-      Glove    & HMM with $ k=2 $ \\
-      Elmo     & HMM with $ k=3 $ \\
+      Word2Vec & 300 & Google News & 100 & 3M   \\
+      GloVe    & 300 & Gigaword5 + Wikipedia & 42 & 400K \\
+      ELMo     & 512 & Wikipedia & 5.5 & - \\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -1913,33 +1798,115 @@ of these models is provided in Table~\ref{tab:word_embeddings}.
 
 Most breakthroughs in sequence labeling tasks in the past few years came through the introduction
 of novel methods for constructing word embeddings. Different from earlier methods such as Word2Vec and
-Glove that produced static vectorial representations of words, more recent approaches such as
-Elmo and Bert produce context dependent embeddings for a specific dataset with a neural network 
-pretrained on a language modelling task. 
+GloVe that produced static vectorial representations of words, more recent approaches such as
+ELMo produce context dependent embeddings for a specific dataset with a neural network 
+pretrained on a language modelling task. Also, the word representations in ELMo are entirely character based,
+therefore there are no out-of-vocabulary words.
 
-As word embedding and language modelling methods become more sophisticated, it comes to mind
-if the complexity is entirely justifiable. 
+% As word embedding and language modelling methods become more sophisticated, it comes to mind
+% if the complexity is entirely justifiable. 
 % https://d4mucfpksywv.cloudfront.net/better-language-models/language_models_are_unsupervised_multitask_learners.pdf
 % https://openai.com/blog/better-language-models/
 
 
-\subsection{Technical Concerns}
+\subsection{Character representations}
+
+When devising deep neural architectures, one of the main objectives is to make the 
+neural network discover useful features by itself instead of feeding it with what
+we think is relevant. In NER, morphological features are very useful to classify
+named entities. For example, knowing that the first character in a word is capitalized
+means that it has a higher chance of being a proper name. We can add a character 
+representation layer at the bottom of the Bi-LSTM-CRF to extract these morphological
+features automatically. This way, we construct character representations, which are
+fixed size morphological feature vectors, and concatenate them to the feature vectors $ x_t $
+that were already being fed to the LSTMs. 
+
+We describe below two methods to build character representations. Both of them receive 
+character embeddings as inputs. Character embeddings are fixed size dense vectors that work
+the same way as word embeddings, except that the lookup function maps characters to embeddings
+instead of words to embeddings. This means that each word generates a character embedding 
+matrix with size $ |W| \times |C| $, where $ |W| $ is the word length and $ |C| $ is the 
+character embedding size (determined experimentally). Also, the character embeddings are 
+trained in the target dataset instead of being trained in a larger corpus, since the vocabulary 
+size is much smaller than in the case of word embeddings.
+
+
+\subsubsection{CNN method}
+\label{sssec:lstm_crf_cnn}
+
+The CNN method proposed by~\cite{Ma2016} adds a convolutional neural network (CNN) layer 
+on top of a bidirectional LSTM-CRF to encode character-level information. The CNN
+layer is described visually in Figure \ref{fig:cnn}.
+
+\begin{figure}[h]
+  \centering
+	  \includegraphics[width=0.5\textwidth]{pics/cnn}
+  \caption{CNN based character representations.}
+  \label{fig:cnn}
+\end{figure}
+
+The convolutional neural network receives character embeddings as inputs and extracts
+morphological features by sliding one dimensional filters over the sequence of characters 
+and collapsing the filter outputs with a max pooling layer, producing a character
+representation with a size determined by the number of filters. This means, that when a filter 
+gets a good match at any position in the sequence, the max pooling layer output relative to that 
+filter will be triggered, therefore this type of character representation detects position
+invariant morphological features.
+
+
+\subsubsection{LSTM character representations}
+
+The LSTM method proposed by~\cite{Lample2016} models character-level 
+representations on top of a Bi-LSTM-CRF similar to the one described in 
+Figure~\ref{fig:bi_lstm_crf}, however instead of receiving words, it receives
+sequences of character embeddings, then it combines the forward and backward 
+LSTM hidden states to form the character representation, as described in 
+Figure~\ref{fig:lstm_char}. 
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{pics/lstm_char_representations}
+  \caption{LSTM based character representations}
+  \label{fig:lstm_char}
+\end{figure}
+
+The forward state is expected to be a better representation of the suffix of 
+a token, and the backward state is expected to be a better representation of 
+the prefix of a token. This differentiates the architecture
+from the CNN method, because CNN filters discover positional invariant features, 
+while LSTMs can better represent suffixes and prefixes. 
+
+
+\subsection{Conclusion}
 
 Eventhough word embeddings and character representations can make up for the feature engineering 
 that was required by earlier statistical approaches to sequence labeling, there are still some
 technical concerns to be faced that require quite a bit of engineering. The loss functions that need
 to be optimized by our neural architectures is not convex, therefore the choice of the optimization 
-function can impact the resulting set of parameters for our model as well as the parameter choice 
-such as the learning rate for these functions. Neural networks are also prone
-to overfitting, what can be partially avoided with the addition of dropout layers (CITE HERE)
-or with the early stopping strategy over a validation dataset \cite{Caruana2000}. 
+function can impact the resulting set of parameters for our model as well as the hyperparameter choice 
+for these functions. Neural networks are also prone
+to overfitting, what can be partially avoided with the addition of dropout layers as in~\cite{Srivastava2014}
+or with the early stopping strategy over a validation dataset as in~\cite{Caruana2000}. 
 
 Another difficulty in training neural networks comes from the training time required for convergence
 to a good set of parameters. This sometimes requires the employment of expensive hardware,
-layer normalization https://arxiv.org/pdf/1607.06450.pdf and parallelization strategies. All of this
-adds into the complexity, hardware cost and training cost of our models, many times providing only slight 
-improvements over simpler approaches. This is not to say that simple models are preferable, but depending
-on the task, deep neural architectures may be an over expensive approach.
+layer normalization and parallelization strategies. All of this adds into the complexity, hardware cost 
+and training cost of our models, many times providing only slight 
+improvements over simpler approaches. 
+
+
+\section{Summary}
+
+In this chapter we introduced multiple models for sequence labeling and, particularly,
+NER. In Section~\ref{sec:hmm}, we presented Hidden Markov Models, a generative model for 
+sequence labeling that can be derived with probability theory if we consider that
+text has the properties of a Markov sequence. In Section~\ref{sec:crf}, we discussed
+Conditional Random Fields, a discriminative analogue to HMMs that relaxes some 
+assumptions made by HMMs and allows the usage of overlapping feature functions in
+context vectors. Finally, in Section~\ref{sec:neural_networks}, we discussed Neural Networks
+for sequence labeling, the state-of-the-art approach. Contrasting with the earlier statistical
+approaches, neural models are more empirically oriented and much more complex in terms of
+the number of parameters and the time required for convergence during training.
 
 
 \chapter{Sequence Labeling on HTML}

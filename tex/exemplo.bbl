@@ -49,6 +49,21 @@
   {41}({\ppgccnumberdoformat {1}}):\ppgccpagedoformat {164}-\ppgccpagedoformat
   {}-\ppgccpagedoformat {171}.
 
+\bibitem[Bengio, 2009]{Bengio2009}
+\ppgccbibauthordoformat {Bengio, Y.} (\ppgccyeardoformat {2009}).
+\newblock \ppgccbibtitledoformat {Learning deep architectures for ai}.
+\newblock \ppgccbibjournaldoformat {Found. Trends Mach. Learn.},
+  \ppgccvolumedoformat {2}({\ppgccnumberdoformat {1}}):\ppgccpagedoformat
+  {1}-\ppgccpagedoformat {}-\ppgccpagedoformat {127}.
+\newblock ISSN \ppgccissndoformat {1935-8237}.
+
+\bibitem[Brown, 1986]{Brown1986}
+\ppgccbibauthordoformat {Brown, L.~D.} (\ppgccyeardoformat {1986}).
+\newblock \ppgccbibbtitledoformat {Fundamentals of Statistical Exponential
+  Families: With Applications in Statistical Decision Theory}.
+\newblock Institute of Mathematical Statistics, Hayworth, CA, USA.
+\newblock ISBN \ppgccissndoformat {0-940-60010-2}.
+
 \bibitem[Califf \ppgccciteauthorand {} Mooney, 1999]{Califf1999}
 \ppgccbibauthordoformat {Califf, M.~E. \ppgccbibauthorand {} Mooney, R.~J.}
   (\ppgccyeardoformat {1999}).
@@ -120,6 +135,15 @@
   {12}:\ppgccpagedoformat {2493}-\ppgccpagedoformat {}-\ppgccpagedoformat
   {2537}.
 \newblock ISSN \ppgccissndoformat {1532-4435}.
+
+\bibitem[Cox, 1958]{Cox1958}
+\ppgccbibauthordoformat {Cox, D.~R.} (\ppgccyeardoformat {1958}).
+\newblock \ppgccbibtitledoformat {The regression analysis of binary sequences}.
+\newblock \ppgccbibjournaldoformat {Journal of the Royal Statistical Society.
+  Series B (Methodological)}, \ppgccvolumedoformat {20}({\ppgccnumberdoformat
+  {2}}):\ppgccpagedoformat {215}-\ppgccpagedoformat {}-\ppgccpagedoformat
+  {242}.
+\newblock ISSN \ppgccissndoformat {00359246}.
 
 \bibitem[Crescenzi et~al.\@, 2001]{Crescenzi2001}
 \ppgccbibauthordoformat {Crescenzi, V.\ppgccbibauthorsep {} Mecca,
@@ -251,6 +275,17 @@
   \ppgccbibpagesstring {} \ppgccpagedoformat {1}-\ppgccpagedoformat
   {}-\ppgccpagedoformat {8}.
 
+\bibitem[Hinton et~al.\@, 2006]{Hinton2006}
+\ppgccbibauthordoformat {Hinton, G.~E.\ppgccbibauthorsep {} Osindero,
+  S.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Teh, Y.-W.}
+  (\ppgccyeardoformat {2006}).
+\newblock \ppgccbibtitledoformat {A fast learning algorithm for deep belief
+  nets}.
+\newblock \ppgccbibjournaldoformat {Neural Comput.}, \ppgccvolumedoformat
+  {18}({\ppgccnumberdoformat {7}}):\ppgccpagedoformat {1527}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {1554}.
+\newblock ISSN \ppgccissndoformat {0899-7667}.
+
 \bibitem[Hirsch, 2005]{Hirsch2005}
 \ppgccbibauthordoformat {Hirsch, J.~E.} (\ppgccyeardoformat {2005}).
 \newblock \ppgccbibtitledoformat {{An index to quantify an individual's
@@ -305,6 +340,14 @@
   tagging}.
 \newblock \ppgccbibjournaldoformat {CoRR}, \ppgccvolumedoformat
   {abs/1508.01991}.
+
+\bibitem[Jaynes, 1957]{Jaynes1957}
+\ppgccbibauthordoformat {Jaynes, E.~T.} (\ppgccyeardoformat {1957}).
+\newblock \ppgccbibtitledoformat {Information theory and statistical
+  mechanics}.
+\newblock \ppgccbibjournaldoformat {Phys. Rev.}, \ppgccvolumedoformat
+  {106}:\ppgccpagedoformat {620}-\ppgccpagedoformat {}-\ppgccpagedoformat
+  {630}.
 
 \bibitem[Katiyar \ppgccciteauthorand {} Cardie, 2018]{Katyar2018}
 \ppgccbibauthordoformat {Katiyar, A. \ppgccbibauthorand {} Cardie, C.}
@@ -389,15 +432,6 @@
 \newblock \ppgccbibtitledoformat {Information extraction using hidden markov
   models}.
 
-\bibitem[Liu \ppgccciteauthorand {} Nocedal, 1989]{Liu1989}
-\ppgccbibauthordoformat {Liu, D.~C. \ppgccbibauthorand {} Nocedal, J.}
-  (\ppgccyeardoformat {1989}).
-\newblock \ppgccbibtitledoformat {On the limited memory bfgs method for large
-  scale optimization}.
-\newblock \ppgccbibjournaldoformat {Mathematical Programming},
-  \ppgccvolumedoformat {45}({\ppgccnumberdoformat {1}}):\ppgccpagedoformat
-  {503}-\ppgccpagedoformat {}-\ppgccpagedoformat {528}.
-
 \bibitem[Liu et~al.\@, 2000]{Liu2000}
 \ppgccbibauthordoformat {Liu, L.\ppgccbibauthorsep {} Pu,
   C.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Han, W.}
@@ -468,6 +502,23 @@
 \newblock \ppgccbibjournaldoformat {Proc. of the Third Annual Conf. on
   Autonomous Agents, ACM}, \ppgccbibpagesstring {} \ppgccpagedoformat
   {190}-\ppgccpagedoformat {}-\ppgccpagedoformat {197}.
+
+\bibitem[Pennington et~al.\@, 2014]{Pennington2014}
+\ppgccbibauthordoformat {Pennington, J.\ppgccbibauthorsep {} Socher,
+  R.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Manning, C.~D.}
+  (\ppgccyeardoformat {2014}).
+\newblock \ppgccbibtitledoformat {Glove: Global vectors for word
+  representation}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {In EMNLP}.
+
+\bibitem[Peters et~al.\@, 2018]{Peters2018}
+\ppgccbibauthordoformat {Peters, M.~E.\ppgccbibauthorsep {} Neumann,
+  M.\ppgccbibauthorsep {} Iyyer, M.\ppgccbibauthorsep {} Gardner,
+  M.\ppgccbibauthorsep {} Clark, C.\ppgccbibauthorsep {} Lee,
+  K.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Zettlemoyer, L.}
+  (\ppgccyeardoformat {2018}).
+\newblock \ppgccbibtitledoformat {Deep contextualized word representations}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proc. of NAACL}.
 
 \bibitem[Rabiner, 1990]{Rabiner1990}
 \ppgccbibauthordoformat {Rabiner, L.~R.} (\ppgccyeardoformat {1990}).
@@ -544,6 +595,13 @@
   {562}-\ppgccpagedoformat {}-\ppgccpagedoformat {}-\ppgccpagedoformat
   {}-\ppgccpagedoformat {567}.
 
+\bibitem[Shannon, 1948]{Shannon1948}
+\ppgccbibauthordoformat {Shannon, C.~E.} (\ppgccyeardoformat {1948}).
+\newblock \ppgccbibtitledoformat {A mathematical theory of communication}.
+\newblock \ppgccbibjournaldoformat {The Bell System Technical Journal},
+  \ppgccvolumedoformat {27}({\ppgccnumberdoformat {3}}):\ppgccpagedoformat
+  {379}-\ppgccpagedoformat {}-\ppgccpagedoformat {423}.
+
 \bibitem[Shi et~al.\@, 2015]{Shi2015}
 \ppgccbibauthordoformat {Shi, S.\ppgccbibauthorsep {} Liu, C.\ppgccbibauthorsep
   {} Shen, Y.\ppgccbibauthorsep {} Yuan, C.\ppgccbibauthorlastsep {}
@@ -564,6 +622,17 @@
   {}-\ppgccpagedoformat {272}.
 \newblock ISSN \ppgccissndoformat {0885-6125}.
 
+\bibitem[Srivastava et~al.\@, 2014]{Srivastava2014}
+\ppgccbibauthordoformat {Srivastava, N.\ppgccbibauthorsep {} Hinton,
+  G.\ppgccbibauthorsep {} Krizhevsky, A.\ppgccbibauthorsep {} Sutskever,
+  I.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Salakhutdinov, R.}
+  (\ppgccyeardoformat {2014}).
+\newblock \ppgccbibtitledoformat {Dropout: A simple way to prevent neural
+  networks from overfitting}.
+\newblock \ppgccbibjournaldoformat {Journal of Machine Learning Research},
+  \ppgccvolumedoformat {15}:\ppgccpagedoformat {1929}--\ppgccpagedoformat
+  {1958}.
+
 \bibitem[Sundheim, 1991]{Sundheim1991}
 \ppgccbibauthordoformat {Sundheim, B.~M.} (\ppgccyeardoformat {1991}).
 \newblock \ppgccbibtitledoformat {Overview of the third message understanding
@@ -572,6 +641,16 @@
   3rd Conference on Message Understanding}, MUC3 '91, \ppgccbibpagesstring {}
   \ppgccpagedoformat {3}-\ppgccpagedoformat {}-\ppgccpagedoformat {16},
   Stroudsburg, PA, USA. Association for Computational Linguistics.
+
+\bibitem[Sutton \ppgccciteauthorand {} McCallum, 2012]{Sutton2012}
+\ppgccbibauthordoformat {Sutton, C. \ppgccbibauthorand {} McCallum, A.}
+  (\ppgccyeardoformat {2012}).
+\newblock \ppgccbibtitledoformat {An introduction to conditional random
+  fields}.
+\newblock \ppgccbibjournaldoformat {Found. Trends Mach. Learn.},
+  \ppgccvolumedoformat {4}({\ppgccnumberdoformat {4}}):\ppgccpagedoformat
+  {267}-\ppgccpagedoformat {}-\ppgccpagedoformat {373}.
+\newblock ISSN \ppgccissndoformat {1935-8237}.
 
 \bibitem[Tjong Kim~Sang \ppgccciteauthorand {} De~Meulder, 2003a]{KimSang2003}
 \ppgccbibauthordoformat {Tjong Kim~Sang, E.~F. \ppgccbibauthorand {}

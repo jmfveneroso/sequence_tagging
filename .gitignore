@@ -14,3 +14,9 @@ imdb.pkl
 **/*.swp
 **/*.swo
 tex/*.pdf
+tex/*.aux
+tex/*.lof
+tex/*.log
+tex/*.lot
+tex/*.out
+tex/*.toc
