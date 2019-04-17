@@ -197,20 +197,11 @@ tune them for specific extraction tasks. Taking this in consideration, we want t
 the best \textit{NER} methods for a specific task, but trying to derive general conclusions
 about their expected performance in other similar tasks.
 
-\section{Objectives}
+\section{Objective}
 
-The main objectives of this dissertation are:
-
-\begin{itemize}
-
-\item \textbf{Objective 1}: To find the best NER method for HTML considering the researcher 
-name extraction task, in terms of its Precision, Recall and F1-score in a dataset designed
-with this purpose in mind.
-
-\item \textbf{Objective 2}: To evaluate different sequence labeling methods for HTML
-and understand their advantages and limitations in a qualitative sense.
-
-\end{itemize}
+The main objective of this dissertation is to find the best NER method for the web
+in terms of its Precision, Recall, and F-scores in the researcher name extraction task,
+and its overall complexity and flexibility.
 
 
 \section{Contributions}
@@ -631,8 +622,9 @@ to the CoNLL-2003 data format. That is, one word per line with empty lines repre
 sentence boundaries. Sentence boundaries were determined by line break HTML tags
 (div, p, table, li, br, etc.) in contrast to inline tags (span, em, a, td, etc.). 
 Sentences that were more than fifty tokens long were also split according to the
-punctuation. The algorithm used for sentence segmentation is described in
-Appendix~\ref{app:html_segmenter}.
+punctuation. 
+% The algorithm used for sentence segmentation is described in
+% Appendix~\ref{app:html_segmenter}.
 
 A proper HTML segmenter poses many challenges by itself. We wanted to evaluate 
 models without relying on any sophisticated data record segmentation system.
@@ -764,6 +756,7 @@ with the formula:
 
 \begin{equation}
 F_{\beta} = (1 + \beta^2) \cdot \frac{\text{Precision} \cdot \text{Recall}}{(\beta^2 \cdot \text{Precision}) + \text{Recall}}
+\label{eq:fscore_formula}
 \end{equation}
 
 The choice for $ \beta $ depends on the relative importance attributed to the Precision and Recall measures.
@@ -1331,6 +1324,7 @@ to one, we will find that:
 
 \begin{equation}
 \hat{\mu}_{c, d} = \frac{\eta'_{c, d}}{\sum_{d'}\eta'_{c, d'}}
+\label{eq:mle_words}
 \end{equation}
 
 This is the expected number of times that we observe word $ d $ when we were at the hidden state $ c $. 
@@ -1831,7 +1825,7 @@ trained in the target dataset instead of being trained in a larger corpus, since
 size is much smaller than in the case of word embeddings.
 
 
-\subsubsection{CNN method}
+\subsubsection{CNN character representations}
 \label{sssec:lstm_crf_cnn}
 
 The CNN method proposed by~\cite{Ma2016} adds a convolutional neural network (CNN) layer 
@@ -1841,7 +1835,7 @@ layer is described visually in Figure \ref{fig:cnn}.
 \begin{figure}[h]
   \centering
 	  \includegraphics[width=0.5\textwidth]{pics/cnn}
-  \caption{CNN based character representations.}
+  \caption{CNN-based character representations.}
   \label{fig:cnn}
 \end{figure}
 
@@ -1866,7 +1860,7 @@ Figure~\ref{fig:lstm_char}.
 \begin{figure}[h]
   \centering
   \includegraphics[width=0.5\textwidth]{pics/lstm_char_representations}
-  \caption{LSTM based character representations}
+  \caption{LSTM-based character representations}
   \label{fig:lstm_char}
 \end{figure}
 
@@ -1909,68 +1903,91 @@ approaches, neural models are more empirically oriented and much more complex in
 the number of parameters and the time required for convergence during training.
 
 
-\chapter{Sequence Labeling on HTML}
+\chapter{Sequence Labeling on the Web}
 
-Up to this point, we have discussed sequence models that can be generally employed in 
-many natural language tasks and also in other similar scenarios. However, there are
-specificities related to the HTML structure and the problem of named entity  extraction 
-on HTML that can be explored to allow further improvement at the researcher name extraction
-task.
+In the last chapter, we discussed sequence models that can be generally employed in 
+a diverse range of natural language processing tasks. However, there are some specificities 
+to the problem of sequence labeing on the web that can be explored to allow further improvement 
+of our models. In Section~\ref{sec:self_training}, we introduce the self-training strategy
+for Hidden Markov Models. In Section~\ref{sec:attention_models}, we introduce two attention models
+to incorporate HTML structural information in our neural sequence taggers. In
+Section~\ref{sec:fscore_optimization}, we propose a new optimization objective for neural 
+networks trained for sequence labeling tasks.
 
-\section{Self training for Hidden Markov Models} 
+
+\section{Self-Training for Hidden Markov Models} 
 \label{sec:self_training}
 
-As described on Section~\ref{sec:hmm}. The simplest conceivable Hidden Markov Model 
+As described in Section~\ref{sec:hmm}. The simplest conceivable Hidden Markov Model 
 for the sequence labeling on HTML task is a generative classifier that has the form:
 
 \begin{equation}
-P(X,Y) \propto \prod_{i=1}^n P(X_i|Y_i) P(Y_i, Y_{i-1})
+P(X,Y) \propto \prod_{i=1}^n P(x_i|y_i) P(y_i, y_{i-1})
 \end{equation}
 
-Where $ X $ is a sequence of words and $ Y $ is a sequence of labels, each with size $ n $.
-This means we need to estimate the probabilities:
+Where $ X $ is a sequence of words and $ Y $ is a sequence of labels, both with size $ n $,
+and the initial probabilities $ P(y_1|y_0) $ are uniform across all label assignments.
+To construct this model from the data, we need to estimate the probabilities:
 
 \begin{itemize}
-  \item $ P(X_i|Y_i) $: the emission probabilities of word $ X_i $ given label $ Y_i $
-  \item $ P(Y_i|Y_{i-1}) $: the transition probabilities of goind from label $ Y_{i-1} $ to label $ Y_i $
+  \item $ P(x_i|y_i) $: the emission probability of word $ x_i $ given label $ y_i $.
+  \item $ P(y_i|y_{i-1}) $: the transition probability of going to label $ y_i $ from label $ y_{i-1} $.
 \end{itemize}
 
-Surely, we may consider $ X_i $ to be a feature vector $ X_i = \{ f_{i,1}, f_{i,2}, ..., f_{i,k} \} $
-as long as all the features are independent. That is:
+We may consider $ x_i $ to be a binary feature vector $ x_i = \{ f_{i,1}, f_{i,2}, ..., f_{i,k} \} $
+as long as all the feature distributions are independent, conditioned on $ y_i $. That is:
 
 \begin{equation}
-P(X_i|Y_i) = P(f_{i,1}, f_{i,2}, ..., f_{i,k}|Y_i) = \prod_{j=1}^k P(f_j|Y_i)
+P(x_i|y_i) = P(f_{i,1}, f_{i,2}, ..., f_{i,k}|y_i) = \prod_{j=1}^k P(f_{i,j}|y_i)
 \end{equation}
 
-With this assumption, we can estimate parameters as described by the equations in Section~\ref{sec:hmm} 
-(CITE SPECIFIC EQUATIONS). This approach yields consistent results, but if we try to use HTML features
-such as the HTML element encompassing a word or the CSS classes related to this element, we will find
-a problem. There is not much statistical similarity between the HTML structure in different web pages.
-What this means is that, only because a given named entity label occurs more often inside "<div>" tags
-in a page, that does not mean it is the case for most web pages. Consider for example a faculty web page 
-that shows researcher names in a table ("<td>" tags) in contrast to a web page that organizes researcher
-names in a list ("<li>" tags). If the first page is in our training set, the second page is in our test
-set and we use the HTML tag feature to predict the labels of researcher names we will probably get many
-wrong predictions.
+With this assumption, we can obtain the maximum likelihood estimators for feature parameters
+from their relative frequencies, just as we did in Section~\ref{sec:hmm} for single words 
+(Equation~\ref{eq:mle_words}). Then, for binary features:
 
+\begin{equation}
+\hat{P}(f_{i,j}=1|y_i=L) = \frac{\text{Count}(f_{*,j}=1, y_*=L)}
+{\text{Count}(f_{*,j}=0, y_*=L) + \text{Count}(f_{*,j}=1, y_*=L)}
+\label{eq:feature_mle}
+\end{equation}
+
+The $ * $ symbol means for every assignment of $ i $, because the probabilities are time invariant.
+This approach yields good experimental results for textual features such as the capitalization
+of a word, but if we try to use HTML structural features such as the HTML tags, we will find that
+they are not very useful, contradicting our intuition.
+The problem is that there is not much statistical similarity between the HTML structure in different web pages.
+For example, only because a named entity label occurs more often inside <div> tags
+in a page, that does not mean this is the case for most web pages. Consider for example a faculty web page 
+that shows researcher names in a table (<td> tags) in contrast to a web page that organizes researcher
+names in a list (<li> tags). If the first page is in our training set, and we use the HTML tag feature to 
+assign labels to the second page in our test set, we will probably get many wrong predictions.
 Nonetheless, the HTML features are not useless. Inside a single web page, the HTML tag is a good predictor
-for the label attributed to a word. A word's HTML context is a good predictor of its label. The question
-is how to incorporate this intution in the Hidden Markov Model.
+of the correct labels. Words with a similar HTML context tend to have similar labels. The question
+is how to obtain better parameter estimators for HTML features.
 
-Consider a set of textual features unrelated to the HTML structure $ F^T = \{ f^T_1, f^T_2, ..., f^T_m \} $
-a set of HTML features that are related to the HTML structure $ F^H = \{ f^H_1, f^H_2, ..., f^H_k \} $.
-Next, consider two HMMs $ \phi_1 $ and $ \phi_2 $, where $ \phi_1 $ incorporates only the textual
-features $ F^T $, while $ \phi_2 $ incorporates the whole set of features $ F^T \cup F^H $. Then,
-if $ \tilde{\phi_1} $ is the Hidden Markov Model with maximum likelihood parameters for a given training 
-set, we can estimate labels $ \tilde{Y} $ for the test set and approximate the probabilities 
-$ P(f^H_{i}|Y) $ by:
+Consider a set of $ m $ textual features unrelated to the HTML structure:
+
+\begin{equation*}
+F^T = \{ f^T_1, f^T_2, ..., f^T_m \}
+\end{equation*}
+
+And a set of $ k $ HTML features that are related to the HTML structure:
+
+\begin{equation*}
+F^H = \{ f^H_1, f^H_2, ..., f^H_k \}
+\end{equation*}
+
+Given a Hidden Markov Model $ H^T $ trained with only the first set of features $ F^T $,
+we can use $ H^T $ to predict the labels of an unlabeled document, and then we simply replace 
+the actual labels in Equation~\ref{eq:feature_mle} with the predicted labels $ \tilde{Y} $:
 
 \begin{equation}
-P(f^H_{i}|y) \approx MLE_{\tilde{y}} P(f^H_{i}|y)
+\hat{P}(f_{i,j}=1|y_i=L) = \frac{\text{Count}(f_{*,j}=1, \tilde{y}_*=L)}
+{\text{Count}(f_{*,j}=0, \tilde{y}_*=L) + \text{Count}(f_{*,j}=1, \tilde{y}_*=L)}
 \end{equation}
 
-Where $ MLE_{\tilde{y}} P(f^H_{i}|y) $ is the maximum likelihood estimator $ P(f^H_{i}|y $ considering 
-that the predicted labels for our test $ \tilde{y} $ set are the correct labels. This self training
+Next, we incorporate the estimators for the HTML feature probabilities in $ H^T $ and predict
+the final labels with the whole set of features $ F^T \cup F^H $. This self-training
 strategy can be implemented like this:
 
 \begin{itemize}
@@ -1981,45 +1998,52 @@ website and estimate HTML feature frequencies for this website alone.
 \item Recompute the labels now using the HTML feature probabilities.
 \end{itemize}
 
-With some effort, this strategy could be incorporated in the Baum-Welch algorithm, but this heuristic
-approach already yields a consistent improvement. In theory, this strategy could be used with any 
-sequence tagger, however retraining a classifier with new features can become prohibitively expensive
-depending on the algorithm being used. This strategy is only possible because the computation of HTML 
-feature frequencies can be performed very quickly. This adds very little overhead to the original HMM 
-and incorporates our intuition that HTML features are useful in sequence labeling tasks for HTML.
+This strategy could possibly be incorporated in the Baum-Welch algorithm, but this heuristic
+approach already yields a consistent improvement to sequence labeling on the web. In theory, this 
+strategy could be used with any sequence tagger, however retraining a classifier with new features can 
+become prohibitively expensive in the case of CRFs or neural networks. In HMMs, retraining the features
+is really fast, because we assume feature independence and the maximum likelihood estimator can be obtained
+with a simple closed form expression.
+
 
 \section{Attentions Models} 
+\label{sec:attention_models} 
 
 The self-training strategy for HMMs demonstrates a way to incorporate HTML features in 
 sequence models, however it is not clear how to apply the same intuition to neural 
 networks. Ultimately, we want the model to consider the predictions that it made for 
 words in similar HTML contexts when constructing the neural representation for the 
 current word in a sequence. A natural way to incorporate this intuition into the neural 
-architectures described in Chapter~\ref{cha:neural_networks} is with the use of 
-self attention mechanisms (https://papers.nips.cc/paper/7181-attention-is-all-you-need.pdf).
-Originally, attention mechanisms were developed with the goal of solving sentence alignement 
-for neural machine translation (https://arxiv.org/pdf/1409.0473.pdf), but since then it
-found other uses in Natural Language Processing. An attention mechanism is a way to combine
+architectures described in Section~\ref{sec:neural_networks} is with the use of 
+self-attention mechanisms, created by~\cite{Vaswani2017}.
+Originally, attention mechanisms were developed with the goal of solving sentence alignment 
+for neural machine translation in~\cite{Bahdanau2014}, but since then it
+found other uses in NLP. An attention mechanism is a way to combine
 inputs from multiple timesteps in a sequence to perform an operation at the current timestep.
-Figure~\ref{fig:attention} describes an attention mechanism that incorporates evidence from
-the whole sequence at time $ t $.
 
 In a LSTM-CRF model, the bidirectional LSTM layer produces output representations at each 
-timestep, producing a $ T \times H $ matrix $ \phi $, where $ T $ is the number of timesteps in the
+timestep, producing a $ T \times H $ matrix, where $ T $ is the number of timesteps in the
 sequence and $ H $ is the LSTM hidden layer size, which is defined arbitrarily (we omit
 the batch size in this matrix representation). If the sequence length in the dataset varies,
-we can simply pad the short sentences with zero vectors. In other words, the matrix $ \phi $ 
+we can simply pad the short sentences with zero vectors. In other words, this matrix
 constitutes a neural representation for a sentence with vectors of size $ H $ representing
 words at each timestep. In the original LSTM-CRF model without an attention layer, these
-neural representations would be passed directly as features to a linear chain conditional random
-fields decoder, but in the Self-Attended LSTM-CRF we add an attention mechanism between the LSTM
-output and the CRF input as described in Figure~\ref{fig:lstm_attention}.
+neural representations would be passed directly to the CRF decoder, but in the Self-Attended 
+Bi-LSTM-CRF, we add an attention mechanism between the LSTM output and the CRF input as described 
+in Figure~\ref{fig:lstm_attention}.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{pics/lstm_attention}
+  \caption{Attention mechanism for the Bi-LSTM-CRF model.}
+  \label{fig:lstm_attention}
+\end{figure}
 
 Now we need to find a way to combine the vectors at each timestep in a way that transforms 
 the representations according to the similarity between HTML contexts. Essentialy, we want to compute a $ T \times T $ 
-attention matrix $ alpha $ where $ alpha_{i, j} $ is the weight attributed to the word representation $ h_j $ at timestep
-$ i $. In other words, $ alpha_t $ is measuring the amount of attention that we pay to all the words in 
-a sentence at timestep $ t $. With the $ \alpha $ matrix, we can calculate new representations $ h'_i $ 
+attention matrix $ \alpha $ where $ \alpha_{i, j} $ is the weight attributed to the word representation $ h_j $ at timestep
+$ i $. In other words, $ \alpha_{i, j} $ is measuring the amount of attention that we pay to each word $ j $ in
+a sentence at timestep $ i $. With the $ \alpha $ matrix, we can calculate new representations $ h'_i $ 
 for each timestep by performing a linear combination of the hidden states according to their 
 attention values:
 
@@ -2029,21 +2053,19 @@ h'_i = \sum_{j} = \alpha_{i, j} h_j
 
 Also, consider a set of $ n $ context vectors $ c_i $ that contain representations for the
 html features at timestep $ i $. This representation can be a binary feature vector,
-a dense vector or even the hidden states $ h_i $. The attention matrix is then calculated by:
+a dense vector or even the hidden states $ h_i $. The attention matrix is then calculated as:
 
 \begin{equation}
-\alpha_{i,j} = \frac{exp(A(c_i, c_j))}{\sum_k exp(A(c_i, c_k))}
+\alpha_{i,j} = \frac{e^{A(c_i, c_j)}}{\sum_k e^{A(c_i, c_k)}}
 \end{equation}
 
 Where $ A(c_i, c_j) $ is an attention function that computes the similarity between
 HTML contexts at timesteps $ i $ and $ j $ and outputs a real number. The exponentials are
 a softmax normalization function to ensure that $ 1 \geq \alpha_{i,j} \geq 0 $ and 
-$ \sum_{j} \alpha_{i, j} = 1 $. Now we propose two ways for defining the attention function
-$ A $. The hard attention function and the soft attention function. The overall architecture 
-for the attention mechanism in sequence labeling for HTML is described in 
-Figure~\ref{fig:attention_for_html}.
+$ \sum_{j} \alpha_{i, j} = 1 $. Next we propose two ways for defining the attention function
+$ A $. The Hard Attention Function and the Soft Attention Function. 
 
-\subsection{Hard Attention}
+\subsection{Hard Attention Function}
 
 The hard attention function is a binary similarity function that either outputs one when 
 contexts are identical or zero when they are different. This definition only makes sense
@@ -2054,49 +2076,59 @@ $ \gamma_j $, we can define the attention function:
 
 \begin{equation}
   A(c_i, c_j) = \begin{cases} 
-    1 \text{ if } f_{i,k} = f_{j,k} \forall k \in m \\ 
-    0 \text{ otherwise}
+    1, \text{ if } f_{i,k} = f_{j,k} \;\;\; \forall \; k \in [1,m] \\ 
+    0, \text{ otherwise}
   \end{cases}
 \end{equation}
 
 The combination of features must be sufficiently restrictive so that the mixture of hidden
 states does not introduce too much noise. We have determined experimentally that considering
 only three features: the enclosing HTML tag, its parent tag and the CSS class; is sufficient to 
-permit a consistent comparison between similar HTML contexts. Ideally, the choice of features
+allow a consistent comparison between similar HTML contexts. Ideally, the choice of features
 could be performed automatically with the incorporation of a feed forward neural network in
 the comparison function and a softer similarity criterion. A possibility for doing this is 
-presented in the Soft Attention function.
+the Soft Attention Function.
 
 
-\subsection{Soft Attention}
+\subsection{Soft Attention Function}
 
-Different from the hard attention function, the soft attention function outputs a real number 
+Different from the Hard Attention Function, the Soft Attention Function outputs a real number 
 that represents the degree of similarity between HTML contexts. Now, instead of considering
 discrete feature vectors we resort to dense vectorial representations for the HTML context.
-Similar to the way we extracted morphological features with characters representations in 
-(CITE HERE lstm-crf-cnn and lstm-crf-lstm), we can extract HTML structural features with
-DOM representations. To do this, consider a DOM tree (which is a directed graph),
+Similar to the way we extracted morphological features with characters representations in
+Section~\ref{ssec:char_representations}, we can extract HTML structural features with
+DOM path representations. To do this, consider a DOM tree (which is an acyclic directed graph),
 a word's HTML context can be represented by the path we take in this graph starting from the 
-root element as described in Figure~\ref{fig:html_graph}. If we consider the path for each
-word in our sequence, we can create HTML dense representations by training a matrix of fixed
-size embeddings for each HTML tag, then we can construct representations for these HTML 
-embeddings the same way we did with character embeddings. The possibility that we chose 
-is represented in Figure~\ref{fig:html_embeddings}. Since the vocabulary of HTML tags is 
-very reduced, there is no need to pretrain the embeddings in a larger corpus.
+root element. If we consider the path for each word in our sequence, we can create HTML dense 
+representations by training a matrix of fixed size embeddings for each HTML tag, then we construct 
+HTML representations by averaging the embeddings in a final vector representation. The process
+is described in Figure~\ref{fig:html_embeddings}. 
+
+\begin{figure}[h]
+  \centering
+  \includegraphics[width=0.5\textwidth]{pics/html_embeddings}
+  \caption{Building HTML representations by climbing the DOM tree.}
+  \label{fig:html_embeddings}
+\end{figure}
+
+Experimentally, we only considered the last two HTML embeddings, since the HTML tag 
+information gets less relevant as we get farther from the leaves. The vocabulary of HTML 
+tags is very small, so we can train HTML embeddings effectively in the target dataset. 
+We could also learn HTML representations with CNNs or LSTMs as we did with character 
+representations, instead of averaging the embeddings. 
 
 Now to measure the similarity between different HTML contexts, we resort to an attention
-function similar to the scaled dot product proposed by (CITE Attention is all you need). 
-That is:
+function similar to the scaled dot product proposed by~\cite{Vaswani2017}. That is:
 
 \begin{equation}
   A(c_i, c_j) = \frac{W c_i \cdot W c_j}{\sqrt{n}}
 \end{equation}
 
 Where $ W $ is a weight matrix to be learned and $ \sqrt{n} $ is a normalization factor
-with $ n $ being the size of the contexts vectors $ c $. This function assumes a larger
-value when the contexts are similar and a smaller value otherwise. With the soft attention
-mechanism, our model can learn HTML context representations from the training data and
-generalize intuition such as: if some words happen together in a list then they probably 
+with $ n $ being the size of the context vectors $ c $. This function assumes a larger
+value when the contexts are similar and a smaller value when they are different. With the 
+soft attention mechanism, our model can learn HTML context representations from the training 
+data and generalize patterns such as: if some words happen together in a list then they probably 
 belong to the same class.
 
 
@@ -2104,77 +2136,69 @@ belong to the same class.
 
 In sequence labeling tasks, it is common to split the dataset in sentences and then train them
 in independent steps. However, if we want to make use of attention mechanisms to 
-perform the comparison of words in different HTML contexts, we want to compare the classes attributed 
-to words in different sentences that share a similar context. That is why splitting the dataset
-into sentences makes these mechanisms useless. To permit the comparison of words in different 
-sentences, we combined multiple sentences in a single training step and separated them with a
-segmentation token.
+perform the comparison of words in different HTML contexts, we want to compare labels attributed 
+to words that share a similar context in different sentences. 
+To allow the comparison of words in different sentences, instead of splitting the dataset into
+independent shuffled sentences, we combined multiple sentences in a single training step and separated 
+them with a segmentation token. Also, with the addition of many parameters to the model, the risk of 
+overfitting increases. To prevent this problem from occurring, we added dropout layers with a 0.5 
+dropout rate before and after the attention mechanism.
 
-Also, the attention matrix calculations can become incredibly burdensome when we consider large
-sentences or combinations of sentences. So, it becomes necessary to perform the matrix calculations
-in a Graphical Processing Unit. And with the addition of many more parameters to the model, the 
-risk of overfitting the training data becomes more salient. To prevent this problem from ocurring 
-it is of utmost importance to add dropout layers before and after the attention mechanism.
 
-\section{F1 Optimization} 
+\section{F-measure Optimization} 
+\label{sec:fscore_optimization}
 
-Normally, we want to estimate model parameters by maximizing the likelihood or minimizing the
-cross entropy, which is equivalent when considering a softmax output layer. The likelihood is
-intimately associated with the accuracy of a model, but in information extraction tasks we 
-usually evaluate the performance of different models with other measures such as Precision, 
-Recall and the F-measure. For example, in the Named Entity Recognition task many times we can 
-get an accuracy that surpasses 90\% by simply labeling all tokens with an O (other) label, which
-is the most common label. However, the F-measure for such a model would be zero. 
-
+In the LSTM-CRF model, we estimate parameters by maximizing the log-likelihood. The likelihood is 
+intimately associated with the accuracy in a classification task, but in NER tasks, models are 
+usually evaluated according to their Precision, Recall, or their harmonic mean (i.e. the F-measure).
 By maximizing the likelihood, we are essentialy increasing acccuracy with the expectation that this 
-will lead to an improvement of the F-measure, what is true. However, since we ultimately want to 
-maximize the F-measure, we could instead maximize an utility function that takes this into consideration. 
-Also, the choice of F-measure for most problem is usually the F1-score, but depending on the
-task, we may prefer more precision rather or more recall. Since usually there is a trade-off
-inherent to the maximization of both measures, it would be useful if we had an utility function that
-could take into consideration the particular precision and recall needs of a specific task.
-In the case of named entity extraction on HTML, we could argue that recall is slightly more
-important than precision, because when parsing a huge amount of data it is much easier to manually 
-filter false positives from the results than manually finding false negatives that were missed by 
-the classifier.
+will lead to an improvement of the F-measure, what is most often true. However, there is a trade-off 
+between Precision and Recall, meaning that we can trade a little less Precision for an increase in
+Recall and vice-versa.
 
-Nevertheless:
+In NER on HTML, we could argue that Recall is slightly more important than Precision, because when 
+we are parsing a huge amount of data, it is much easier to manually filter false positives than 
+manually finding the false negatives that were ignored by the classifier. This preference for Recall
+could be expressed in our evaluation by setting the F-measure $ \beta $ in a way that values Recall twice 
+as much as Precision, for example. However, when maximizing the accuracy of a classifier
+with the cross-entropy function, we have no way to tell the optimizer to choose the parameters that maximize 
+the F-measure with a particular $ \beta $. We could try to maximize the F-measure directly, but:
 
-"while the F-measure of a classifier evaluated on a single supervised instance is well defined, the
+\begin{quote}
+While the F-measure of a classifier evaluated on a single supervised instance is well defined, the
 overall F-measure on a larger dataset is not a function of the F-measure evaluated on each instance
 in the dataset. This is in contrast to ordinary loss/utility, whose grand total (or average) on a dataset
-can be computed by direct summation"
+can be computed by direct summation~\cite{Jansche2005}.
+\end{quote}
 
-% http://www.cs.columbia.edu/nlp/papers/2005/jansche_05b.pdf
-
-This makes the usage of the F-score as a utility function impractical for large datasets trained in 
-batches. However, with a few simplifications we can replace our loss function and instead 
-maximize the F-measure in terms of the expected utility. We take the method proposed by Jasche (CITE) to 
-approximately maximize the F-measure of a classifier based on a logistical regression model and 
-apply it to our neural architectures. The F-measure function can be calculated in terms of a triple (A,B,C):
+This makes the usage of the F-measure as an optimization objective impractical for large datasets trained in 
+batches. However, with a few simplifications, we can replace our loss function and instead 
+maximize the F-measure in terms of the expected utility. We take the method proposed by~\cite{Jansche2005}, that
+approximately maximizes the F-measure of a classifier based on a logistical regression model, and 
+apply it on our neural architectures. The F-measure function can be calculated in terms of a triple (A,B,C):
 
 \begin{equation}
 F_\alpha(A, B, C) = \frac{A}{A + \alpha B + (1-\alpha) C}
 \end{equation}
 
-This is equivalent to the $ \alpha $-weighted harmonic mean defined in (CITE FSCORE FORMULA HERE).
-A is the number of true positives, B is the number of false negatives, and C is the number of false
-positives. Also, consider that:
+This is equivalent to the $ \beta $-weighted harmonic mean defined in Equation~\ref{eq:fscore_formula}.
+Variable $ A $ is the number of true positives, $ B $ is the number of false negatives, and $ C $ is the number 
+of false positives. Also, consider that:
 
-\begin{eqnarray}
+\begin{eqnarray*}
 n_{pos} = A + B \\
 m_{pos} = A + C
-\end{eqnarray}
+\end{eqnarray*}
 
 That is, $ n_{pos} $ is the number of positive examples in the dataset (true positives plus missed positives) 
 and $ m_{pos} $ is the number of positive examples that were predicted (true positives plus false positives).
 With this, we can rewrite $ F_\alpha(A, B, C) $ as:
 
 \begin{equation}
-F_\alpha(A, B, C) = \frac{A}{\alpha n_pos + (1-\alpha) m_pos}
+F_\alpha(A, B, C) = \frac{A}{\alpha n_{pos} + (1-\alpha) m_{pos}}
 \end{equation}
 
-Now, Jasche propose the optimization objective:
+With this expression in mind, \cite{Jansche2005} proposes the optimization objective:
 
 \begin{equation}
 \tilde{F}_\alpha(\hat{y}, y) = 
@@ -2182,51 +2206,115 @@ Now, Jasche propose the optimization objective:
   {\alpha \tilde{n}_{pos} + (1-\alpha) \tilde{m}_{pos}(\theta)}
 \end{equation}
 
-For simplicity sake, we consider that we are dealing with a binary classification problem
-with \textit{False} and \textit{True} labels. Then, $ \hat{y_i} $ is the label 
-prediction made by our classifier for example $ i $ and $ \theta_i $ is the probability
-that example $ i $ should take a \textit{True} label. Then, considering $ n $ examples:
+Where $ \hat{y} = \{ \hat{y}_1, \hat{y}_2, \ldots, \hat{y}_n \} $ is a vector of predictions,
+$ y = \{ y_1, y_2, \ldots, y_n \} $ is a vector with the actual labels, and:
 
-\begin{eqnarray}
-\tilde{A}(y, \hat{y}) = \sum_{i=1}^n I_{y = \hat{y} = 1} \cdot \theta_i  \\
-\tilde{m}_{pos} = \sum_{i=1}^n \theta_i \\
-\tilde{n}_{pos} = \sum_{i=1}^n I_{y=1} - \tilde{A}(y, \hat{y}) \\
-\end{eqnarray}
+\begin{equation}
+\theta_i \equiv \hat{P}(y_i = \textit{True}) \;\; \forall i \; \in \; [1, n]
+\end{equation}
 
-With that, we have defined an optimization function that can be optimized with standard numerical optimization methods.
+That is, $ \theta_i $ is the probability attributed by the model that the label at time $ i $ is a
+\textit{True} label, assuming that we are dealing with a binary classification 
+problem with only \textit{True} and \textit{False} labels. Finally:
+
+\begin{align*}
+\tilde{A}(y, \hat{y}) & \equiv \sum_{i=1}^n I_{y = \hat{y} = 1} \cdot \theta_i  \\
+\tilde{m}_{pos}       & \equiv \sum_{i=1}^n \theta_i \\
+\tilde{n}_{pos}       & \equiv \sum_{i=1}^n I_{y=1} - \tilde{A}(y, \hat{y})
+\end{align*}
+
+Where $ I_{Z} $ is an identity function that is one when the clause $ Z $ is true and zero otherwise.
+With that, we have defined an optimization objective that can be optimized with standard numerical optimization methods.
 Different from the actual F-measure employed on a sequence labeling problem, we consider that each label here 
 is independent and belongs to a different entity. Further work is needed to resolve this simplification and to 
-adapt this optimization function to multi-label classification tasks.
+adapt this optimization function to multi-label classification tasks. But, as we will see in the experiments section,
+this formulation is sufficient for the researcher name extraction task.
+
+\section{Summary}
+
+In this chapter we have discussed several methods for improving the performance of sequence
+labeling models in NER on HTML. Section~\ref{sec:self_training} and Section~\ref{sec:attention_models} 
+discussed methods for incorporating HTML features in Hidden Markov Models and Neural Networks. 
+Section~\ref{sec:fscore_optimization} discussed the usage of a modified F-measure function as
+an optimization objective for neural networks to allow the choice of specific Precision or Recall 
+goals.
 
 
 \chapter{Experiments}
 \label{cha:experiments}
 
-In our experiments, we wanted to determine the best sequence labeling methods for HTML by testing
-their performance on a named entity recognition task over the NER on HTML dataset introduced in
-Chapter~\ref{cha:ner_on_html}. Model performance was evaluated in terms of their accuracy, precision,
-recall, F-score and overall simplicity, because some metric improvements require a significant 
-amount of added complexity and training time.
+The main objective of this dissertation is to find the best method for performing NER on the 
+web considering the researcher name extraction task. The value of a specific method is determined
+not only by its accuracy, but also by the amount of feature engineering required, the training
+time required, and the overall complexity of the model when we consider its gains relative to
+simpler alternatives. With this objective in mind, we pose the following research questions:
+
+\begin{enumerate}
+
+\item Are Hidden Markov Models effective for solving the researcher name extraction task?
+\begin{enumerate}
+\item Does the order of the Hidden Markov Model influence its performance?
+\item Can we improve a HMM by adding textual features?
+\item Can we improve a HMM with the self-training strategy?
+\end{enumerate}
+
+\item Are Conditional Random Fields effective for solving the researcher name extraction task?
+\begin{enumerate}
+\item Are featureless linear chain CRFs better than featureless HMMs?
+\item Can we improve the CRFs by adding textual features?
+\item Are CRFs more resilient to bad features than HMMs?
+\end{enumerate}
+
+\item Are Neural Networks effective for solving the researcher name extraction task?
+\begin{enumerate}
+\item How does a featureless LSTM-CRF compare with HMMs and CRFs?
+\item Can character representations boost the performance of the Bi-LSTM-CRF?
+\item Does the selection of word embeddings influence the performance of the Bi-LSTM-CRF?
+\item Can the hard-attention and soft-attention mechanisms boost the performance of the Bi-LSTM-CRF?
+\item Can we control how much the Bi-LSTM-CRF values recall over precision by changing the optimization objective?
+\end{enumerate}
+
+\item All things considered what is the best model?
+\begin{enumerate}
+\item What model has the best F1-score?
+\item Can we improve the results of the best models with a simple filtering strategy?
+\item What do we lose and what do we gain as we increase the complexity of the models?
+\end{enumerate}
+
+\end{enumerate}
+
+All models in this dissertation were trained and tested in the dataset described in Chapter~\ref{cha:dataset}.
+When relevant, the technical specifications for the experiments will be given in each section.
+Section~\ref{sec:baseline} establishes a featureless baseline in addition to the dictionary
+matching baseline that was described in Chapter~\ref{cha:dataset} for the researcher name
+extraction task. Section~\ref{sec:experiments_hmm} discusses the experimental results that concern
+Research Question 1. Section~\ref{sec:experiments_crf} discusses the experimental results that 
+concern Research Question 2. Section~\ref{sec:experiments_nn} discusses the experimental results 
+that concern Research Question 3. Finally, Section~\ref{sec:experiments_best} discusses the experimental 
+results that concern Research Question 4.
 
 
 \section{Simple Baseline}
+\label{sec:baseline}
 
-Since the NER on HTML dataset is novel, we wanted to establish some baseline results in addition to
-the gazetteer matching results presented in Table~\ref{tab:gazetter_matching}. For this purpose, we
+A model that works well despite the absence of a good feature selection is more valuable than
+a method that requires a lot of feature engineering or a model that requires a big dictionary of
+named entities. For this reason, we wanted to establish some baseline results in addition to 
+the gazetteer matching results presented in Chapter~\ref{cha:dataset}. For this purpose, we
 trained a simple generative model and a simple discriminative model to provide a measure of the
-expected difficulty for solving this task. The simple generative model is a Naive Bayes classifier,
+expected difficulty of solving this task. The simple generative model is a Naive Bayes classifier,
 which is essentialy a \textit{Hidden Markov Model}, as presented in Section~\ref{sec:hmm}, with the
-assumption of label independence. That is, $ P(Y_i|Y_{i-1}) = P(Y_i) $ for timestep $ i $. The simple
-discriminative model is a Logistic Classifier, as presented in Section~\ref{sec:max_ent}. 
+assumption of label independence. That is, $ P(Y_i|Y_{i-1}) = P(Y_i) $ for all timesteps $ i $. 
+The simple discriminative model is a Logistic Classifier, as presented in Section~\ref{sec:crf}. 
 
-The Naive-Bayes and Logistic classifiers form a generative-discriminative pair (CITE PAPER),
-% http://ai.stanford.edu/~ang/papers/nips01-discriminativegenerative.pdf
+The "Naive-Bayes and Logistic Classifiers form a generative-discriminative pair"~\cite{Ng2001},
 in the sense that the essential difference between the models is that the first estimates the
 joint probability between words and labels $ P(X, Y) $ and the latter models the conditional
-probability $ P(Y|X) $. They are very simple and fast to train, so they provide a good 
-first approximation to a solution for this task. We also consider model variants that incorporate
-all the features presented in Table~\ref{tab:features} and variants that use no features beside
-the current word. Table~\ref{tab:nb_and_maxent} shows a comparison between these models.
+probability $ P(Y|X) $. The same analogy can be made for HMMs and CRFs. The Naive Bayes model and
+the Logistic Classifier are very simple and fast to train, so they provide a good 
+first approximation to a solution for this task. Both models used only the current word as a
+feature. Table~\ref{tab:nb_and_maxent} shows a comparison between these models and the dictionary
+matching approach.
 
 \begin{table}[h]
   \small
@@ -2240,40 +2328,35 @@ the current word. Table~\ref{tab:nb_and_maxent} shows a comparison between these
       Gazetteer Matching     & 0.847 & 0.285 & 0.427 & 0.871 & 0.328 & 0.477          \\
       Naive Bayes            & 0.172 & 0.851 & 0.287 & 0.181 & 0.776 & 0.294          \\
       Maxent                 & 0.287 & 0.547 & 0.377 & 0.335 & 0.508 & 0.404          \\
-      Naive Bayes + Features & 0.354 & 0.784 & 0.488 & 0.414 & 0.767 & \textbf{0.537} \\
-      Maxent + Features      & 0.309 & 0.544 & 0.394 & 0.416 & 0.618 & 0.497          \\
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Naive Bayes and Logistic Regression performance}
+  \caption{Naive Bayes and Logistic Classifier in the researcher name extraction task.}
   \label{tab:nb_and_maxent}
 \end{table}
 
 As previously discussed, the Maximum Entropy classifier allows for overlapping features while
-Naive Bayes assumes feature independence. 
-The maximum entropy classifier fares better when no features besides the current word are considered. 
-Nevertheless, when considering 
-the whole set of features, there is not much difference between the discriminative and generative 
-approaches. So we consider the best F1-score in the test set (\textit{Naive Bayes} with features) as 
-a baseline to compare how much better we can get as we increase the model complexity.
+the Naive Bayes assumes feature independence. That is possibly why the Logistic Classifier 
+performs better than the Naive Bayes model in this problem. However, both models are worse than 
+the dictionary matching approach when we consider the F1-score. With these baselines we can
+proceed to test more complex models.
 
 
 \section{Hidden Markov Models}
+\label{sec:experiments_hmm}
 
 There are a couple of parameters that need to be considered when we employ \textit{Hidden Markov Models}
-to a sequence labeling task. First, the number of previous states (the order of the HMM) and, second, 
-the model features. 
+in a sequence labeling task. First, the number of previous states (the order of the HMM) and, second, 
+the model features.
 
 \subsection{HMM order}
 
-Table~\ref{fig:hmm_no_features} shows performance of \textit{HMMs} up to the third 
-order in the validation and test sets of the NER on HTML dataset. We can see that considering label
-dependencies over multiple timesteps increases the classifier performance by a considerable margin 
-relative to the \textit{Naive Bayes} model even without the addition of any features. That is, the 
-second order \textit{HMM} (HMM-2) achieved an F1-score of 0.583 at the task, while
-the \textit{Naive Bayes} classifier that incorporated all features achieved only 0.537 F1-score. Nevertheless,
-we already observe a relaive decline in performance with the third order \textit{HMM} (0.506 F1-score), 
-suggesting that increasing the order of the \textit{HMM} is not always advantegeous.
+We hypothesized that the performance of HMMs on sequence labeling tasks for NLP can be improved by
+raising the number of previous states checked at each timestep, that is the order of the HMM.
+Table~\ref{fig:hmm_no_features} shows the performance of \textit{HMMs} up to third 
+order in the test sets of the NER on HTML dataset. To allow comparison with the baselines, we also 
+add the results of a Naive Bayes classifier. The Naive Bayes classifier can be thought of as a
+HMM of zeroth-order.
 
 \begin{figure}[h!]
   \begin{center}
@@ -2325,16 +2408,25 @@ suggesting that increasing the order of the \textit{HMM} is not always advantege
   \end{center}
 \end{figure}
 
+Considering label dependencies over multiple timesteps increases the classifier performance by a considerable margin 
+relative to the Naive Bayes model even without the addition of any features besides the current word. The 
+second order HMM (HMM-2) achieved an F1-score of 0.583 at the task, while
+the Naive Bayes classifier achieves an F1-score of 0.294 and the dictionary matching approach 
+only achieved an F1-score of 0.477. Nevertheless,
+we already observe a relative decline in performance with the third order \textit{HMM} (0.506 F1-score), 
+suggesting that increasing the order of the \textit{HMM} is not always advantegeous. This is probably because
+as we increase the window of previous labels at each timestep, the label combinations get less common
+in the training set, and therefore, the probability estimates get less reliable.
+
+
 \subsection{Feature selection}
 
-Finally, thirteen categorical features were associated with each token in the dataset. 
+Eleven categorical features were extracted from the dataset. 
 These were selected through feature engineering from a larger pool of features, 
 considering their aid to the performance of the extraction systems. Deep learning 
-architectures can work incredibly well without any of these features, however these 
-features are of critical importance to classical approaches such as HMMs and CRFs. 
-The selected features are presented in Table~\ref{tab:features}. Additionaly, all 
-models also make use of the unmodified tokens as features directly or as embedding
-lookups.
+architectures can work incredibly well without any of these features, however they
+are of critical importance to traditional approaches such as HMMs and CRFs. 
+The selected features are presented in Table~\ref{tab:features}. 
 
 \begin{table}[h]
   \small
@@ -2346,16 +2438,14 @@ lookups.
       1  & Unaccented lowercase token \\
       2  & Exact gazetteer match \\
       3  & Partial gazetteer match \\
-      4  & Log name gazetteer count\\
-      5  & Log word gazetteer count\\
-      6  & Email \\
-      7  & Number \\
-      8  & Honorific (Mr., Mrs., Dr., etc.)\\
-      9  & URL \\
-      10 & Is capitalized \\
-      11 & Is a punctuation sign \\
-      12 & HTML tag + parent \\
-      13 & CSS class \\
+      4  & Email \\
+      5  & Number \\
+      6  & Honorific (Mr., Mrs., Dr., etc.)\\
+      7  & Matches a URL \\
+      8  & Is capitalized \\
+      9  & Is a punctuation sign \\
+      10 & HTML tag + parent \\
+      11 & CSS class \\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -2363,27 +2453,31 @@ lookups.
   \label{tab:features}
 \end{table}
 
-Feature 1 represents the token converted to unaccented lowercase format.
-Feature 2 represents an exact match of a sequence of tokens to any of the 1,595,771 
-names from the DBLP list, and feature 3 represents a partial match. Feature 4 is the rounded logarithm of 
-the frequency of a token in the gazetteer, and feature 5 is the rounded logarithm of the frequency
-of a token in a word corpus obtained through a random crawl on university websites.
-Features 6 to 11 represent a simple regular expression match to an email, number, 
-honorific, URL, capitalization or punctuation sign. Feature 12 represents the HTML enclosing tag 
-and its parent concatenated. Finally, feature 13 represents all CSS classes concatenated. 
-Features 12 and 13 are of importance to the self-training strategy of HMMs described in 
-Section~\ref{sssec:self_training} and the attention architecture for DNNs described in
-Section~\ref{sssec:attention}.
+\begin{description}
+\item[Feature 1] is the token converted to unaccented lowercase format.
+\item[Feature 2] represents an exact match of a sequence of tokens to any of the 1,595,771 
+names from the dictionary extracted from DBLP described in Section~\ref{sec:dictionary}.
+\item[Feature 3] represents a partial match in the same dictionary. 
+\item[Feature 4] is a binary feature describing a regular expression match to an email address.
+\item[Feature 5] is true if the token contains a number.
+\item[Feature 6] is true if the token is an honorific.
+\item[Feature 7] is true if the token matches the regular expression for a URL.
+\item[Feature 8] is true if the token is capitalized.
+\item[Feature 9] is true if the token is a punctuation sign.
+\item[Feature 10] is the token's enclosing HTML tag and its parent tag concatenated.
+\item[Feature 11] is the CSS class for the token's HTML tag.
+\end{description}
 
-
-In the previous section, we considered a \textit{Naive Bayes} classifier that incorporated all the
-features regardless of their correlations, eventhough we know that correlated features may 
-hurt the performance of such a classifier. Table~\ref{tab:feature_correlation} presents a feature 
-correlation matrix based on the Cramér's V measure~\footnote{
-Dpython implementation
-% https://en.wikipedia.org/wiki/Cram%C3%A9r%27s_V
-% https://github.com/shakedzy/dython/blob/master/dython/nominal.py
-}. 
+Features 10 and 11 are only useful in the self-training strategy for HMMs and the
+attention architectures for Bi-LSTM-CRFs.
+We know that correlated features may hurt the performance of some classifiers, so
+in Table~\ref{tab:feature_correlation} we present the feature correlation matrix based on 
+the Cramér's V measure.
+% ~\footnote{
+% Dpython implementation
+% % https://en.wikipedia.org/wiki/Cram%C3%A9r%27s_V
+% % https://github.com/shakedzy/dython/blob/master/dython/nominal.py
+% }. 
 
 \begin{table}[h]
   \tiny
@@ -2412,18 +2506,17 @@ Dpython implementation
 \end{table}
 
 The current word is strongly correlated with most features besides the URL feature, and the ones related to 
-the HTML structure. That shows there is not a lot of information gain from these features. To understand how
-this can help or hurt the \textit{Hidden Markov Model} performance we test the model using two groups 
-of features:
+the HTML structure. That shows there is not a lot of information to gain from these features. To understand how
+this can help or hurt the Hidden Markov Model performance we test the model using two groups of features:
 
 \begin{description}
   \item[Group A] Current word, Exact Match, Partial Match, URL, Capitalized
   \item[Group B] All features except HTML Tag and CSS Class
 \end{description}
 
-Table~\ref{tab:hmm_features} compares the performance of \textit{Hidden Markov Models} using the features from
-Group A and Group B. The Group A model performed better in all criteria showing that the selection of features
-is of the utmost importance for the application of \textit{HMMs} to the sequence labeling problem.
+Group A is composed of features with a smaller correlation and Group B is composed of all 
+textual features. Figure~\ref{fig:hmm_features} compares the performance of HMMs using the 
+features from Group A and Group B. 
 
 \begin{figure}[h!]
   \begin{center}
@@ -2513,23 +2606,23 @@ is of the utmost importance for the application of \textit{HMMs} to the sequence
     \end{tikzpicture}
 
     \caption{Hidden Markov Models trained with the features in Group A and Group B.}
-    \label{fig:hmm_all_features}
+    \label{fig:hmm_features}
   \end{center}
 \end{figure}
 
+The Group A models were better overall showing that the selection of features
+is of importance for HMMs in the sequence labeling problem. Also, we notice a
+massive improvement relative to the HMMs that used no features.
+
+
 \subsection{Self-training strategy}
 
-In the next experiment, we want to understand if the self-training strategy from 
+In the next experiment, we wanted to understand if the self-training strategy described in
 Section~\ref{sec:self_training} is effective for improving the performance of 
 \textit{HMMs}. Figure~\ref{fig:hmm_self_training} compares the performance of \textit{HMMs}
-up to third order with features from \textit{Group A} and with the self-training 
-strategy for the \textit{HTML Tag} and the \textit{CSS Class} features in addition to the 
-\textit{Group A} features. The self-trained models show a marked improvement in comparison
-to the models with no self-training at the test set except for the third order \textit{HMM}.
-With this, we conclude that the best \textit{HMM} for the name extraction task is a 
-second-order \textit{HMM} using \textit{Group A} features and the self-training strategy. This
-model achieves an \textit{F1} of 0.879. The detailed results for all HMMs is presented in
-Table~\ref{tab:hmm_results}.
+up to third order with features from \textit{Group A} with HMMs that used
+the \textit{HTML Tag} and the \textit{CSS Class} features trained with the self-training strategy 
+in addition to the \textit{Group A} features. 
 
 \begin{figure}[h!]
   \begin{center}
@@ -2623,6 +2716,14 @@ Table~\ref{tab:hmm_results}.
   \end{center}
 \end{figure}
 
+The self-trained models show a marked improvement in comparison
+to the models with no self-training at the test set except for the third order \textit{HMM}.
+With this, we conclude that the best \textit{HMM} for the name extraction task is a 
+second-order \textit{HMM} using \textit{Group A} features and the self-training strategy. This
+model achieves an \textit{F1} of 0.879. The detailed results for all HMMs is presented in
+Table~\ref{tab:hmm_results}.
+
+
 \begin{table}[h]
   \small
   \begin{center}
@@ -2657,21 +2758,25 @@ Table~\ref{tab:hmm_results}.
 
 
 \section{Conditional Random Fields}
+\label{sec:experiments_crf}
 
-Linear \textit{Chain Conditional Random Fields} provide a much more flexible way to incorporate 
-features in our model in comparison to \textit{Hidden Markov Models}. When considering the application
-of this class of models to the \textit{Name Extraction Task}, we want to understand how the feature
-selection impacts the performance of our model and if pretrained word embeddings can help improving
-its performance.
+When we compared a featureless Logistic Classifier with a featureless Naive Bayes model
+we found that the Logistic Classifier performed significantly better. In this section we
+want to check if CRFs are also better than HMMs when they use no features besides the
+current word. Also, Linear Chain CRFs provide a much more flexible way to incorporate 
+features in comparison to HMMs. When considering the application
+of this class of models to the Researcher Name Extraction task, we want to understand how the feature
+selection impacts the performance of the model.
 
 \subsection{No Features}
 
-Figure~\ref{fig:crf_without_features} shows a comparison between the \textit{Maximum Entropy Model}
-that assumes label independence, the best \textit{Hidden Markov Model} from the previous section without features
-and a \textit{Linear Chain CRF} at the name extraction task. The \textit{Maxent} and \textit{CRF} use 
-one-hot representations of the words. Also, different from \textit{HMMs} the discriminative models resort to numerical 
-optimization methods, therefore their parameters may vary between different runs, so we present the average result 
-for each measure over five runs.
+Figure~\ref{fig:crf_no_features} shows a comparison between the Logistic Classifier
+(that assumes label independence), the best Hidden Markov Model without features
+and a CRF without features in the name extraction task. Different from the HMMs the 
+discriminative models presented here resort to numerical optimization methods, therefore 
+their parameters may vary between different runs, so we present the average result 
+for each measure over five runs. In other sections, numerically optimized models will
+follow the same rule.
 
 \begin{figure}[h!]
   \begin{center}
@@ -2719,20 +2824,20 @@ for each measure over five runs.
       Performance of the Maximum Entropy classifier, second-order Hidden Markov Models and 
       Linear Chain CRFs without features besides the current word on the test set of the NER on HTML dataset.
     }
-    \label{fig:hmm_no_features}
+    \label{fig:crf_no_features}
   \end{center}
 \end{figure}
 
 The \textit{CRF} model shows a significant improvement in comparison to the other models that used no features,
-achieving an F1-score of 0.750. Next we proceed to understand if the addition of features can improve this
+achieving an F1-score of 0.750. Next, we proceed to understand if the addition of features can improve this
 performance further.
 
 
 \subsection{Feature Selection}
 
 To allow comparison between the \textit{HMMs} from the last section we consider \textit{CRFs} using features
-from \textit{Group A} and \textit{Group B}. Figure~\ref{fig:} shows a comparison between the best \textit{HMM}
-for each group of features and the \textit{CRF}.
+from \textit{Group A} and \textit{Group B}. Figure~\ref{fig:crf_all_features} shows a comparison between 
+the best \textit{HMM} for each group of features and the respective \textit{CRF} using the same group of features.
 
 \begin{figure}[h!]
   \begin{center}
@@ -2826,16 +2931,18 @@ for each group of features and the \textit{CRF}.
   \end{center}
 \end{figure}
 
-As expected, the \textit{CRF} is more robust to variations in the feature selection. It performs
-similar to the second-order \textit{HMM} in \textit{Group A} and slightly better in \textit{Group B}, though
-it tends towards an increase in precision rather than recall. The \textit{CRF} is marginally better than
-the \textit{HMM}, however, when we consider the self-trained \textit{HMM-2}, it still shows a better overall 
-performance. There are two things that could still be tried to improve the \textit{CRF} performance. First,
-the \textit{CRF} allows for a more flexible feature selection, so we could try adding any imaginable feature,
-since feature correlation is not impeditive in this case. Second, we could try developing a self-training 
-strategy for \textit{CRFs} similar to the one employed on \textit{HMMs}. However, \textit{Neural Networks} 
-showed a superior performance in many NLP tasks, so we prefered to try a \textit{Neural Network}-based approach 
-next. Table~\ref{tab:crf_results} presents the detailed results for \textit{CRFs} at the name extraction
+The CRF is more robust to variations in the feature selection. It performs
+similar to the second-order HMM in Group A and slightly better in Group B, though
+it tends towards an increase in precision rather than recall. The CRF is marginally better than
+the HMM, however, when we consider the self-trained HMM-2, it still shows a better overall 
+performance. 
+
+There are two things that could still be tried to improve the CRF performance. First,
+the CRF allows for a more flexible feature selection, so we could try adding more features,
+since the correlation is not impeditive in this case. Second, we could try developing a self-training 
+strategy for CRFs similar to the one employed on HMMs. However, Neural Networks 
+showed a superior performance in many NLP tasks, so next, we consider neural architectures.
+Table~\ref{tab:crf_results} presents the detailed results for CRFs at the name extraction
 task in the validation and test sets.
 
 \begin{table}[h]
@@ -2854,13 +2961,15 @@ task in the validation and test sets.
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{All \textit{Conditional Random Fields}}
+  \caption{All Conditional Random Fields.}
   \label{tab:crf_results}
 \end{table}
 
-\section{Neural Networks}
 
-There are multiple \textit{Neural Network Architectures} that are suitable for solving 
+\section{Neural Networks}
+\label{sec:experiments_nn}
+
+There are multiple Neural Network architectures that are suitable for solving 
 \textit{Sequence Labeling} tasks. A model that has recently had remarkable success at 
 solving these types of tasks is the BI-LSTM-CRF discussed in Section~\ref{sec:lstm_crf},
 so we start our investigation by determining if it is also suited for the researcher
@@ -2939,6 +3048,7 @@ self-training, which achieved 0.879 F1-score).
 
 
 \subsection{Character Representations}
+\label{ssec:char_representations}
 
 Morphological features can help identifying named entities. We presented in Section~\ref{sec:char_representations}
 two methods for incorporating character representations in \textit{Recurrent Neural Networks}, the \textit{CNN-based}
@@ -3179,6 +3289,7 @@ were done entirely in Python using Google's Tensorflow deep learning library.
 
 
 \section{What model is best?}
+\label{sec:experiments_best}
 
 We have discussed multiple sequence labeling methods in the previous Sections and now we provide
 an overview of the best variants of each category.
@@ -3293,6 +3404,10 @@ The results for the \textit{Heuristic Filtering Strategy} show that the precisio
 be improved considerably with a very simple approach. This implies that the number of false 
 positives is not such a big problem on extraction tasks, since the mistakes commited by the classifiers
 are at least to some extext quite repetitive.
+
+\section{Summary}
+
+Baochikawawau.
 
 
 \chapter{Related Work}
@@ -3563,18 +3678,18 @@ web data extraction.
 \ppgccbibliography{bibfile}
 
 
-\begin{appendices}
-\label{app:html_segmenter}
-
-\chapter{HTML sentence segmenter}
-
-Lorem ipsum dolor.
-
+% \begin{appendices}
+% \label{app:html_segmenter}
+% 
+% \chapter{HTML sentence segmenter}
+% 
+% Lorem ipsum dolor.
+% 
 % \chapter{Outro apêndice}
 % 
 % \dummytxta
 % 
-\end{appendices}
+% \end{appendices}
 % 
 % 
 % \begin{attachments}

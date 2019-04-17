@@ -39,6 +39,15 @@
   {127}-\ppgccpagedoformat {}-\ppgccpagedoformat {141}.
 \newblock ISSN \ppgccissndoformat {10743227}.
 
+\bibitem[Bahdanau et~al.\@, 2014]{Bahdanau2014}
+\ppgccbibauthordoformat {Bahdanau, D.\ppgccbibauthorsep {} Cho,
+  K.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Bengio, Y.}
+  (\ppgccyeardoformat {2014}).
+\newblock \ppgccbibtitledoformat {Neural machine translation by jointly
+  learning to align and translate}.
+\newblock cite arxiv:1409.0473Comment: Accepted at ICLR 2015 as oral
+  presentation.
+
 \bibitem[Baum et~al.\@, 1970]{Baum1970}
 \ppgccbibauthordoformat {Baum, L.~E.\ppgccbibauthorsep {} Petrie,
   T.\ppgccbibauthorsep {} Soules, G.\ppgccbibauthorlastsep {}
@@ -341,6 +350,16 @@
 \newblock \ppgccbibjournaldoformat {CoRR}, \ppgccvolumedoformat
   {abs/1508.01991}.
 
+\bibitem[Jansche, 2005]{Jansche2005}
+\ppgccbibauthordoformat {Jansche, M.} (\ppgccyeardoformat {2005}).
+\newblock \ppgccbibtitledoformat {Maximum expected f-measure training of
+  logistic regression models}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  Conference on Human Language Technology and Empirical Methods in Natural
+  Language Processing}, HLT '05, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {692}-\ppgccpagedoformat {}-\ppgccpagedoformat {699}, Stroudsburg, PA, USA.
+  Association for Computational Linguistics.
+
 \bibitem[Jaynes, 1957]{Jaynes1957}
 \ppgccbibauthordoformat {Jaynes, E.~T.} (\ppgccyeardoformat {1957}).
 \newblock \ppgccbibtitledoformat {Information theory and statistical
@@ -503,6 +522,17 @@
   Autonomous Agents, ACM}, \ppgccbibpagesstring {} \ppgccpagedoformat
   {190}-\ppgccpagedoformat {}-\ppgccpagedoformat {197}.
 
+\bibitem[Ng \ppgccciteauthorand {} Jordan, 2001]{Ng2001}
+\ppgccbibauthordoformat {Ng, A.~Y. \ppgccbibauthorand {} Jordan, M.~I.}
+  (\ppgccyeardoformat {2001}).
+\newblock \ppgccbibtitledoformat {On discriminative vs. generative classifiers:
+  A comparison of logistic regression and naive bayes}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  14th International Conference on Neural Information Processing Systems:
+  Natural and Synthetic}, NIPS'01, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {841}-\ppgccpagedoformat {}-\ppgccpagedoformat {848}, Cambridge, MA, USA. MIT
+  Press.
+
 \bibitem[Pennington et~al.\@, 2014]{Pennington2014}
 \ppgccbibauthordoformat {Pennington, J.\ppgccbibauthorsep {} Socher,
   R.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Manning, C.~D.}
@@ -547,6 +577,13 @@
   2018 ACM International Conference on Bioinformatics, Computational Biology,
   and Health Informatics}, BCB '18, \ppgccbibpagesstring {} \ppgccpagedoformat
   {575}-\ppgccpagedoformat {}-\ppgccpagedoformat {575}, New York, NY, USA. ACM.
+
+\bibitem[Ratnaparkhi, 1998]{Ratnaparkhi1998}
+\ppgccbibauthordoformat {Ratnaparkhi, A.} (\ppgccyeardoformat {1998}).
+\newblock \ppgccbibbtitledoformat {Maximum Entropy Models for Natural Language
+  Ambiguity Resolution}.
+\newblock \ppgccbibphdstring {}, Philadelphia, PA, USA.
+\newblock AAI9840230.
 
 \bibitem[Ribas et~al.\@, 2015]{Ribas2015a}
 \ppgccbibauthordoformat {Ribas, S.\ppgccbibauthorsep {} Ribeiro-Neto,
@@ -683,6 +720,22 @@
   \ppgccvolumedoformat {42}({\ppgccnumberdoformat {5}}):\ppgccpagedoformat
   {279}-\ppgccpagedoformat {}-\ppgccpagedoformat {291}.
 \newblock ISSN \ppgccissndoformat {0361-7688}.
+
+\bibitem[Vaswani et~al.\@, 2017]{Vaswani2017}
+\ppgccbibauthordoformat {Vaswani, A.\ppgccbibauthorsep {} Shazeer,
+  N.\ppgccbibauthorsep {} Parmar, N.\ppgccbibauthorsep {} Uszkoreit,
+  J.\ppgccbibauthorsep {} Jones, L.\ppgccbibauthorsep {} Gomez,
+  A.~N.\ppgccbibauthorsep {} Kaiser, L.~u.\ppgccbibauthorlastsep {}
+  \ppgccbibauthorand {} Polosukhin, I.} (\ppgccyeardoformat {2017}).
+\newblock \ppgccbibtitledoformat {Attention is all you need}.
+\newblock \ppgccbibinstring {} Guyon, I.\ppgccbibauthorsep {} Luxburg,
+  U.~V.\ppgccbibauthorsep {} Bengio, S.\ppgccbibauthorsep {} Wallach,
+  H.\ppgccbibauthorsep {} Fergus, R.\ppgccbibauthorsep {} Vishwanathan,
+  S.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Garnett, R.,
+  \ppgccbibeditorsstring {}, {\em Advances in Neural Information Processing
+  Systems 30}, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {5998}-\ppgccpagedoformat {}-\ppgccpagedoformat {6008}. Curran Associates,
+  Inc.
 
 \bibitem[Wang \ppgccciteauthorand {} Lochovsky, 2003]{Wang2003}
 \ppgccbibauthordoformat {Wang, J. \ppgccbibauthorand {} Lochovsky, F.~H.}

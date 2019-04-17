@@ -9,7 +9,6 @@ Repeated entry---line 1144 of file bibfile.bib
 I'm skipping whatever remains of this entry
 Warning--I didn't find a database entry for "Bikel1999"
 Warning--I didn't find a database entry for "Borthwick1998"
-Warning--I didn't find a database entry for "Ratnaparkhi1998"
 Warning--I didn't find a database entry for "McCallum2003"
 Warning--I didn't find a database entry for "Devlin2018"
 Warning--I didn't find a database entry for "Akbik2018"
@@ -17,45 +16,46 @@ Warning--I didn't find a database entry for "Baevksi2019"
 Warning--empty booktitle in Lafferty2001
 Warning--empty booktitle in Rabiner1990
 Warning--can't use both author and editor fields in Ramshaw1999
-You've used 74 entries,
+Warning--empty school in Ratnaparkhi1998
+You've used 79 entries,
             2043 wiz_defined-function locations,
-            1095 strings with 19509 characters,
-and the built_in function-call counts, 34702 in all, are:
-= -- 3554
-> -- 1223
-< -- 72
-+ -- 422
-- -- 408
-* -- 3185
-:= -- 5605
-add.period$ -- 269
-call.type$ -- 74
-change.case$ -- 571
-chr.to.int$ -- 72
-cite$ -- 77
-duplicate$ -- 1333
-empty$ -- 2452
-format.name$ -- 524
-if$ -- 7109
+            1129 strings with 20771 characters,
+and the built_in function-call counts, 37204 in all, are:
+= -- 3808
+> -- 1334
+< -- 78
++ -- 459
+- -- 445
+* -- 3398
+:= -- 6015
+add.period$ -- 288
+call.type$ -- 79
+change.case$ -- 610
+chr.to.int$ -- 77
+cite$ -- 83
+duplicate$ -- 1435
+empty$ -- 2613
+format.name$ -- 568
+if$ -- 7627
 int.to.chr$ -- 3
 int.to.str$ -- 0
-missing$ -- 148
-newline$ -- 405
-num.names$ -- 222
-pop$ -- 501
+missing$ -- 153
+newline$ -- 431
+num.names$ -- 239
+pop$ -- 537
 preamble$ -- 1
-purify$ -- 574
+purify$ -- 614
 quote$ -- 0
-skip$ -- 1155
+skip$ -- 1245
 stack$ -- 0
-substring$ -- 2642
-swap$ -- 269
-text.length$ -- 32
+substring$ -- 2806
+swap$ -- 299
+text.length$ -- 35
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 436
-warning$ -- 3
-while$ -- 298
+type$ -- 466
+warning$ -- 4
+while$ -- 318
 width$ -- 0
-write$ -- 1063
+write$ -- 1136
 (There was 1 error message)
