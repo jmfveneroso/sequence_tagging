@@ -1803,7 +1803,8 @@ therefore there are no out-of-vocabulary words.
 % https://openai.com/blog/better-language-models/
 
 
-\subsection{Character representations}
+\subsection{Character Representations}
+\label{ssec:char_representations}
 
 When devising deep neural architectures, one of the main objectives is to make the 
 neural network discover useful features by itself instead of feeding it with what
@@ -2096,7 +2097,7 @@ Different from the Hard Attention Function, the Soft Attention Function outputs 
 that represents the degree of similarity between HTML contexts. Now, instead of considering
 discrete feature vectors we resort to dense vectorial representations for the HTML context.
 Similar to the way we extracted morphological features with characters representations in
-Section~\ref{ssec:char_representations}, we can extract HTML structural features with
+Section~\ref{ssec:experiment_char_representations}, we can extract HTML structural features with
 DOM path representations. To do this, consider a DOM tree (which is an acyclic directed graph),
 a word's HTML context can be represented by the path we take in this graph starting from the 
 root element. If we consider the path for each word in our sequence, we can create HTML dense 
@@ -2179,6 +2180,7 @@ apply it on our neural architectures. The F-measure function can be calculated i
 
 \begin{equation}
 F_\alpha(A, B, C) = \frac{A}{A + \alpha B + (1-\alpha) C}
+\label{eq:falpha}
 \end{equation}
 
 This is equivalent to the $ \beta $-weighted harmonic mean defined in Equation~\ref{eq:fscore_formula}.
@@ -2772,11 +2774,7 @@ selection impacts the performance of the model.
 
 Figure~\ref{fig:crf_no_features} shows a comparison between the Logistic Classifier
 (that assumes label independence), the best Hidden Markov Model without features
-and a CRF without features in the name extraction task. Different from the HMMs the 
-discriminative models presented here resort to numerical optimization methods, therefore 
-their parameters may vary between different runs, so we present the average result 
-for each measure over five runs. In other sections, numerically optimized models will
-follow the same rule.
+and a CRF without features in the name extraction task. 
 
 \begin{figure}[h!]
   \begin{center}
@@ -2969,25 +2967,31 @@ task in the validation and test sets.
 \section{Neural Networks}
 \label{sec:experiments_nn}
 
-There are multiple Neural Network architectures that are suitable for solving 
-\textit{Sequence Labeling} tasks. A model that has recently had remarkable success at 
-solving these types of tasks is the BI-LSTM-CRF discussed in Section~\ref{sec:lstm_crf},
-so we start our investigation by determining if it is also suited for the researcher
-name extraction task. Additionaly, we want to determine if the CNN-based or LSTM-based
-character representations can help improving the LSTM-CRF performance. We also want to
-test if the Hard-Attention and Soft-Attention mechanisms for incorporating HTML structural
-features provides any improvement. Finally, we want to understand if the F-score optimization
-function can help controlling how much the model values precision in detriment of recall and
-vice versa.
+A neural network architecture that has had remarkable success at solving sequence labeling 
+tasks is the Bi-LSTM-CRF described in Section~\ref{sec:lstm_crf}. 
+First, we investigate how featureless Bi-LSTM-CRFs compare to featureless HMMs and 
+CRFs in the researcher name extraction task. Second, we check if CNN-based or LSTM-based character 
+representations can boost the performance of Bi-LSTM-CRFs in the same task. Third, we check if
+the choice of pretrained Word Embeddings alters the results significantly. Fourth, we assess the
+performance of soft and hard attentions models. And last, we show the results of a Bi-LSTM-CRF model trained
+with a F-score optimization objective.
 
+Different from the previous models, that converged to an optimal set of parameters, the neural
+networks must resort to numerical optimization methods over a rugged optimization function, therefore
+they may get trapped in local minima and never find the best set of parameters. The results for the 
+models may vary between different runs. That is why we present the average results for each measure over
+five runs. 
 
-\subsection{Bi-LSTM-CRF with Glove-300 Embeddings}
+% For lack of space, we will not show the standard deviations in the tables in this section, but
+% the complete results with all standard deviations can be checked in the Appendix.
 
-One of the advantages of deep neural
-networks is the fact that they can usually work without any feature engineering. 
+\subsection{Plain Bi-LSTM-CRF}
+
+One of the advantages of deep neural networks relative to earlier sequence labeling methods is that they 
+usually work without any feature engineering. Following the original paper, we only use GloVe-300 word embeddings
+as inputs to the model.
 Figure~\ref{fig:bi_lstm_crf} compares the performance of a \textit{BI-LSTM-CRF} on the test
-set of the researcher name extraction task with the best \textit{HMM} and \textit{CRF} 
-without features.
+set of the researcher name extraction task with the best featureless \textit{HMM} and \textit{CRF}.
 
 \begin{figure}[h!]
   \begin{center}
@@ -3032,23 +3036,23 @@ without features.
       \end{axis}
     \end{tikzpicture}
     \caption{
-      Performance of the Bi-LSTM-CRF in comparison with the second-order Hidden Markov Models and 
-      Linear Chain CRFs without features.
+      Performance of the Bi-LSTM-CRF in comparison to featureless HMM-2 and 
+      featureless CRF.
     }
     \label{fig:hmm_no_features}
   \end{center}
 \end{figure}
 
-The Bi-LSTM-CRF improves the performance of earlier models by a significant margin, though the
-comparison is not completely fair, since we fed the model with Glove-300 word embeddings. However,
-these pretrained embeddings are general to any language related task, so their incorporation in
-does not require a lot of additional effort. Without any feature engineering, the Bi-LSTM-CRF model
-already achieves an F1-score of 0.886, surpassing the best model up to this point (the HMM-2 with
+The Bi-LSTM-CRF is significantly better than the previous models, though the comparison is not 
+completely fair, since we fed the model with word embeddings. However, these pretrained embeddings 
+are static and general to any language related task, so their incorporation in the model does not 
+require any a substantial effort. Without any feature engineering, the Bi-LSTM-CRF model
+already achieves an 0.886 F1-score, surpassing the best model up to this point (the HMM-2 with
 self-training, which achieved 0.879 F1-score).
 
 
 \subsection{Character Representations}
-\label{ssec:char_representations}
+\label{ssec:experiment_char_representations}
 
 Morphological features can help identifying named entities. We presented in Section~\ref{sec:char_representations}
 two methods for incorporating character representations in \textit{Recurrent Neural Networks}, the \textit{CNN-based}
@@ -3060,14 +3064,22 @@ method, and the \textit{LSTM-based} method. In Table~\ref{tab:char_reps}, we com
   \begin{center}
     \begin{tabular}{ lllllll }
       \toprule
-      Model & Precision & Recall & F1 \\
+      \multirow{2}{*}{Model} & \multicolumn{3}{c}{Validation} & \multicolumn{3}{c}{Test} \\
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
       \midrule
-      Bi-LSTM-CRF                        & 0.909 (0.008) & 0.865 (0.020) & 0.886 (0.011) \\
-      Bi-LSTM-CRF + CNN chars            & 0.921 (0.006) & 0.881 (0.005) & 0.901 (0.002) \\
-      Bi-LSTM-CRF + LSTM chars           & 0.920 (0.007) & 0.886 (0.031) & 0.902 (0.019) \\
-      Bi-LSTM-CRF (Group B)              & 0.921 (0.008) & 0.883 (0.022) & 0.901 (0.008) \\
-      Bi-LSTM-CRF (Group B) + CNN chars  & 0.922 (0.006) & 0.868 (0.033) & 0.894 (0.018) \\
-      Bi-LSTM-CRF (Group B) + LSTM chars & 0.913 (0.005) & 0.855 (0.021) & 0.883 (0.012) \\
+      Bi-LSTM-CRF           & 0.906 & 0.938 & 0.922 & 0.909 & 0.865 & 0.886 \\
+      +CNN chars            & 0.929 & 0.946 & 0.938 & 0.921 & 0.881 & 0.901 \\
+      +LSTM chars           & 0.928 & 0.950 & 0.939 & 0.920 & \textbf{0.886} & \textbf{0.902} \\
+      Bi-LSTM-CRF (Group B) & 0.914 & 0.947 & 0.930 & 0.921 & 0.883 & 0.901 \\
+      +CNN chars            & 0.939 & 0.947 & 0.943 & \textbf{0.922} & 0.868 & 0.894 \\
+      +LSTM chars           & 0.932 & 0.942 & 0.937 & 0.913 & 0.855 & 0.883 \\
+      % Bi-LSTM-CRF                        & 0.909 (0.008) & 0.865 (0.020) & 0.886 (0.011) \\
+      % Bi-LSTM-CRF + CNN chars            & 0.921 (0.006) & 0.881 (0.005) & 0.901 (0.002) \\
+      % Bi-LSTM-CRF + LSTM chars           & 0.920 (0.007) & 0.886 (0.031) & 0.902 (0.019) \\
+      % Bi-LSTM-CRF (Group B)              & 0.921 (0.008) & 0.883 (0.022) & 0.901 (0.008) \\
+      % Bi-LSTM-CRF (Group B) + CNN chars  & 0.922 (0.006) & 0.868 (0.033) & 0.894 (0.018) \\
+      % Bi-LSTM-CRF (Group B) + LSTM chars & 0.913 (0.005) & 0.855 (0.021) & 0.883 (0.012) \\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -3083,28 +3095,43 @@ invariant.
 
 We also present the results for these models using the features from \textit{Group B}. The
 addition of features improves the performance of the plain \textit{Bi-LSTM-CRF}, but hurts the 
-performance of the models with character representations.
+performance of the models with character representations. Still, in all cases, the performance is
+worse than the featureless Bi-LSTM-CRF model with LSTM-based character representations, so there
+little point in trying to boost the performance further by adding more features.
 
 
 \subsection{Attention Mechanisms}
 
-The \textit{Self-Training} strategy for \textit{HMMs} showed that there is a lot to gain
-from incorporating features related to the HTML structure in our models. The hard and soft
-attention mechanisms proposed in Section~\ref{sec:attention} are two ways to do that. We 
-compare the performance of the \textit{Bi-LSTM-CRF} with \textit{LSTM-based} character 
-representations with the same model using a Hard Attention layer and a Soft Attention 
-layer in Table~\ref{tab:attention}.
+The \textit{Self-Training} strategy for HMMs showed that there is a lot to gain
+from incorporating features related to the HTML structure in our models. The HMM-2 
+model went from 0.805 F1-score to 0.879 F1-score with the self-training strategy. With the
+Bi-LSTM-CRF model, the margin for improvement is smaller because the model already performs
+remarkably well.
+
+The hard and soft attention mechanisms proposed in Section~\ref{sec:attention_models} are 
+techniques aimed at doing to neural networks something similar to what is done in the 
+self-training strategy for HMMs. In Table~\ref{tab:attention}, we compare the performance of 
+the Bi-LSTM-CRF with LSTM-based character representations using a Hard Attention layer and 
+a Soft Attention layer.
 
 \begin{table}[h]
   \small
   \begin{center}
     \begin{tabular}{ lllllll }
       \toprule
-      Model & Precision & Recall & F1 \\
+      \multirow{2}{*}{Model} & \multicolumn{3}{c}{Validation} & \multicolumn{3}{c}{Test} \\
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
       \midrule
-      Bi-LSTM-CRF + LSTM chars           & 0.920 (0.007) & 0.886 (0.031) & 0.902 (0.019) \\
-      ... + Hard Attention               & 0.925 (0.007) & 0.890 (0.011) & 0.907 (0.005) \\
-      ... + Soft Attention               & 0.884 (0.025) & 0.849 (0.021) & 0.866 (0.013) \\
+
+      
+      
+      Bi-LSTM-CRF + LSTM chars      & 0.928 & 0.950 & 0.939 & 0.920 & 0.886 & 0.902 \\
+      +Hard Attention               & 0.944 & 0.961 & 0.952 & \textbf{0.925} & \textbf{0.890} & \textbf{0.907} \\
+      +Soft Attention               & 0.894 & 0.961 & 0.926 & 0.884 & 0.849 & 0.866 \\
+      % Bi-LSTM-CRF + LSTM chars       & 0.920 (0.007) & 0.886 (0.031) & 0.902 (0.019) \\
+      % +Hard Attention               & 0.925 (0.007) & 0.890 (0.011) & 0.907 (0.005) \\
+      % +Soft Attention               & 0.884 (0.025) & 0.849 (0.021) & 0.866 (0.013) \\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -3112,77 +3139,95 @@ layer in Table~\ref{tab:attention}.
   \label{tab:attention}
 \end{table}
 
-The \textit{Hard Attention} layer improved the original model by roughly 0.5 F1-score with the
-bonus of reducing variance significantly. However,
-the \textit{Soft Attention} actually hurt the performance significantly, what demands further 
-explanation. The reason for this is probably that the \textit{Hard Attention} only captures if
-the HTML context between two tags is exactly the same, but it does not look at what is this 
-context. What the \textit{Hard Attention} layer learns is essentialy how much it can trust 
-predictions made for words in the same HTML context, no matter what this context is. The 
-\textit{Soft Attention} layer, however, also learns features about the HTML context, so
-it can learn for example to look more at words that happen inside a <div> tag. This would not 
-be problematic if all documents came from the same website, however, since this is not the case,
+The Hard Attention layer improved the original model by roughly 0.5 F1-score, which is
+significant, considering that we only gained 0.34 F1-score with the addition of character
+representations. However, the Soft Attention layer actually decreased the performance, 
+what demands further explanation. The reason for this is probably that the Hard Attention layer only 
+captures if the HTML context between two tags is exactly the same, but it does not look at what is the
+context itself. What the Hard Attention layer learns is essentialy how much it can trust 
+predictions made for other words in the same HTML context, no matter what is the actual context. 
+However, the Soft Attention layer, also learns features about the HTML context. For example, the
+model could learn that tokens happening inside a list are more likely to be names. This would not 
+be problematic if all the documents came from the same website, but since this is not the case,
 we cannot trust specific HTML configurations to be meaningful outside the document where they
-happen. This does not mean that the \textit{Soft Attention} layer is useless, but for it to grasp
-abstract structural patterns that could be useful, we would probably need a much larger dataset.
+happen. This does not mean that the Soft Attention layer is useless, but for it to grasp
+abstract structural patterns that could be generally useful, we would need a much larger 
+dataset. A possibility would be to pretrain unsupervised HTML contextual embeddings to detect
+useful HTML patterns in a large collection and then use this knowledge in a specific sequence 
+labelling setting.
 
 
 \subsection{Word Embeddings}
 
-Up to this point, all neural architectures used Glove-300 pretrained word embeddings. However, the
+Up to this point, all neural architectures used GloVe-300 pretrained word embeddings. However, the
 choice of embeddings is of great importance to the success of neural sequence models. In fact, most
-recent developments to the \textit{Named Entity Recognition} models come from the incorporation of 
-better word embeddings rather than from different neural architectures. We considered three sets of
-pretrained word embeddings in our experiments: Glove-300, Word2Vec-300 and Elmo.
-
-Different from Glove-300 and Word2Vec-300, which are static, Elmo embeddings are context dependent and
-need to be calculated for the specific dataset. This adds significant overhead to the model training.
-
-Table~\ref{tab:word_embeddings} compares the performance of different sets of word embeddings in the
-\textit{Bi-LSTM-CRF} model with \textit{LSTM-based} character representations.
+recent developments in NER models come from the incorporation of better pretrained word embeddings 
+to state-of-the-art models in many NLP tasks. We considered three sets of pretrained word embeddings 
+in our experiments: GloVe-300, Word2Vec-300 and ELMo. The characteristics of these
+word embeddings is described in Table~\label{tab:word_embeddings}. Different from Glove-300 and Word2Vec-300, 
+which are static, ELMo embeddings are context dependent and need to be recalculated for the specific dataset. 
+This adds significant overhead to the model training. In fact, while training the Bi-LSTM-CRF variations
+in a CPU is slow but possible, the training of the same models with ELMo embeddings without a good GPU is almost
+inconceivable. Table~\ref{tab:experiments_word_embeddings} compares the performance of \textit{Bi-LSTM-CRF} 
+models with \textit{LSTM-based} character representations using different sets of pretrained word embeddings.
 
 \begin{table}[h]
   \small
   \begin{center}
     \begin{tabular}{ lllllll }
       \toprule
-      Model & Precision & Recall & F1 \\
+      \multirow{2}{*}{Model} & \multicolumn{3}{c}{Validation} & \multicolumn{3}{c}{Test} \\
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
       \midrule
-      Bi-LSTM-CRF + LSTM chars + Glove    & 0.920 (0.007) & 0.886 (0.031) & 0.902 (0.019) \\
-      Bi-LSTM-CRF + LSTM chars + Word2Vec & 0.899 (0.011) & 0.831 (0.028) & 0.864 (0.019) \\
-      Bi-LSTM-CRF + LSTM chars + Elmo     & 0.720 (0.033) & 0.885 (0.062) & 0.794 (0.043) \\
+      GloVe    & 0.928 & 0.950 & 0.939 & 0.920 & 0.886 & 0.902 \\
+      Word2Vec & 0.925 & 0.926 & 0.926 & 0.899 & 0.831 & 0.864 \\
+      ELMo     & 0.783 & 0.844 & 0.812 & 0.720 & 0.885 & 0.794 \\
+      
+      % GloVe    & 0.920 (0.007) & 0.886 (0.031) & 0.902 (0.019) \\
+      % Word2Vec & 0.899 (0.011) & 0.831 (0.028) & 0.864 (0.019) \\
+      % ELMo     & 0.720 (0.033) & 0.885 (0.062) & 0.794 (0.043) \\
       \bottomrule
     \end{tabular}
   \end{center}
   \caption{Word Embeddings}
-  \label{tab:attention}
+  \label{tab:experiments_word_embeddings}
 \end{table}
 
-As the results in Conll-2003 show, Glove-300 embeddings are superior to Word2Vec at the \textit{Named Entity Recognition}
-task. However the \textit{ELMO} embeddings showed a very poor performance, contrasting to the great improvements
-it showed in many NLP tasks, including NER. This is probably due to the fact that the pretrained \textit{Language Model} 
-that generates the \textit{ELMO} embeddings has been trained on plain text, which is too different from the type of HTML
-that we are dealing with.
+Glove embeddings are superior to Word2Vec in our NER setting, agreeing with the reported results for neural 
+models in the CoNLL-2003 English dataset for NER. But, \textit{ELMo} embeddings showed a very poor performance, 
+contrasting with the results reported in the CoNLL-2003 English dataset. This is probably due to the fact that,
+different from static embeddings, ELMo considers the context when generating word representations. Since
+the pretrained language model that generates ELMo embeddings was trained on plain text, it is natural that the
+contextual representations on HTML will not make much sense. 
+
+The results obtained with different sets of embeddings are important because they show that the choice of 
+word embeddings makes the performance of the original model vary considerably. In fact, if we used Word2Vec embeddings
+instead of GloVe embeddings, the Bi-LSTM-CRF would lose to the self-trained HMM-2, which reached a \textbf{0.879}
+F1-score. Also, we cannot trust that only because an embedding shows superior performance in related tasks
+that it will also be effective in the present task (ELMo).
 
 
 \subsection{F-score Maximization}
 
-Numerical optimization methods such as \textit{SGD} for training \textit{Deep Neural Networks} 
-usually want to minimize the \textit{Cross Entropy}. However, what we ultimately care about
-are the \textit{Precision} and \textit{Recall} measures. By reducing the \textit{Cross Entropy}, we
-expect to increase these measures. But in Section~\ref{sec:fscore_optimization} we proposed to use
-the \textit{F-score} expected utility function as an optimization objective for \textit{Deep Neural Networks}
-on \textit{Sequence Labeling} tasks. We want to understand if, by using the optimization objective, we
-can control how much the model prioritizes one measure over the other. Also, the results presented
-in the last Section show that \textit{Neural Architectures} tend to value \textit{Precision} over
-\textit{Recall} in the name extraction task, however it is arguably better to improve \textit{Recall} 
-and lose a little bit of precision in this task, since it easier to filter out false positives from the
-results than to find manually the false negatives in the corpus. Figure~\ref{fig:fscore_optimization}
-presents the results on the test set for a \textit{Bi-LSTM-CRF} model with LSTM character representations
-trained with the \textit{F-score} expected utility maximization objective and varying the objective
-\textit{F-score} $ \alpha $. For example, $ \alpha=0.5 $ means that we value Recall as much as Precision,
-$ \alpha=0.2 $ means that we value Precision twice as much as Recall, and $ \alpha=0.8 $ means that we value 
-Recall twice as much as Precision.
+Numerical optimization methods such as Stochastic Gradient Descent for training Deep Neural Networks
+usually work by minimizing the Cross Entropy. However, what we ultimately care about is the
+F-score. In Section~\ref{sec:fscore_optimization}, we proposed to change the optimization objective
+for Neural Networks in NER and optimize the expected F-score utility function instead of the Cross Entropy.
+We want to understand if, by using this optimization objective, we can control how much the model prioritizes 
+Recall over Precision. 
+
+The results presented in the previous sections show that Neural Architectures tend 
+to value Precision over Recall in the name extraction task, however it is arguably better to improve Recall
+and lose a little Precision in this task, since it is easier to filter out false positives from the
+results than to find manually the false negatives in the corpus. 
+
+Figure~\ref{fig:fscore_optimization} presents the results on the test set of the NER-on-HTML dataset
+for a \textit{Bi-LSTM-CRF} model with LSTM character representations trained with the expected \textit{F-score} 
+maximization objective and varying the \textit{F-score} $ \alpha $. For example, $ \alpha=0.5 $ means that we 
+value Recall as much as Precision, $ \alpha=0.2 $ means that we value Precision twice as much as Recall, and 
+$ \alpha=0.8 $ means that we value Recall twice as much as Precision. The exact formula for the $ F_\alpha-score $
+is given in Equation~\ref{eq:falpha}.
 
 \begin{figure}[h!]
   \begin{center}
@@ -3234,23 +3279,36 @@ Recall twice as much as Precision.
 \end{figure}
 
 The experiment shows that the capacity to control how much the model optimizes for one measure over the
-other is very limited. Even when giving a lot more priority to Precision ($ \alpha=0.1 $), the model is still
+other is limited. Even when giving a lot more priority to Precision ($ \alpha=0.1 $), the model is still
 less precise than the variant that optimizes for the F1-score ($ \alpha=0.5 $). Actually, the model that achieves
 top Precision (0.864) and the second best Recall (0.922) is the one with $ \alpha=0.5 $. The model with 
 $ \alpha=0.8 $ achieves the best Recall (0.923).
 
 An interesting result that we can observe in the models that optimized the expected F-score function is that
-all of them valued \textit{Recall} over \textit{Precision}. A result that contrasts with the 
-\textit{Neural Networks} that were presented earlier, which prioritized \textit{Precision}. Table~\ref{tab:fscore_optimization}
+all of them valued Recall over Precision. A result that contrasts with the Neural Networks that were presented 
+earlier, which prioritized Precision. This is very useful because, the F1-score optimized Bi-LSTM-CRF obtains
+a Recall of 0.922 in the test set without losing a lot of Precision, contrasting with the best model so far,
+the Hard-Attention Bi-LSTM-CRF, that achieved a 0.890 Recall and had better Precision. Table~\ref{tab:fscore_optimization}
 shows the detailed results from the models discussed in this Section.
 
 \begin{table}[h]
   \small
   \begin{center}
-    \begin{tabular}{ lllllll }
+    \begin{tabular}{ cllllll }
       \toprule
-      Alpha & Precision & Recall & F-score ($ \alpha $) \\
+      \multirow{2}{*}{$\alpha$} & \multicolumn{3}{c}{Validation} & \multicolumn{3}{c}{Test} \\
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{$F_\alpha $}
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{$F_\alpha $} \\
       \midrule
+       0.1 & 0.879 & 0.925 & 0.884 & 0.831 & 0.838 & 0.832 \\ 
+       0.2 & 0.876 & 0.939 & 0.888 & 0.844 & 0.858 & 0.847 \\
+       0.3 & 0.881 & 0.935 & 0.896 & 0.851 & 0.864 & 0.855 \\
+       0.4 & 0.873 & 0.962 & 0.907 & 0.860 & 0.893 & 0.873 \\
+       0.5 & 0.823 & 0.970 & 0.890 & \textbf{0.864} & 0.922 & 0.892 \\
+       0.6 & 0.839 & 0.976 & 0.916 & 0.844 & 0.907 & 0.881 \\
+       0.7 & 0.810 & 0.975 & 0.919 & 0.818 & 0.904 & 0.877 \\
+       0.8 & 0.814 & 0.980 & 0.942 & 0.840 & \textbf{0.923} & \textbf{0.905} \\
+       0.9 & 0.680 & 0.900 & 0.871 & 0.636 & 0.752 & 0.738 \\
        % 0.1 & 0.879 (0.007) & 0.925 (0.012) & 0.884 (0.006) & 0.831 (0.010) & 0.838 (0.014) & 0.832 (0.009) \\ 
        % 0.2 & 0.876 (0.001) & 0.939 (0.003) & 0.888 (0.000) & 0.844 (0.009) & 0.858 (0.013) & 0.847 (0.010) \\
        % 0.3 & 0.881 (0.005) & 0.935 (0.007) & 0.896 (0.004) & 0.851 (0.011) & 0.864 (0.014) & 0.855 (0.011) \\
@@ -3260,126 +3318,148 @@ shows the detailed results from the models discussed in this Section.
        % 0.7 & 0.810 (0.007) & 0.975 (0.003) & 0.919 (0.002) & 0.818 (0.018) & 0.904 (0.005) & 0.877 (0.009) \\
        % 0.8 & 0.814 (0.009) & 0.980 (0.002) & 0.942 (0.001) & 0.840 (0.006) & 0.923 (0.011) & 0.905 (0.010) \\
        % 0.9 & 0.680 (0.081) & 0.900 (0.055) & 0.871 (0.060) & 0.636 (0.085) & 0.752 (0.048) & 0.738 (0.053) \\
-       0.1 & 0.831 (0.010) & 0.838 (0.014) & 0.832 (0.009) \\ 
-       0.2 & 0.844 (0.009) & 0.858 (0.013) & 0.847 (0.010) \\
-       0.3 & 0.851 (0.011) & 0.864 (0.014) & 0.855 (0.011) \\
-       0.4 & 0.860 (0.010) & 0.893 (0.012) & 0.873 (0.007) \\
-       0.5 & 0.864 (0.037) & 0.922 (0.027) & 0.892 (0.032) \\
-       0.6 & 0.844 (0.004) & 0.907 (0.013) & 0.881 (0.010) \\
-       0.7 & 0.818 (0.018) & 0.904 (0.005) & 0.877 (0.009) \\
-       0.8 & 0.840 (0.006) & 0.923 (0.011) & 0.905 (0.010) \\
-       0.9 & 0.636 (0.085) & 0.752 (0.048) & 0.738 (0.053) \\
+       % 0.1 & 0.831 (0.010) & 0.838 (0.014) & 0.832 (0.009) \\ 
+       % 0.2 & 0.844 (0.009) & 0.858 (0.013) & 0.847 (0.010) \\
+       % 0.3 & 0.851 (0.011) & 0.864 (0.014) & 0.855 (0.011) \\
+       % 0.4 & 0.860 (0.010) & 0.893 (0.012) & 0.873 (0.007) \\
+       % 0.5 & 0.864 (0.037) & 0.922 (0.027) & 0.892 (0.032) \\
+       % 0.6 & 0.844 (0.004) & 0.907 (0.013) & 0.881 (0.010) \\
+       % 0.7 & 0.818 (0.018) & 0.904 (0.005) & 0.877 (0.009) \\
+       % 0.8 & 0.840 (0.006) & 0.923 (0.011) & 0.905 (0.010) \\
+       % 0.9 & 0.636 (0.085) & 0.752 (0.048) & 0.738 (0.053) \\
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{F-score optimization}
+  \caption{Bi-LSTM-CRF with LSTM character embeddings and F-score optimization objective.}
   \label{tab:fscore_optimization}
 \end{table}
 
 
 \subsection{Technical Details for Neural Networks}
 
-All neural models were trained with the Adam Optimizer using a learning rate of 0.001 over 20 epochs on minibatches
-of size 10. We used early stopping \cite{Caruana2000} to select the best 
-parameters, considering the F1 measure in the validation set. All \textit{Bi-LSTM-CRF} models contained a 
+All neural models were trained with the Adam Optimizer using a learning rate of 0.001 over 20 epochs on 
+minibatches of size 10. We used early stopping~\cite{Caruana2000} to select the best parameters, considering 
+the F1 measure in the validation set. All \textit{Bi-LSTM-CRF} models contained a 
 single LSTM layer with 100 weights. Dropout layers with 0.5 dropout rates were added after the LSTM, 
 the character representations, and the attention matrix when applicable. The neural models were trained on 
-Amazon G3.4xlarge instances, which use NVIDIA Tesla M60 GPUs with 8GB internal memory. The implementations
-were done entirely in Python using Google's Tensorflow deep learning library. 
+Amazon G3.4xlarge instances, which have NVIDIA Tesla M60 GPUs with 8GB internal memory. The implementations
+were done entirely in Python using Google's Tensorflow deep learning library~\footnote{https://www.tensorflow.org/.}. 
 
 
-\section{What model is best?}
+\section{What is the best model?}
 \label{sec:experiments_best}
 
-We have discussed multiple sequence labeling methods in the previous Sections and now we provide
+We finally reach the point where we try to answer the main question of this dissertation. 
+We have experimented with multiple sequence labeling methods in the previous Sections and now we provide
 an overview of the best variants of each category.
 In Table~\ref{tab:best_models}, we compare the performance of the best \textit{HMMs}, 
-\textit{CRFs} and \textit{Neural Networks} on the test set of the NER on HTML dataset.
+\textit{CRFs} and \textit{Neural Networks} in the NER on HTML dataset.
 
 \begin{table}[h]
   \small
   \begin{center}
     \begin{tabular}{ lllllll }
       \toprule
-      Model & Precision & Recall & F1 \\
+      \multirow{2}{*}{Model} & \multicolumn{3}{c}{Validation} & \multicolumn{3}{c}{Test} \\
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
       \midrule
        % HMM-2 (No features)                        & 0.703 & 0.630 & 0.665 & 0.653 & 0.527 & 0.583 \\
        % HMM-2 (Group A)                            & 0.787 & 0.820 & 0.803 & 0.823 & 0.802 & 0.812 \\
        % HMM-2 (Group A) + Self-Training            & 0.784 & 0.892 & 0.835 & 0.888 & 0.864 & 0.879 \\
        % CRF (No features)                          & 0.806 & 0.805 & 0.806 & 0.795 & 0.710 & 0.750 \\
        % CRF (Group B)                              & 0.881 & 0.903 & 0.892 & 0.870 & 0.786 & 0.826 \\
-       HMM-2 (Group A)                            & 0.823         & 0.802         & 0.812                  \\
-       HMM-2 (Group A) + Self-Training            & 0.888         & 0.864         & 0.879                  \\
-       CRF (Group B)                              & 0.870         & 0.786         & 0.826                  \\
-       Bi-LSTM-CRF + LSTM chars                   & 0.920 (0.007) & 0.886 (0.031) & 0.902 (0.019)          \\
-       Bi-LSTM-CRF + LSTM chars + Hard Attention  & 0.925 (0.007) & 0.890 (0.011) & \textbf{0.907 (0.005)} \\
-       Bi-LSTM-CRF + LSTM chars + F1 Optimization & 0.864 (0.037) & 0.922 (0.027) & 0.892 (0.032)          \\
+       % HMM-2 (Group A)                  & 0.823         & 0.802         & 0.812                  \\
+       % HMM-2 (Group A) + Self-Training  & 0.888         & 0.864         & 0.879                  \\
+       % CRF (Group B)                    & 0.870         & 0.786         & 0.826                  \\
+       % HMM-2 (Group A)                    & 0.787 & 0.820 & 0.803 & 0.823 & 0.802 & 0.812 \\
+       HMM-2 (Group A) + Self-Training    & 0.784 & 0.892 & 0.835 & 0.888 & 0.864 & 0.879 \\
+       CRF (Group B)                      & 0.881 & 0.903 & 0.892 & 0.870 & 0.786 & 0.826 \\
+       Bi-LSTM-CRF+LSTM                   & 0.928 & 0.950 & 0.939 & 0.920 & 0.886 & 0.902           \\
+       Bi-LSTM-CRF+LSTM + Hard Attention  & 0.944 & 0.961 & 0.952 & \textbf{0.925} & 0.890 & \textbf{0.907}   \\
+       Bi-LSTM-CRF+LSTM + F1 Optimization & 0.823 & 0.970 & 0.890 & 0.864 & \textbf{0.922} & 0.892           \\
+       % Bi-LSTM-CRF+LSTM                   & 0.920 (0.007) & 0.886 (0.031) & 0.902 (0.019)          \\
+       % Bi-LSTM-CRF+LSTM + Hard Attention  & 0.925 (0.007) & 0.890 (0.011) & \textbf{0.907 (0.005)} \\
+       % Bi-LSTM-CRF+LSTM + F1 Optimization & 0.864 (0.037) & 0.922 (0.027) & 0.892 (0.032)          \\
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Overview of the best models for the name extraction task in the NER on HTML dataset}
+  \caption{Overview of the best models for the name extraction task in the NER on HTML dataset.}
   \label{tab:best_models}
 \end{table}
 
-If we take the \textit{F1} score as the comparison criterium, then the \textit{Bi-LSTM-CRF} with LSTM 
+If we take the F1 score as the comparison criterion, then the Bi-LSTM-CRF model with LSTM 
 character representations, Glove-300 embeddings, and a Hard Attention Layer is the winning model with an
-\textit{F1} of 0.907. However, as we previously argued, \textit{Recall} should be privileged over 
-\textit{Precision} in this task. When we take this in consideration, the \textit{Bi-LSTM-CRF} optimized
-with the \textit{Expected F-score} objective is probably a better option, but its variance is significantly 
-higher.
+F1 of 0.907. However, as we previously argued, Recall should be privileged over 
+Precision in this task. When we take this in consideration, the Bi-LSTM-CRF optimized
+with the Expected F1-score objective is probably a better option.
 
-Despite the superior performance of \textit{Neural Networks} in this task, there remains an important 
+Despite the superior performance of Neural Networks in this task, there remains an important 
 consideration to be made. As we increase the complexity and training time required by our models, there 
-is only a scant gain in terms of \textit{Precision} and \textit{Recall}. For example, lets compare the 
-\textit{Bi-LSTM-CRF} with a Hard Attention Layer and the \textit{HMM-2} using Self-training strategy.
-The first model achieved an 0.907 $ \pm 0.005 $ \textit{F1-score} in comparison to the 0.879 F1-score 
-achieved by the latter. This is a 0.028 increase, which is not bad, but it comes to mind if the added
+is only a scant gain in terms of Precision and Recall. For example, the 
+Bi-LSTM-CRF with a Hard Attention Layer achieved an 0.907 $ \pm 0.005 $ \textit{F1-score} (considering 
+the standard deviation), while the HMM-2 using a Self-training strategy achieved an 0.879 
+F1-score. This is a 0.028 increase, which is not bad, but it comes to mind if the additional
 complexity is entirely justifiable. 
 
-The \textit{Neural Network} approach does not demand any feature engineering or special
-training strategy, contrasting with the \textit{HMM} approach, which is highly reliant on
+The Neural Network approach does not demand any feature engineering or self-training 
+strategy, contrasting with the HMM approach, which is highly reliant on
 the right selection of features and the self-training strategy. However, the absence of
-human intervention on \textit{Neural Network} training is questionable since we need to
-define a number of hyper parameters (e.g. learning rate, momentum, weight decay, etc.) and
+human engineering in Neural Network training is questionable to some degree since we need to
+define many hyper parameters (e.g. learning rate, momentum, weight decay, etc.) and
 many details about the neural architecture, such as the number of \textit{LSTM} layers and
-hidden weights, where to add dropout layers, which word embeddings to use, etc. In summary, there
-are many choices to be made, none of which have a definitive justification, and all of them
-can impact model performance (especially the dropout layers and word embeddings). 
+hidden weights, where to add dropout layers, which word embeddings to use, etc. In summary, 
+there are many choices to be made, none of which have definitive theoretical justification, 
+and so they have to be tested empirically. This means many iterations between setting
+parameters, obtaining results, and tuning parameters once again. Considering that each of 
+these iterations can take at least a couple of hours to finish, it is not clear if
+selecting features is really a more arduous struggle.
 
 To the best of our abilities, the TensorFlow implementation of the Bi-LSTM-CRF + LSTM chars + 
 Hard Attention model running on an AWS GPU instance took approximately 6075 seconds to train 
 and run predictions in the test set. While, the \textit{HMM-2} did the same in approximately
-64 seconds, running in a conventional CPU. That is almost a hundred times faster. Finally, if 
-we consider the intellectual cost of understanding and implementing both models and the code 
-maintainability of both implementations, the difference gets even more profound.
+64 seconds, running in a conventional CPU with unoptimized code. That is almost a hundred times 
+faster. Finally, if we consider the intellectual cost of understanding and implementing both 
+models and the code maintainability of both implementations, the difference is even more profound.
 
-So, what model is best? It depends on the end goal. If the goal is to achieve as much accuracy
-as possible, then definitely go for \textit{Deep Neural Architectures}. However, for most
-ordinary implementations, simpler models should probably be preferred. In both cases, models
+Then, what is the best model? It depends on the end goal. If the goal is to achieve as much accuracy
+as possible, then definitely go for Deep Neural Architectures. However, in most ordinary 
+implementations, simpler models should probably be preferred. In both cases, models
 trained on publically available sequence tagging datasets will probably perform rather poorly,
 so most of the effort would certainly be better spent on constructing task specific datasets
-of high quality. This points to the necessity of searching for good unsupervised approaches to 
+with a high quality. This points to the necessity of searching for good unsupervised approaches to 
 sequence labeling. This way, we would have models with better flexibility and good accuracy in
 many extraction tasks. Unfortunately, unsupervised and semi supervised approaches to this problem 
 are still far from serviceable.
 
-\subsection{Heuristic Filtering}
 
+\subsection{Filtering Strategy}
+
+Many times in this dissertation we argue that Recall is more valuable than Precision in named
+entity extraction tasks. To verify this empirically, we consider the results of the best models
+presented in Table~\ref{tab:best_models} and apply a simple filter to the results obtained in
+the test set.
 Despite the variation between the sequence models presented above, they tend to commit some
-similar prediction mistakes. We tried a simple heuristic strategy to test how difficult
-it would be to filter out false positives from the results. We automatically relabeled tokens
-that were labeled as a person ("B-PER" or "I-PER") to an outside ("O") label if:
+similar prediction mistakes. Also, some named entities are missed because they are only partially
+matched or because the match extends beyond the actual named entity. We tried a simple strategy to 
+test how difficult it would be to filter out false positives from the results. So, we automatically 
+relabeled tokens that were labeled as a person ("B-PER" or "I-PER") to an outside ("O") label if:
 
-\begin{itemize}
+\begin{enumerate}
+\small
 \item It was an honorific (Mr., Dr., P.hD., etc.).
 \item It contained a number.
 \item It was a punctuation sign just before or after a name (e.g. "- Mark" or "Emma ;").
 \item It was an isolated name label.
 \item It belonged to a name that was repeated at least three times.
-\end{itemize}
+\end{enumerate}
 
-The results of the heuristic filtering strategy for the best models is presented in 
-Table~\ref{tab:heuristic_filtering}.
+The results of this simple filtering strategy for the best models is presented in 
+Table~\ref{tab:heuristic_filtering}. The strategy could improve the precision of all 
+models considerably with a very simple approach, showing that filtering out false 
+positives can be accomplised with a small effort. A viable idea for future research is to incorporate
+these filters in the models, especially filters 3 and 5, to prevent them from making
+the mistakes and allow them some flexibility to derive new filters depending on the task.
 
 \begin{table}[h]
   \small
@@ -3388,31 +3468,37 @@ Table~\ref{tab:heuristic_filtering}.
       \toprule
       Model & Precision & Recall & F1 \\
       \midrule
-       HMM-2 (Group A)                            & 0.9240 & 0.8795 & 0.9012 \\
+       HMM-2 (Group A) + Self-Training            & 0.9240 & 0.8795 & 0.9012 \\
        CRF (Group B)                              & 0.9236 & 0.7951 & 0.8545 \\
-       Bi-LSTM-CRF + LSTM chars                   & 0.9387 & 0.8887 & 0.9130 \\
+       Bi-LSTM-CRF + LSTM chars                   & \textbf{0.9387} & 0.8887 & 0.9130 \\
        Bi-LSTM-CRF + LSTM chars + Hard Attention  & 0.9376 & 0.8997 & 0.9183 \\
-       Bi-LSTM-CRF + LSTM chars + F1 Optimization & 0.9239 & 0.9409 & 0.9323 \\
+       Bi-LSTM-CRF + LSTM chars + F1 Optimization & 0.9239 & \textbf{0.9409} & \textbf{0.9323} \\
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Overview of the best models for the name extraction task in the NER on HTML dataset}
+  \caption{Overview of the best models for the name extraction task in the NER on HTML dataset after the filtering strategy.}
   \label{tab:heuristic_filtering}
 \end{table}
 
-The results for the \textit{Heuristic Filtering Strategy} show that the precision of all models could 
-be improved considerably with a very simple approach. This implies that the number of false 
-positives is not such a big problem on extraction tasks, since the mistakes commited by the classifiers
-are at least to some extext quite repetitive.
-
 \section{Summary}
 
-Baochikawawau.
-
+In this chapter, we presented experimental results for various HMMs, CRFs, and Neural Networks in the
+researcher name extraction task. We learned that, despite being very simple models, HMMs can perform
+incredibly well with the right selection of features and the self-training strategy, obtaining a
+0.879 F1 in the test set. When we consider featureless models, the best performance
+is achieved by the Bi-LSTM-CRF model with LSTM character representations and a Hard-Attention layer, achieving
+0.907 F1, however this model is much more complex than HMMs. After applying the filtering strategy, both
+models gain an increase in the F1, but the overall best performance is achieved by the Bi-LSTM-CRF model
+with LSTM character representations optimized with a F1-score optimization objective, achieving a
+0.9323 F1.
 
 \chapter{Related Work}
 
-\section{Web Information Extraction}
+This chapter presents related research in the fields of Web Data Extraction in Section~\ref{sec:wde}
+and Named Entity Recognition in Section~\ref{sec:ner}.
+
+\section{Web Data Extraction}
+\label{sec:wde}
 
 In the last 20 years, the astonishing growth of public information in the Web has 
 led to the development of a number of different approaches to the problem of Web 
@@ -3543,11 +3629,10 @@ In that regard, the recent advancements in sequence taggers may provide more rob
 flexible extraction tools.
 
 \section{Named Entity Recognition}
+\label{sec:ner}
 
 \textit{Named Entity Recognition} is an important subtask of \textit{Information Extraction},
 together with \textit{Relationship Extraction} and \textit{Named Entity Linking}.
-In the context of the researcher name extraction task, we are evaluating the 
-performance of different systems only in this subtask.
 As previously discussed in Chapter~\ref{cha:problem_discussion}, the 
 \textit{Named Entity Recognition} task was introduced in the Third Message 
 Understanding Conference (MUC-3) (CITE), where researchers were asked to extract
