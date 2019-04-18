@@ -58,13 +58,13 @@
 \begin{document}
 
 \ppgccufmg{
-  title={Named Entity Recognition on HTML: Name Extraction from Faculty Directories},
+  title={Named Entity Recognition on the Web},
   authorrev={de Freitas Veneroso, João Mateus},
   cutter={D1234p},
   cdu={519.6*82.10},
   university={Federal University of Minas Gerais},
   course={Computer Science},
-  portuguesetitle={Reconhecimento de Entidades Nomeadas em HTML: Extração de Nomes de Diretórios Acadêmicos},
+  portuguesetitle={Reconhecimento de Entidades Nomeadas na Web},
   portugueseuniversity={Universidade Federal de Minas Gerais},
   portuguesecourse={Ciência da Computação},
   address={Belo Horizonte},
@@ -3195,7 +3195,7 @@ models with \textit{LSTM-based} character representations using different sets o
 \end{table}
 
 Glove embeddings are superior to Word2Vec in our NER setting, agreeing with the reported results for neural 
-models in the CoNLL-2003 English dataset for NER. But, \textit{ELMo} embeddings showed a very poor performance, 
+models in the CoNLL-2003 English dataset for NER. But, ELMo embeddings showed a very poor performance, 
 contrasting with the results reported in the CoNLL-2003 English dataset. This is probably due to the fact that,
 different from static embeddings, ELMo considers the context when generating word representations. Since
 the pretrained language model that generates ELMo embeddings was trained on plain text, it is natural that the
@@ -3203,7 +3203,7 @@ contextual representations on HTML will not make much sense.
 
 The results obtained with different sets of embeddings are important because they show that the choice of 
 word embeddings makes the performance of the original model vary considerably. In fact, if we used Word2Vec embeddings
-instead of GloVe embeddings, the Bi-LSTM-CRF would lose to the self-trained HMM-2, which reached a \textbf{0.879}
+instead of GloVe embeddings, the Bi-LSTM-CRF would lose to the self-trained HMM-2, which reached a 0.879
 F1-score. Also, we cannot trust that only because an embedding shows superior performance in related tasks
 that it will also be effective in the present task (ELMo).
 
@@ -3492,86 +3492,89 @@ models gain an increase in the F1, but the overall best performance is achieved 
 with LSTM character representations optimized with a F1-score optimization objective, achieving a
 0.9323 F1.
 
+
 \chapter{Related Work}
 
-This chapter presents related research in the fields of Web Data Extraction in Section~\ref{sec:wde}
-and Named Entity Recognition in Section~\ref{sec:ner}.
+The researcher name extraction task is a problem of Web Data Extraction that
+we solved with machine learning models for Named Entity Recognition.
+This chapter presents the related research in the fields of Web Data Extraction 
+in Section~\ref{sec:wde} and Named Entity Recognition in Section~\ref{sec:ner}.
 
 \section{Web Data Extraction}
 \label{sec:wde}
 
 In the last 20 years, the astonishing growth of public information in the Web has 
 led to the development of a number of different approaches to the problem of Web 
-data extraction. Traditionally, the task was solved by designing special purpose
+Data Extraction. Traditionally, the task was solved by designing special purpose
 programs called wrappers to recognize relevant data and store records in a structured
 format. These early tools varied wildly relative to their degree of automation. 
 
 It was readily perceived that manual wrapper generation was a rather tedious and
 error prone process, unsuited for large scale operations. Wrappers tend to
-break frequently because they rely heavily on webpage features that can change 
+break frequently because they rely on webpage features that can change 
 often. So, in the late nineties, several authors advocated for wrapper induction, a technique 
 that consists of automatically constructing wrappers from a small set of examples by 
 identifying delimiters or context tokens that single out the desired attributes. 
-Some remarkable wrapper induction methods are WIEN \cite{Kushmerick2000}, Soft 
-Mealy \cite{Hsu1998} and STALKER \cite{Muslea1999}.
+Some remarkable wrapper induction methods are WIEN by~\cite{Kushmerick2000}, Soft 
+Mealy by~\cite{Hsu1998} and STALKER by~\cite{Muslea1999}.
 
 Despite being better than constructing wrappers manually, wrapper induction methods 
 still suffered from a lack of expressive power and flexibility. These methods had 
 trouble handling records with missing attributes or unusual structures because
 patterns could only be identified if they happened at least once in the examples.
 
-Other approaches such as NoDoSE \cite{Adelberg1998} and Debye \cite{Laender2002a} 
+Other approaches such as NoDoSE by~\cite{Adelberg1998} and Debye by~\cite{Laender2002a} 
 brought greater flexibility to wrapper induction methods by requiring a greater level 
-of human interaction through graphical user interfaces. Web data extraction techniques often 
+of human interaction through graphical user interfaces. Web Data Extraction techniques often 
 require some sort of assistance from human experts to boost accuracy. One of the main challenges 
 in the field lies in determining an adequate trade-off between the degree of automation and 
-the precision and recall of the data extraction tool.
+the Precision and Recall of the data extraction tool.
 
 To automate the task of Web data extraction completely some approaches,
-such as Road Runner \cite{Crescenzi2001}, removed entirely the need for data examples.
-Road Runner parses documents belonging to a same class (e.g. books on Amazon) and 
+such as Road Runner by~\cite{Crescenzi2001}, removed entirely the need for data examples.
+Road Runner parses documents belonging to a same class (e.g. books in Amazon) and 
 generates wrappers based on their similarities and differences, yielding comparable results 
 to those obtained by wrapper induction methods. However, like previous approaches, it was 
 unsuited for cross site extraction tasks because the learned rules were not general enough.
 
-NLP based approaches aimed at extracting more general rules that could possibly
-be employed over multiple websites. RAPIER \cite{Califf1999} is a method of rule
+Early NLP-based approaches aimed at extracting more general rules that could possibly
+be employed over multiple websites. RAPIER by~\cite{Califf1999} is a method of rule
 extraction that uses information such as part-of-speech tags and semantic classes from
 a lexicon to derive patterns from a set of training examples. This approach is more
 flexible than the wrapper induction methods, however it achieves much lower rates of 
-recall and precision.
+Precision and Recall.
 
-In 2002, a survey by Laender et al. \cite{Laender2002} made a thorough classification of the
+In 2002, a survey by~\cite{Laender2002} made a thorough classification of the
 early approaches with a taxonomy based on their main technology, being them: languages for
 wrapper development, HTML-aware tools, NLP-based tools, Wrapper Induction Tools,
 Modeling-based tools and Ontology-based tools. Some noteworthy examples from this era
 are: 
 
 \begin{itemize}
-\item TSIMMIS \cite{Hammer1997} and WebOQL \cite{Arocena1999}, which are special purpose 
+\item TSIMMIS by~\cite{Hammer1997} and WebOQL by~\cite{Arocena1999}, which are special purpose 
 languages for building wrappers.
 
-\item Road Runner \cite{Crescenzi2001}, XWRAP \cite{Liu2000} and W4F \cite{Sahuguet1999}, 
+\item Road Runner by~\cite{Crescenzi2001}, XWRAP by~\cite{Liu2000} and W4F by~\cite{Sahuguet1999}, 
 which are HTML-aware tools that infer meaningful patterns from the HTML structure.
 
-\item RAPIER \cite{Califf1999}, SRV \cite{Freitag1998}, WHISK \cite{Soderland1999}, which 
+\item RAPIER by~\cite{Califf1999}, SRV by~\cite{Freitag1998}, WHISK by~\cite{Soderland1999}, which 
 are NLP-based tools.
 
-\item WIEN \cite{Kushmerick2000}, Soft Mealy \cite{Hsu1998} and STALKER \cite{Muslea1999} which 
+\item WIEN by~\cite{Kushmerick2000}, Soft Mealy by~\cite{Hsu1998} and STALKER by~\cite{Muslea1999} which 
 are wrapper induction methods.
 
-\item NoDoSE \cite{Adelberg1998} and Debye \cite{Laender2002a}, which are semi supervised modeling
-based tools that require some interaction with the user by means of a graphical
+\item NoDoSE by~\cite{Adelberg1998} and Debye by~\cite{Laender2002a}, which are semi-supervised
+tools that require some interaction with the user by means of a graphical
 user interface.
 \end{itemize}
 
-In 2006, Chang et al. \cite{Chang2006} complemented the previous surveys with semi-supervised 
-technologies such as Thresher \cite{Hogue2005}, IEPAD \cite{Chang2001} and 
-OLERA \cite{Chang2004}. They differed from supervised 
+\cite{Chang2006} complemented the previous surveys with semi-supervised 
+technologies such as Thresher by~\cite{Hogue2005}, IEPAD by~\cite{Chang2001} and 
+OLERA by~\cite{Chang2004}. They differed from supervised 
 and unsupervised methods because they either needed only a rough description of
 data from users for extraction rule generation or some level of post processing
 that needed user attention. The survey also mentioned newer unsupervised methods
-such as DeLa \cite{Wang2003}, Exalg \cite{Arasu2003} and Depta \cite{Zhai2005}.
+such as DeLa by~\cite{Wang2003}, Exalg by~\cite{Arasu2003} and Depta by~\cite{Zhai2005}.
 
 Most of the early information extraction systems were rule-based with either 
 manual rule description or automatic rule learning from examples, thus they
@@ -3579,9 +3582,9 @@ suffered from a lack of flexibility when dealing with noisy and unstructured dat
 Huge progress in the field of statistical learning led to the development of
 models that tried to solve this problem.
 
-In 2008, Sarawagi \cite{Sarawagi2008} introduced a classification that segmented wrappers in
+\cite{Sarawagi2008} introduced a classification that segmented wrappers in
 rule-based methods, statistical methods and hybrid models, bringing together 
-the fields of named entity recognition, relationship extraction and information extraction. 
+the fields of Named Entity Recognition, Relationship Extraction and Web Data Extraction. 
 The rule based methods encompass most of the previous models. While the statistical methods 
 convert the extraction task into a token labeling task, solved with Named Entity Recognition 
 and Relationship Extractions methods. Traditionally, these subtasks were solved with 
@@ -3591,126 +3594,122 @@ Networks. Different from automatic wrapper generators, statistical methods are s
 a large variety of tasks, especially when we want the system to handle cross website information 
 extraction and plain text information extraction. That is why this class of methods is of 
 special interest to our application. The progress of Statistical models will be 
-discussed in the next Section.
+discussed in Section~\ref{sec:ner}.
 
-Surveys by Ferrara et al. \cite{Ferrara2014}, Schulz et al. \cite{Schulz2016} and 
-Varlamov et al. \cite{Varlamov2016} updated the previous surveys on information 
+Surveys by~\cite{Ferrara2014}, \cite{Schulz2016} and \cite{Varlamov2016} updated the 
+previous surveys on information 
 extraction methods with some interesting innovations. 
-Some examples are: the Visual Box Model \cite{Krupl2005}, a data extraction system that produces 
+Some examples are: the Visual Box Model by~\cite{Krupl2005}, a data extraction system that produces 
 a visualization of the webpage to exploit visual cues to identify records presented in a tabular form;
-automatic wrapper adaptation \cite{Ferrara2011}, a technique that tries to reduce the cost of 
+automatic wrapper adaptation by~\cite{Ferrara2011}, a technique that tries to reduce the cost of 
 wrapper maintenance by measuring the similarity of HTML trees and adapting
-wrappers to the new page structure; AutoRM \cite{Shi2015}, a method to mine
+wrappers to the new page structure; AutoRM by~\cite{Shi2015}, a method to mine
 records from a single webpage by identifying similar data regions through DOM
-tree analysis; Knowledge Vault \cite{Dong2014}, a method that combines different 
+tree analysis; and Knowledge Vault by~\cite{Dong2014}, a method that combines different 
 extraction approaches to feed a probabilistic knowledge base.
 
 Most data extraction systems focus on extracting information from single websites
 and are therefore unsuited for cross website extraction tasks. Even unsupervised
-approaches that are domain independent, such as RoadRunner \cite{Crescenzi2001} 
-and EXALG \cite{Arasu2003} only work well for extracting data from pages generated 
-from a same template. 
+approaches that are domain independent, such as RoadRunner and EXALG only work well 
+for extracting data from pages generated from a same template. 
 
 A statistical approach to unsupervised domain 
-independent Web data extraction was described by Zhu et al \cite{Zhu2005}. The 2D CRF 
+independent Web data extraction was described by~\cite{Zhu2005}. The 2D CRF 
 model takes a webpage segmented into data blocks and employs a two dimensional conditional 
-random field model to perform attribute labeling. The model was further improved
-\cite{Zhu2006} to model record segmentation and attribute labeling as a joint task.
+random field model to perform attribute labeling. The model was further improved 
+in~\cite{Zhu2006} to model record segmentation and attribute labeling as a joint task.
 Some of the limitations of early unsupervised methods 
-were also tackled by ObjectRunner \cite{Abdessalem2010} and AMBER \cite{Furche2012}. 
+were also addressed by ObjectRunner \cite{Abdessalem2010} and AMBER \cite{Furche2012}. 
 These methods work by annotating webpages automatically with regular expressions, gazetteers and 
 knowledge bases. They can rectify low quality annotations and even improve the annotators
 by exploring regular structures in the DOM during the record segmentation phase.
 
-Web data extraction methods have undoubtedly improved extraordinarily, but
-as pointed by Schulz et al. \cite{Schulz2016}, it is difficult to compare the results 
+Web Data Extraction methods have undoubtedly improved extraordinarily, but
+as pointed by \cite{Schulz2016}, it is difficult to compare the results 
 achieved by competing tools, and many seem to rely excessively on heuristic methods.
 In that regard, the recent advancements in sequence taggers may provide more robust and
 flexible extraction tools.
 
+
 \section{Named Entity Recognition}
 \label{sec:ner}
 
-\textit{Named Entity Recognition} is an important subtask of \textit{Information Extraction},
-together with \textit{Relationship Extraction} and \textit{Named Entity Linking}.
-As previously discussed in Chapter~\ref{cha:problem_discussion}, the 
-\textit{Named Entity Recognition} task was introduced in the Third Message 
-Understanding Conference (MUC-3) (CITE), where researchers were asked to extract
-entities from a news corpus about terrorist incidents. But, it was the 
+Named Entity Recognition is an important subtask in Information Extraction.
+The Named Entity Recognition task was defined in the Third Message 
+Understanding Conference (MUC-3), described in~\cite{Sundheim1991}, where researchers were asked to extract
+entities from a news corpus about terrorist incidents. However, it was the 
 language-independent Named Entity Recognition shared task at the Conference 
-on Computational Natural Language Learning in 2003 (CONLL-2003)~\cite{KimSang2003} 
+on Computational Natural Language Learning in 2003 (CoNLL-2003), described in~\cite{KimSang2003},
 that established an enduring labeled dataset constructed with news texts from Reuters.
-Despite its reduced size and the limited variability of its documents, the CONLL-2003 
-dataset is still used to compare the performance of different NER systems in English, and 
+Despite its reduced size and the limited variability of its documents, the CoNLL-2003 
+dataset is still used to compare the performance of NER systems in English, and 
 German. 
 
-Sequence labeling for NER and part-of-speech tags (labeling nouns, verbs, pronouns, etc.) 
-is very similar, so, many times, research articles report results for systems
-on both tasks. And, frequently, the best methods for the former task are also the best 
-methods for the latter task.
+Sequence labeling for NER and part-of-speech tagging (labeling nouns, verbs, pronouns, etc.) 
+is very similar, so many times, research articles that propose new methods for NER
+also report results for the POS-tagging task. And frequently, the best methods for 
+POS-Tagging are also the best methods for NER.
 
 Traditionally, the NER task was solved with generative models based on 
-\textit{Hidden Markov Models} (HMMs). The first appearances of HMMs in the
+Hidden Markov Models (HMMs). The first appearances of HMMs in the
 field of Natural Language Processing occurred in the mid-seventies and were
 primarily focused on the problem of Speech Recognition. 
-In the late nineties, HMMs also found important applications in Information 
-Extraction and NER \cite{Leek1997, Bikel1999, Freitag1999, Freitag2000}.
+But in the late nineties, HMMs also found important applications in Information 
+Extraction and NER as in the works by~\cite{Leek1997}, \cite{Bikel1999}, 
+\cite{Freitag1999}, and \cite{Freitag2000}.
 
 % A. Borthwick, J. Sterling, E. Agichtein, and R. Grishman, "Exploiting diverse
 % knowledge sources via maximum entropy in named entity recognition," in Sixth
 % Workshop on Very Large Corpora New Brunswick, New Jersey, Association for
 % Computational Linguistics, 1998.
 
-% [Bikelrfa/. , 1999] D. Bikel, R. Schwartz, and R. Weischedel. 
-% An algorithm that learns what's in a  name. Machine Learning, 34(1 ):211-231, 1999. 
-
-% [Freitag and McCallum, 2000] D. Freitag and A. McCallum. Information extraction with HM M structures learned by stochastic optimization. 
-
-The problem with HMMs was primarily that it modeled the joint probability between 
+The problem with HMMs was that they modeled the joint probability between 
 sequences of observations and labels $ P(X, Y) $, a harder problem than modelling the corresponding 
-conditional probability $ P(Y|X) $. It assumed a prior distribution for the observations $ X $, and
-therefore, it could not handle any selection of features. This lack of flexibility led to the 
+conditional probability $ P(Y|X) $. They assumed conditional independence for the observations $ X $, and
+therefore, they could not handle overlapping features. This lack of flexibility led to the 
 development of discriminative approaches to sequence labeling.
 
-Some early examples are Maximum Entropy Taggers for NER~\cite{Borthwick1998} and
-POS-Tagging~\cite{Ratnaparkhi1998}. The Maximum Entropy Markov Model~\cite{McCallum2000} 
+Some early examples are Maximum Entropy Taggers for NER by~\cite{Borthwick1998} and
+POS-Tagging by~\cite{Ratnaparkhi1998}. The Maximum Entropy Markov Model introduced in~\cite{McCallum2000} 
 was developed just a while later, building up on the intuition of HMMs combined with
 the flexibility of discriminative approaches. However, because of the label bias problem,
-this model was superseded by Conditional Random Fields~\cite{Lafferty2001, McCallum2003} (CRF). 
+this model was superseded by Conditional Random Fields in~\cite{Lafferty2001} and~\cite{McCallum2003}. 
 % https://aclweb.org/anthology/W03-0425.
 At this time, the best performing systems almost always resorted to external gazetteers 
-and hand-chosen features~\ref{Florian2003}.
+and hand-chosen features, as is the case for the CoNLL-2003 winning model, described
+in~\cite{Florian2003}.
 
-With the advancement of \textit{Machine Learning} in recent years, we saw the rise
-of \textit{Neural Networks} for \textit{Sequence Labeling}. In 2011, \cite{Collobert2011} 
-introduced Neural Networks free of feature engineering to \textit{Sequence Labeling},
+With the advancement of Machine Learning in recent years, we saw the rise
+of Neural Networks applied to sequence labeling. In 2011, \cite{Collobert2011} 
+introduced Neural Networks free of feature engineering to sequence labeling tasks,
 using a Convolutional Neural Network over word embeddings with a CRF output layer to tackle 
 the problems of POS-tagging, Chunking, Semantic Role Labeling, and NER. A similar architecture 
-proposed in 2015 by~\cite{Huang2015}, the LSTM-CRF, replaced the CNN in \cite{Collobert2011} 
+proposed in 2015 by~\cite{Huang2015}, the Bi-LSTM-CRF, replaced the CNN in \cite{Collobert2011} 
 with a bidirectional LSTM, achieving better results.
 
 In 2016, further advancement to the NER models was achieved by incorporating character 
-representations at the bottom of the LSTM-CRF archictecture to extract morphological 
-features from the words automatically. The model by~\cite{Lample2016} uses a 
+representations at the bottom of the Bi-LSTM-CRF architecture to extract morphological 
+features from words automatically. The model by~\cite{Lample2016} uses a 
 bidirectional LSTM over character embeddings and the model by~\cite{Ma2016} uses a
-one dimensional CNN with max pooling over character embeddings.
+one dimensional CNN with max pooling over character embeddings. Both models also 
+made use of pre-trained GloVe word embeddings, described in~\cite{Pennington2014}.
 
 Small improvements to NER systems have been made since then, primarily due to the 
-introduction of new Word Embeddings on variations of the LSTM-CRF architecture. From
-this group, we can mention ElMO~\cite{Peters2018}, Bert~\cite{Devlin2018}, and
-Flair~\cite{Akbik2018}. 
-% https://arxiv.org/abs/1802.05365
+introduction of new word embeddings on variations of the Bi-LSTM-CRF architecture. From
+this group, we can mention ELMo by~\cite{Peters2018}, BERT by~\cite{Devlin2018}, and
+Flair by~\cite{Akbik2018}. 
 % https://arxiv.org/abs/1810.04805
 % https://drive.google.com/file/d/17yVpFA7MmXaQFTe-HDpZuqw9fJlmzg56/view
-All of them were introduced in 2018, and they differ primarily 
+All of them were introduced in 2018 and they differ primarily 
 in how to construct contextual embeddings from the internal states of a language model.
-To our knowledge, the best NER system up to this date (considering the Conll-2003 dataset)
-is the bidirectional transformer model proposed by~\cite{Baevksi2019} in 2019 that used
-a stack of self attention modeules and Elmo embeddings. Table~\ref{tab:ner_model_comparison}
-shows a comparison of the reported F1 scores for each one of the neural models
-discussed in this Section and the model that won the challenge in 2003~\ref{Florian2003}.
-Many models that held the best F1-score at one point or another were omitted from this
-table.
+
+To our knowledge, the best NER system up to this date (considering the performance in the
+CoNLL-2003 dataset) is the bidirectional transformer model proposed by~\cite{Baevksi2019} that uses
+a stack of self attention modules and ELMo embeddings. Table~\ref{tab:ner_model_comparison}
+shows a comparison of the history of reported F1 scores in the English test set of the CoNLL-2003 dataset
+for the NER systems that were mentioned in this section. Each of the mentioned systems held the 
+record for the task at a given time, but some models that held the best F1-score were also omitted 
+from this table.
 
 \begin{table}[h]
   \small
@@ -3719,45 +3718,142 @@ table.
       \toprule
       Model & Test F1 \\
       \midrule
-       Florian et al 2003 (CONLL-2003 Winner)      & 88.76 \\
-       Collobert et al 2011                        & 89.59 \\
-       Huang 2015                                  & 90.10 \\
-       Lample 2016                                 & 90.94 \\
-       Ma 2016                                     & 91.21 \\
-       Elmo Peters 2018                            & 92.22 \\
-       Bert Devlin 2018                            & 92.80 \\
-       Flair Akbik 2018                            & 93.09 \\
-       Baevski 2019                                & 93.50 \\
+       \cite{Florian2003} (CoNLL-2003 Winner)      & 88.76 \\
+       \cite{Collobert2011}                        & 89.59 \\
+       \cite{Huang2015}                            & 90.10 \\
+       \cite{Lample2016}                           & 90.94 \\
+       \cite{Ma2016}                               & 91.21 \\
+       \cite{Peters2018}                           & 92.22 \\
+       \cite{Devlin2018}                           & 92.80 \\
+       \cite{Akbik2018}                            & 93.09 \\
+       \cite{Baevski2019}                          & 93.50 \\
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{}
-  \label{tab:heuristic_filtering}
+  \caption{Model performances in the CoNLL-2003 English test set.}
+  \label{tab:ner_model_comparison}
 \end{table}
 
-\chapter{Conclusion and Future Work}
 
-Machine-learning-based sequence labeling models provide a flexible approach to Web data 
-extraction, in contrast to more traditional methods. In simple cases, a neural
-named entity tagger may be sufficient to solve the entire data extraction task. In 
-other cases, the sequence tagger remains an important part of the web data extraction
-system, as it performs attribute labeling on data records with accuracy and flexibility.
+\section{Summary}
 
-In this article, we compared the performance of different sequence models on the task of
-named entity recognition on HTML, introducing a novel dataset that is publicly available. 
-We found that there are two components to the most successful models: neural based character 
-representations that extract morphological features automatically, and the joint modelling 
-of output labels.
+In this chapter, we discussed the related work in Web Data Extraction and Named
+Entity Recognition. The models discussed in this dissertation and employed in
+the experiments are mainly NER methods that were deemed the best machine learning 
+techniques for solving the problem at a given time. However, the researcher name extraction 
+task is essentially a WDE task, so some ideas from the field are extremely useful, 
+such as using HTML structural features, as we did in the Self-Training strategy for 
+HMMs and the attention models for Neural Networks. Also, NER is only a subtask that 
+is hardly useful by itself, so ideally, it should be discussed in the context of a
+larger task, such as WDE. Because, as we saw in the experiments described in 
+Chapter~\ref{cha:experiments}, improvements to NER in plain text, such as ELMo, are
+not always great for NER in the web.
 
-We showed that a BI-LSTM-CRF neural network with LSTM-based character representations can 
-be employed effectively to solve a web data extraction task, achieving an F1-score of 
-0.8867 with no feature engineering on the faculty listings dataset.
 
-The effective recognition of named entities on HTML is an essential step in most general 
-Web data extraction methods. The accuracy achieved by deep neural architectures even
-on webpages that are very different from the plain text for which these architectures 
-were initially designed shows the potential for a truly flexible approach to cross domain 
-web data extraction.
+\chapter{Conclusions and Future Work}
+
+Existing Wed Data Extraction methods are useful for extracting simple entities
+from templated web pages, but they do not handle cross website extraction tasks
+so well. Some techniques from machine learning such as Named Entity Recognition are 
+much more flexible, but the existing models for NER are usually concerned with 
+extraction tasks in plain text, so there is an absence of datasets for web named 
+entity extraction tasks. In this dissertation, we introduced a novel dataset that 
+handled the researcher name extraction task and discussed the applicability of different 
+machine learning approaches to this problem.
+
+We assessed the performance of different types of Hidden Markov Models, Conditional
+Random Fields and Neural Networks in the researcher name extraction task, considering
+their accuracy and complexity. We also proposed the self-training strategy for HMMs
+and the attentions models for Bi-LSTM-CRFs to make use of HTML structural features,
+as many WDE systems do, improving the performance of plain models.
+
+
+\section{Summary of Conclusions}
+
+In this dissertation we learned that machine learning methods for NER are
+useful for solving some cross-website data extraction tasks and, particularly, the
+researcher name extraction task. We discussed the relative advantages and disadvantages of 
+HMMs, CRFs, and Neural Networks.
+HMMs and CRFs can solve the researcher name extraction
+task with very good accuracy as long as we feed them with the correct features. Contrastingly,
+Neural Networks demand no feature engineering and can obtain even better accuracy, however
+their complexity and training time is not entirely justifiable since the gains are not
+substantial. In fact, neural networks cannot be considered entirely automatic, since we still 
+have to tune hyper parameters and choose the right set of word embeddings. 
+
+Additionally, both traditional methods and neural networks can profit from making use of
+HTML structural features when sequence labeling webpages. We proposed the self-training
+strategy and the attention models to incorporate this knowledge in HMMs and Neural Networks, respectively.
+And finally, we argued that we should value Recall a little more that Precision in web extraction tasks, 
+because filtering out false positives is easier than finding false negatives in the corpus. Two ways for 
+incorporating this intuition in our models is through the optimization of the expected F-score and the 
+filtering strategy, which is task-specific. Overall, we have many proposed solid approaches to
+NER in the web.
+
+
+\section{Summary of Contributions}
+
+The main contributions of this dissertation were already summarized in the first chapter,
+but in this section, we condense them in two general contributions, using the knowledge
+obtained from previous chapters: 
+
+\begin{itemize}
+
+\item \textbf{The NER on HTML dataset} was created to assess the performance of NER methods
+on webpages with a structure that vary significantly from what is typical in plain text. By
+creating this dataset and testing NER models in it, we learned some valuable things. First,
+not all methods that work well in plain text also work well in webpages. Second, some NER
+tasks can be solved effectively with rather simple models, such as HMMs, as long as we 
+incorporate task specific knowledge in the model. Third, different extraction tasks are 
+likely to demand the creation of task-specific datasets. Finally, the researcher affiliation 
+data obtained with the models trained in this dataset can be used to perform research group
+academic impact comparison. The dataset is also available to conduct further research~\footnote{
+https://github.com/jmfveneroso/ner-on-html.
+}.
+
+\item \textbf{The new NER methods for the web.} Namely, the Self-Training strategy for HMMs,
+the Hard-Attention model for neural networks and the F-score optimization objective are likely
+to be useful in other web extraction tasks. Additionally, we present results for many variations of 
+plain HMMs, CRFs, and Bi-LSTM-CRFs in the researcher name extraction task, providing a way to 
+assess their expected performance in other web named entity extraction tasks.
+
+\end{itemize}
+
+
+\section{Future Work}
+
+This dissertation left many open ideas that could be explored in future research:
+
+\begin{itemize}
+
+\item \textbf{The self-training strategy} was very useful for improving the performance of HMMs,
+but variations of this strategy could also be incorporated in neural architectures. The
+hard-attention and soft-attention layers described in this dissertation were an early approach
+for doing that, but they require further improvement. To make soft-attention layers more reliable,
+we could pre-train HTML context embeddings in a large collection and derive structural
+patterns that can be useful in many sequence labeling tasks in HTML.
+
+\item \textbf{Good unsupervised methods} for web data extraction are necessary if we want
+to solve this task definitively. NER methods trained in plain text become ineffective when 
+they are applied to documents of a different type, so we end up having to construct new
+datasets for each extraction task. This effort is very time-consuming, so we need more
+flexible and accurate approaches. The Baum-Welch algorithm is an unsupervised method for
+training HMMs, but it is not effective in NER. If we could devise an efficient way to
+train semi supervised neural networks especially for web extraction tasks, we could make 
+an end-to-end system that solves NER, relationship extraction and named entity linking 
+in a single step.
+
+\end{itemize}
+
+\section{Final Remarks}
+
+The preliminary results of some of the Hidden Markov Models discussed in this dissertation 
+were published in~\cite{deFreitasVeneroso2018}, though the results in this research article 
+were not obtained with the exact same dataset. The other contributions in this dissertation
+generated other two research articles that are still being reviewed. The first article makes a 
+comparison of the P-score measure and the H-index, that was made possible by the collection of
+affiliation information from university websites. The second article discusses the NER techniques 
+proposed in this dissertation.
 
 
 \ppgccbibliography{bibfile}
@@ -3768,26 +3864,8 @@ web data extraction.
 % 
 % \chapter{HTML sentence segmenter}
 % 
-% Lorem ipsum dolor.
-% 
-% \chapter{Outro apêndice}
-% 
-% \dummytxta
+% xxx.
 % 
 % \end{appendices}
-% 
-% 
-% \begin{attachments}
-% 
-% % Para cada anexo, um \chapter
-% \chapter{Um anexo}
-% 
-% \dummytxta
-% 
-% \chapter{Outro anexo}
-% 
-% \dummytxta
-% \end{attachments}
-
 
 \end{document}

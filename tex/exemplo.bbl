@@ -20,6 +20,18 @@
   {}-\ppgccpagedoformat {294}.
 \newblock ISSN \ppgccissndoformat {01635808}.
 
+\bibitem[Akbik et~al.\@, 2018]{Akbik2018}
+\ppgccbibauthordoformat {Akbik, A.\ppgccbibauthorsep {} Blythe,
+  D.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Vollgraf, R.}
+  (\ppgccyeardoformat {2018}).
+\newblock \ppgccbibtitledoformat {Contextual string embeddings for sequence
+  labeling}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  27th International Conference on Computational Linguistics},
+  \ppgccbibpagesstring {} \ppgccpagedoformat {1638}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {1649}, Santa Fe, New Mexico, USA. Association for
+  Computational Linguistics.
+
 \bibitem[Arasu et~al.\@, 2003]{Arasu2003}
 \ppgccbibauthordoformat {Arasu, A.\ppgccbibauthorsep {} Garcia-Molina,
   H.\ppgccbibauthorsep {} Arasu, A.\ppgccbibauthorlastsep {} \ppgccbibauthorand
@@ -38,6 +50,16 @@
   \ppgccvolumedoformat {5}({\ppgccnumberdoformat {3}}):\ppgccpagedoformat
   {127}-\ppgccpagedoformat {}-\ppgccpagedoformat {141}.
 \newblock ISSN \ppgccissndoformat {10743227}.
+
+\bibitem[Baevski et~al.\@, 2019]{Baevski2019}
+\ppgccbibauthordoformat {Baevski, A.\ppgccbibauthorsep {} Edunov,
+  S.\ppgccbibauthorsep {} Liu, Y.\ppgccbibauthorsep {} Zettlemoyer,
+  L.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Auli, M.}
+  (\ppgccyeardoformat {2019}).
+\newblock \ppgccbibtitledoformat {Cloze-driven pretraining of self-attention
+  networks}.
+\newblock \ppgccbibjournaldoformat {CoRR}, \ppgccvolumedoformat
+  {abs/1903.07785}.
 
 \bibitem[Bahdanau et~al.\@, 2014]{Bahdanau2014}
 \ppgccbibauthordoformat {Bahdanau, D.\ppgccbibauthorsep {} Cho,
@@ -65,6 +87,25 @@
   \ppgccvolumedoformat {2}({\ppgccnumberdoformat {1}}):\ppgccpagedoformat
   {1}-\ppgccpagedoformat {}-\ppgccpagedoformat {127}.
 \newblock ISSN \ppgccissndoformat {1935-8237}.
+
+\bibitem[Bikel et~al.\@, 1999]{Bikel1999}
+\ppgccbibauthordoformat {Bikel, D.~M.\ppgccbibauthorsep {} Schwartz,
+  R.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Weischedel, R.~M.}
+  (\ppgccyeardoformat {1999}).
+\newblock \ppgccbibtitledoformat {An algorithm that learns what's in a name}.
+\newblock \ppgccbibjournaldoformat {Machine Learning}, \ppgccvolumedoformat
+  {34}({\ppgccnumberdoformat {1}}):\ppgccpagedoformat {211}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {231}.
+\newblock ISSN \ppgccissndoformat {1573-0565}.
+
+\bibitem[Borthwick et~al.\@, 1998]{Borthwick1998}
+\ppgccbibauthordoformat {Borthwick, A.\ppgccbibauthorsep {} Sterling,
+  J.\ppgccbibauthorsep {} Agichtein, E.\ppgccbibauthorlastsep {}
+  \ppgccbibauthorand {} Grishman, R.} (\ppgccyeardoformat {1998}).
+\newblock \ppgccbibtitledoformat {Exploiting diverse knowledge sources via
+  maximum entropy in named entity recognition}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Sixth Workshop on
+  Very Large Corpora}.
 
 \bibitem[Brown, 1986]{Brown1986}
 \ppgccbibauthordoformat {Brown, L.~D.} (\ppgccyeardoformat {1986}).
@@ -165,6 +206,25 @@
   \ppgccpagedoformat {109}-\ppgccpagedoformat {}-\ppgccpagedoformat {118}.
 \newblock ISSN \ppgccissndoformat {10477349}.
 
+\bibitem[de~Freitas~Veneroso \ppgccciteauthorand {} Ribeiro-Neto,
+  2018]{deFreitasVeneroso2018}
+\ppgccbibauthordoformat {de~Freitas~Veneroso, J.~a.~M. \ppgccbibauthorand {}
+  Ribeiro-Neto, B.} (\ppgccyeardoformat {2018}).
+\newblock \ppgccbibtitledoformat {Entity name extraction from faculty
+  directories}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  18th ACM/IEEE on Joint Conference on Digital Libraries}, JCDL '18,
+  \ppgccbibpagesstring {} \ppgccpagedoformat {389}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {390}, New York, NY, USA. ACM.
+
+\bibitem[Devlin et~al.\@, 2018]{Devlin2018}
+\ppgccbibauthordoformat {Devlin, J.\ppgccbibauthorsep {} Chang,
+  M.-W.\ppgccbibauthorsep {} Lee, K.\ppgccbibauthorlastsep {}
+  \ppgccbibauthorand {} Toutanova, K.} (\ppgccyeardoformat {2018}).
+\newblock \ppgccbibtitledoformat {Bert: Pre-training of deep bidirectional
+  transformers for language understanding}.
+\newblock \ppgccbibjournaldoformat {arXiv preprint arXiv:1810.04805}.
+
 \bibitem[Dong et~al.\@, 2014]{Dong2014}
 \ppgccbibauthordoformat {Dong, X.\ppgccbibauthorsep {} Gabrilovich,
   E.\ppgccbibauthorsep {} Heitz, G.\ppgccbibauthorsep {} Horn,
@@ -200,6 +260,17 @@
   \ppgccvolumedoformat {70}:\ppgccpagedoformat {301}-\ppgccpagedoformat
   {}-\ppgccpagedoformat {323}.
 \newblock ISSN \ppgccissndoformat {09507051}.
+
+\bibitem[Florian et~al.\@, 2003]{Florian2003}
+\ppgccbibauthordoformat {Florian, R.\ppgccbibauthorsep {} Ittycheriah,
+  A.\ppgccbibauthorsep {} Jing, H.\ppgccbibauthorlastsep {} \ppgccbibauthorand
+  {} Zhang, T.} (\ppgccyeardoformat {2003}).
+\newblock \ppgccbibtitledoformat {Named entity recognition through classifier
+  combination}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  Seventh Conference on Natural Language Learning at HLT-NAACL 2003},
+  \ppgccbibpagesstring {} \ppgccpagedoformat {168}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {171}.
 
 \bibitem[{Forney}, 1973]{Forney1973}
 \ppgccbibauthordoformat {{Forney}, G.~D.} (\ppgccyeardoformat {1973}).
@@ -498,6 +569,17 @@
   \ppgccbibpagesstring {} \ppgccpagedoformat {591}-\ppgccpagedoformat
   {}-\ppgccpagedoformat {598}, San Francisco, CA, USA. Morgan Kaufmann
   Publishers Inc.
+
+\bibitem[McCallum \ppgccciteauthorand {} Li, 2003]{McCallum2003}
+\ppgccbibauthordoformat {McCallum, A. \ppgccbibauthorand {} Li, W.}
+  (\ppgccyeardoformat {2003}).
+\newblock \ppgccbibtitledoformat {Early results for named entity recognition
+  with conditional random fields, feature induction and web-enhanced lexicons}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  Seventh Conference on Natural Language Learning at HLT-NAACL 2003 - Volume
+  4}, CONLL '03, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {188}-\ppgccpagedoformat {}-\ppgccpagedoformat {191}, Stroudsburg, PA, USA.
+  Association for Computational Linguistics.
 
 \bibitem[Mikolov et~al.\@, 2013]{Mikolov2013}
 \ppgccbibauthordoformat {Mikolov, T.\ppgccbibauthorsep {} Sutskever,

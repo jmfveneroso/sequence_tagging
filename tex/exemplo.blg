@@ -1,61 +1,52 @@
-This is BibTeX, Version 0.99d (TeX Live 2018)
-Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+This is BibTeX, Version 0.99d (TeX Live 2015/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: exemplo.aux
 The style file: ppgccufmg.bst
 Database file #1: bibfile.bib
-Repeated entry---line 1144 of file bibfile.bib
- : @inproceedings{Pennington2014
- :                              ,
-I'm skipping whatever remains of this entry
-Warning--I didn't find a database entry for "Bikel1999"
-Warning--I didn't find a database entry for "Borthwick1998"
-Warning--I didn't find a database entry for "McCallum2003"
-Warning--I didn't find a database entry for "Devlin2018"
-Warning--I didn't find a database entry for "Akbik2018"
 Warning--I didn't find a database entry for "Baevksi2019"
 Warning--empty booktitle in Lafferty2001
 Warning--empty booktitle in Rabiner1990
 Warning--can't use both author and editor fields in Ramshaw1999
 Warning--empty school in Ratnaparkhi1998
-You've used 79 entries,
+You've used 87 entries,
             2043 wiz_defined-function locations,
-            1129 strings with 20771 characters,
-and the built_in function-call counts, 37204 in all, are:
-= -- 3808
-> -- 1334
-< -- 78
-+ -- 459
-- -- 445
-* -- 3398
-:= -- 6015
-add.period$ -- 288
-call.type$ -- 79
-change.case$ -- 610
-chr.to.int$ -- 77
-cite$ -- 83
-duplicate$ -- 1435
-empty$ -- 2613
-format.name$ -- 568
-if$ -- 7627
+            1167 strings with 22312 characters,
+and the built_in function-call counts, 41119 in all, are:
+= -- 4205
+> -- 1493
+< -- 84
++ -- 515
+- -- 499
+* -- 3738
+:= -- 6642
+add.period$ -- 316
+call.type$ -- 87
+change.case$ -- 677
+chr.to.int$ -- 85
+cite$ -- 91
+duplicate$ -- 1596
+empty$ -- 2882
+format.name$ -- 634
+if$ -- 8440
 int.to.chr$ -- 3
 int.to.str$ -- 0
-missing$ -- 153
-newline$ -- 431
-num.names$ -- 239
-pop$ -- 537
+missing$ -- 169
+newline$ -- 472
+num.names$ -- 263
+pop$ -- 609
 preamble$ -- 1
-purify$ -- 614
+purify$ -- 681
 quote$ -- 0
-skip$ -- 1245
+skip$ -- 1382
 stack$ -- 0
-substring$ -- 2806
-swap$ -- 299
-text.length$ -- 35
+substring$ -- 3065
+swap$ -- 337
+text.length$ -- 39
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 466
+type$ -- 514
 warning$ -- 4
-while$ -- 318
+while$ -- 348
 width$ -- 0
-write$ -- 1136
-(There was 1 error message)
+write$ -- 1248
+(There were 5 warnings)
