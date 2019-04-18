@@ -58,8 +58,7 @@
   (\ppgccyeardoformat {2019}).
 \newblock \ppgccbibtitledoformat {Cloze-driven pretraining of self-attention
   networks}.
-\newblock \ppgccbibjournaldoformat {CoRR}, \ppgccvolumedoformat
-  {abs/1903.07785}.
+\newblock \ppgccbibjournaldoformat {arXiv preprint arXiv:1903.07785}.
 
 \bibitem[Bahdanau et~al.\@, 2014]{Bahdanau2014}
 \ppgccbibauthordoformat {Bahdanau, D.\ppgccbibauthorsep {} Cho,
