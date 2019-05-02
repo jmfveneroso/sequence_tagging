@@ -2175,7 +2175,7 @@ the actual labels.
   \label{tab:precision_recall}
 \end{table}
 
-Also, consider that:
+Where:
 
 \begin{eqnarray*}
 n_{pos} = A + B \\
@@ -2317,29 +2317,27 @@ matching approach.
                              & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
                              & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
       \midrule
-      Gazetteer Matching     & 0.847 & 0.285 & 0.427 & 0.871 & 0.328 & 0.477          \\
+      Dictionary Matching    & 0.847 & 0.285 & 0.427 & 0.871 & 0.328 & 0.477          \\
       Naive Bayes            & 0.172 & 0.851 & 0.287 & 0.181 & 0.776 & 0.294          \\
       Maxent                 & 0.287 & 0.547 & 0.377 & 0.335 & 0.508 & 0.404          \\
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Naive Bayes and Logistic Classifier in the researcher name extraction task.}
+  \caption{Naive Bayes and Logistic Classifier results for the researcher name extraction task.}
   \label{tab:nb_and_maxent}
 \end{table}
 
-As previously discussed, the Maximum Entropy classifier allows for overlapping features while
-the Naive Bayes assumes feature independence. That is possibly why the Logistic Classifier 
-performs better than the Naive Bayes model in this problem. However, both models are worse than 
-the dictionary matching approach when we consider the F1-score. With these baselines we can
-proceed to test more complex models.
+The Logistic Classifier performs better than the Naive Bayes model in this problem. However, both 
+models are worse than the dictionary matching approach when we consider the F1-score. With these 
+baselines in place, we proceed to test more complex models.
 
 
 \section{Hidden Markov Models}
 \label{sec:experiments_hmm}
 
-There are a couple of parameters that need to be considered when we employ \textit{Hidden Markov Models}
-in a sequence labeling task. First, the number of previous states (the order of the HMM) and, second, 
-the model features.
+There are a couple of parameters that need to be considered when we employ Hidden Markov Models
+to a sequence labeling task. First, the number of previous states (the order of the HMM), and second, 
+the features.
 
 \subsection{HMM order}
 
@@ -2402,11 +2400,11 @@ HMM of zeroth-order.
 
 Considering label dependencies over multiple timesteps increases the classifier performance by a considerable margin 
 relative to the Naive Bayes model even without the addition of any features besides the current word. The 
-second order HMM (HMM-2) achieved an F1-score of 0.583 at the task, while
-the Naive Bayes classifier achieves an F1-score of 0.294 and the dictionary matching approach 
-only achieved an F1-score of 0.477. Nevertheless,
-we already observe a relative decline in performance with the third order \textit{HMM} (0.506 F1-score), 
-suggesting that increasing the order of the \textit{HMM} is not always advantageous. This is probably because
+second order HMM (HMM-2) achieved a $F_1$-score of 0.583 at the task, while
+the Naive Bayes classifier achieved a $F_1$-score of 0.294. All Hidden Markov Models are also 
+better than the dictionary matching approach, which only achieved an $F_1$-score of 0.477. Nevertheless,
+we already observe a relative decline in performance with the third order HMM (0.506 F1-score), 
+suggesting that increasing the number of previous timesteps is not always advantageous. This is probably because
 as we increase the window of previous labels at each timestep, the label combinations get less common
 in the training set, and therefore, the probability estimates get less reliable.
 
@@ -2414,7 +2412,7 @@ in the training set, and therefore, the probability estimates get less reliable.
 \subsection{Feature selection}
 
 Eleven categorical features were extracted from the dataset. 
-These were selected through feature engineering from a larger pool of features, 
+These were selected from a larger pool of features, 
 considering their aid to the performance of the extraction systems. Deep learning 
 architectures can work incredibly well without any of these features, however they
 are of critical importance to traditional approaches such as HMMs and CRFs. 
@@ -2428,8 +2426,8 @@ The selected features are presented in Table~\ref{tab:features}.
       Feature & Description \\
       \midrule
       1  & Unaccented lowercase token \\
-      2  & Exact gazetteer match \\
-      3  & Partial gazetteer match \\
+      2  & Exact dictionary match \\
+      3  & Partial dictionary match \\
       4  & Email \\
       5  & Number \\
       6  & Honorific (Mr., Mrs., Dr., etc.)\\
@@ -2445,31 +2443,25 @@ The selected features are presented in Table~\ref{tab:features}.
   \label{tab:features}
 \end{table}
 
-\begin{description}
-\item[Feature 1] is the token converted to unaccented lowercase format.
-\item[Feature 2] represents an exact match of a sequence of tokens to any of the 1,595,771 
-names from the dictionary extracted from DBLP described in Section~\ref{sec:dictionary}.
-\item[Feature 3] represents a partial match in the same dictionary. 
-\item[Feature 4] is a binary feature describing a regular expression match to an email address.
-\item[Feature 5] is true if the token contains a number.
-\item[Feature 6] is true if the token is an honorific.
-\item[Feature 7] is true if the token matches the regular expression for a URL.
-\item[Feature 8] is true if the token is capitalized.
-\item[Feature 9] is true if the token is a punctuation sign.
-\item[Feature 10] is the token's enclosing HTML tag and its parent tag concatenated.
-\item[Feature 11] is the CSS class for the token's HTML tag.
-\end{description}
+The only features that demand further explanation are features 10 and 11.
+Feature 10 is the token's enclosing HTML tag and its parent tag concatenated.
+Feature 11 is the CSS class for the token's HTML tag.
+Both of these features are only useful in the self-training strategy for HMMs and the
+attention architectures for Bi-LSTM-CRFs. In other models, we only use features 1 to 9.
 
-Features 10 and 11 are only useful in the self-training strategy for HMMs and the
-attention architectures for Bi-LSTM-CRFs.
 We know that correlated features may hurt the performance of some classifiers, so
 in Table~\ref{tab:feature_correlation} we present the feature correlation matrix based on 
-the Cramér's V measure.
-% ~\footnote{
-% Dpython implementation
-% % https://en.wikipedia.org/wiki/Cram%C3%A9r%27s_V
-% % https://github.com/shakedzy/dython/blob/master/dython/nominal.py
-% }. 
+the Cramér's V measure
+~\footnote{
+The Cramér's V measure is a correlation measure between two nominal variables. A value closer
+to 0 means no correlation, a value close to 1 means complete correlation, and a value
+close to -1 means inverse correlation. This measure is based on Pearson's chi-square. Its description
+is given in~\cite{Cramer1946}. The stronger correlations are shown in bold numbers.
+
+Dpython implementation
+% https://en.wikipedia.org/wiki/Cram%C3%A9r%27s_V
+% https://github.com/shakedzy/dython/blob/master/dython/nominal.py
+}. 
 
 \begin{table}[h]
   \tiny
@@ -2497,9 +2489,9 @@ the Cramér's V measure.
   \label{tab:feature_correlation}
 \end{table}
 
-The current word is strongly correlated with most features besides the URL feature, and the ones related to 
-the HTML structure. That shows there is not a lot of information to gain from these features. To understand how
-this can help or hurt the Hidden Markov Model performance we test the model using two groups of features:
+The current word is strongly correlated with most features besides the URL feature and the ones related to 
+the HTML structure. To understand how this can help or hurt the Hidden Markov Model performance we test the 
+model using two groups of features:
 
 \begin{description}
   \item[Group A] Current word, Exact Match, Partial Match, URL, Capitalized
@@ -2603,7 +2595,7 @@ features from Group A and Group B.
 \end{figure}
 
 The Group A models were better overall showing that the selection of features
-is of importance for HMMs in the sequence labeling problem. Also, we notice a
+is of importance for HMMs applied to the sequence labeling problem. Also, we notice a
 massive improvement relative to the HMMs that used no features.
 
 
@@ -2611,10 +2603,10 @@ massive improvement relative to the HMMs that used no features.
 
 In the next experiment, we wanted to understand if the self-training strategy described in
 Section~\ref{sec:self_training} is effective for improving the performance of 
-\textit{HMMs}. Figure~\ref{fig:hmm_self_training} compares the performance of \textit{HMMs}
-up to third order with features from \textit{Group A} with HMMs that used
-the \textit{HTML Tag} and the \textit{CSS Class} features trained with the self-training strategy 
-in addition to the \textit{Group A} features. 
+HMMs. Figure~\ref{fig:hmm_self_training} compares the performance of HMMs
+up to third order with features from Group A with HMMs that used
+the HTML Tag and the CSS Class features trained with the self-training strategy 
+in addition to the Group A features. 
 
 \begin{figure}[h!]
   \begin{center}
@@ -2725,7 +2717,6 @@ Table~\ref{tab:hmm_results}.
                              & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
                              & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
       \midrule
-      \midrule
       HMM-1                           & 0.693 & 0.581 & 0.632 & 0.637 & 0.458 & 0.533 \\
       HMM-2                           & 0.703 & 0.630 & 0.665 & 0.653 & 0.527 & 0.583 \\
       HMM-3                           & 0.616 & 0.618 & 0.617 & 0.551 & 0.468 & 0.506 \\
@@ -2744,7 +2735,7 @@ Table~\ref{tab:hmm_results}.
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{All \textit{Hidden Markov Models}}
+  \caption{All Hidden Markov Models.}
   \label{tab:hmm_results}
 \end{table}
 
@@ -2752,7 +2743,7 @@ Table~\ref{tab:hmm_results}.
 \section{Conditional Random Fields}
 \label{sec:experiments_crf}
 
-When we compared a featureless Logistic Classifier with a featureless Naive Bayes model
+When we compared a featureless Logistic Classifier with a featureless Naive Bayes model,
 we found that the Logistic Classifier performed significantly better. In this section we
 want to check if CRFs are also better than HMMs when they use no features besides the
 current word. Also, Linear Chain CRFs provide a much more flexible way to incorporate 
@@ -2773,7 +2764,7 @@ and a CRF without features in the name extraction task.
         title={CRF without Features},
         xmin=0.5, xmax=3.5,
         ymin=0, ymax=1,
-        xticklabels={Maxent,HMM-2,CRF},
+        xticklabels={Logistic,HMM-2,CRF},
         xtick={1,...,3},
         ytick={0,0.2,...,1},
         ybar=0pt,
@@ -2809,23 +2800,23 @@ and a CRF without features in the name extraction task.
       \end{axis}
     \end{tikzpicture}
     \caption{
-      Performance of the Maximum Entropy classifier, second-order Hidden Markov Models and 
+      Performance of the Logistic Classifier, second-order Hidden Markov Models and 
       Linear Chain CRFs without features besides the current word on the test set of the NER on HTML dataset.
     }
     \label{fig:crf_no_features}
   \end{center}
 \end{figure}
 
-The \textit{CRF} model shows a significant improvement in comparison to the other models that used no features,
+The CRF shows a significant improvement in comparison to the other models that used no features,
 achieving an F1-score of 0.750. Next, we proceed to understand if the addition of features can improve this
 performance further.
 
 
 \subsection{Feature Selection}
 
-To allow comparison between the \textit{HMMs} from the last section we consider \textit{CRFs} using features
-from \textit{Group A} and \textit{Group B}. Figure~\ref{fig:crf_all_features} shows a comparison between 
-the best \textit{HMM} for each group of features and the respective \textit{CRF} using the same group of features.
+To allow comparison between the HMMs from the last section, we consider CRFs using features
+from Group A and Group B. Figure~\ref{fig:crf_all_features} shows a comparison between 
+the best HMM for each group of features and the respective CRF using the same group of features.
 
 \begin{figure}[h!]
   \begin{center}
@@ -2920,17 +2911,16 @@ the best \textit{HMM} for each group of features and the respective \textit{CRF}
 \end{figure}
 
 The CRF is more robust to variations in the feature selection. It performs
-similar to the second-order HMM in Group A and slightly better in Group B, though
-it tends towards an increase in precision rather than recall. The CRF is marginally better than
-the HMM, however, when we consider the self-trained HMM-2, it still shows a better overall 
-performance. 
+similar to the second-order HMM in Group A and slightly better in Group B.
+The CRF is marginally better than the HMM, however, when we consider the 
+self-trained HMM-2, it still shows a better overall performance. 
 
 There are two things that could still be tried to improve the CRF performance. First,
 the CRF allows for a more flexible feature selection, so we could try adding more features,
 since the correlation is not impeditive in this case. Second, we could try developing a self-training 
-strategy for CRFs similar to the one employed on HMMs. However, Neural Networks 
-showed a superior performance in many NLP tasks, so next, we consider neural architectures.
-Table~\ref{tab:crf_results} presents the detailed results for CRFs at the name extraction
+strategy for CRFs similar to the one employed on HMMs. However, since Neural Networks 
+showed a superior performance in many NLP tasks, we proceed to investigate these models in the
+next section. Table~\ref{tab:crf_results} presents the detailed results for CRFs at the name extraction
 task in the validation and test sets.
 
 \begin{table}[h]
@@ -2941,7 +2931,6 @@ task in the validation and test sets.
       \multirow{2}{*}{Model} & \multicolumn{3}{c}{Validation} & \multicolumn{3}{c}{Test} \\
                              & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
                              & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
-      \midrule
       \midrule
       CRF                    & 0.806 & 0.805 & 0.806 & 0.795 & 0.710 & 0.750 \\
       CRF (Group A)          & 0.857 & 0.875 & 0.866 & 0.845 & 0.775 & 0.808 \\
@@ -2980,8 +2969,8 @@ five runs.
 One of the advantages of deep neural networks relative to earlier sequence labeling methods is that they 
 usually work without any feature engineering. Following the original paper, we only use GloVe-300 word embeddings
 as inputs to the model.
-Figure~\ref{fig:bi_lstm_crf} compares the performance of a \textit{BI-LSTM-CRF} on the test
-set of the researcher name extraction task with the best featureless \textit{HMM} and \textit{CRF}.
+Figure~\ref{fig:bi_lstm_crf} compares the performance of a BI-LSTM-CRF on the test
+set of the researcher name extraction task with the best featureless HMM and CRF.
 
 \begin{figure}[h!]
   \begin{center}
@@ -3036,7 +3025,7 @@ set of the researcher name extraction task with the best featureless \textit{HMM
 The Bi-LSTM-CRF is significantly better than the previous models, though the comparison is not 
 completely fair, since we fed the model with word embeddings. However, these pre-trained embeddings 
 are static and general to any language related task, so their incorporation in the model does not 
-require any a substantial effort. Without any feature engineering, the Bi-LSTM-CRF model
+require any substantial effort. Without any feature engineering, the Bi-LSTM-CRF model
 already achieves an 0.886 F1-score, surpassing the best model up to this point (the HMM-2 with
 self-training, which achieved 0.879 F1-score).
 
@@ -3045,9 +3034,9 @@ self-training, which achieved 0.879 F1-score).
 \label{ssec:experiment_char_representations}
 
 Morphological features can help identifying named entities. We presented in Section~\ref{ssec:char_representations}
-two methods for incorporating character representations in \textit{Recurrent Neural Networks}, the \textit{CNN-based}
-method, and the \textit{LSTM-based} method. In Table~\ref{tab:char_reps}, we compare the performance of
-\textit{CNN} and \textit{LSTM} representations with the plain \textit{Bi-LSTM-CRF}.
+two methods for incorporating character representations in Recurrent Neural Networks, the CNN-based
+method, and the LSTM-based method. In Table~\ref{tab:char_reps}, we compare the performance of
+CNN and LSTM representations with the plain Bi-LSTM-CRF.
 
 \begin{table}[h]
   \small
@@ -3073,33 +3062,33 @@ method, and the \textit{LSTM-based} method. In Table~\ref{tab:char_reps}, we com
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Bi-LSTM-CRF with Character Representations}
+  \caption{Bi-LSTM-CRF with Character Representations.}
   \label{tab:char_reps}
 \end{table}
 
-The character representations improved the \textit{F1-score} by ~1.3 points. Also, both the 
-\textit{CNN-based} and the \textit{LSTM-based} representations have a similar performance, yet 
-the \textit{LSTM-based} representations are slightly better, owing probably to the fact that they 
-can represent prefixes and suffixes while the \textit{CNN-based} filters are position 
+The LSTM character representations improved the $F_1$-score by ~1.3 points. Also, both the 
+CNN-based and the LSTM-based representations have a similar performance, yet 
+the LSTM-based representations are slightly better, owing probably to the fact that they 
+can represent prefixes and suffixes while the CNN-based filters are position 
 invariant. 
 
-We also present the results for these models using the features from \textit{Group B}. The
-addition of features improves the performance of the plain \textit{Bi-LSTM-CRF}, but hurts the 
+We also present the results for these models using the features from Group B. The
+addition of features improves the performance of the plain Bi-LSTM-CRF, but hurts the 
 performance of the models with character representations. Still, in all cases, the performance is
 worse than the featureless Bi-LSTM-CRF model with LSTM-based character representations, so there
-little point in trying to boost the performance further by adding more features.
+is little point in trying to boost the performance further by adding more textual features.
 
 
 \subsection{Attention Mechanisms}
 
-The \textit{Self-Training} strategy for HMMs showed that there is a lot to gain
+The Self-Training strategy for HMMs showed that there is a lot to gain
 from incorporating features related to the HTML structure in our models. The HMM-2 
-model went from 0.805 F1-score to 0.879 F1-score with the self-training strategy. With the
+model went from 0.805 $F_1$-score to 0.879 $F_1$-score with the self-training strategy. With the
 Bi-LSTM-CRF model, the margin for improvement is smaller because the model already performs
-remarkably well.
+rather well.
 
 The hard and soft attention mechanisms proposed in Section~\ref{sec:attention_models} are 
-techniques aimed at doing to neural networks something similar to what is done in the 
+techniques for neural networks created to do something similar to the 
 self-training strategy for HMMs. In Table~\ref{tab:attention}, we compare the performance of 
 the Bi-LSTM-CRF with LSTM-based character representations using a Hard Attention layer and 
 a Soft Attention layer.
@@ -3129,8 +3118,8 @@ a Soft Attention layer.
   \label{tab:attention}
 \end{table}
 
-The Hard Attention layer improved the original model by roughly 0.5 F1-score, which is
-significant, considering that we only gained 0.34 F1-score with the addition of character
+The Hard Attention layer improved the original model by roughly 0.5 $F_1$-score, which is
+meaningful, considering that we only gained 0.34 F1-score with the addition of character
 representations. However, the Soft Attention layer actually decreased the performance, 
 what demands further explanation. The reason for this is probably that the Hard Attention layer only 
 captures if the HTML context between two tags is exactly the same, but it does not look at what is the
@@ -3144,7 +3133,7 @@ happen. This does not mean that the Soft Attention layer is useless, but for it 
 abstract structural patterns that could be generally useful, we would need a much larger 
 dataset. A possibility would be to pre-train unsupervised HTML contextual embeddings to detect
 useful HTML patterns in a large collection and then use this knowledge in a specific sequence 
-labelling setting.
+labeling setting.
 
 
 \subsection{Word Embeddings}
@@ -3154,12 +3143,12 @@ choice of embeddings is of great importance to the success of neural sequence mo
 recent developments in NER models come from the incorporation of better pre-trained word embeddings 
 to state-of-the-art models in many NLP tasks. We considered three sets of pre-trained word embeddings 
 in our experiments: GloVe-300, Word2Vec-300 and ELMo. The characteristics of these
-word embeddings is described in Table~\label{tab:word_embeddings}. Different from Glove-300 and Word2Vec-300, 
+word embeddings is described in Table~\ref{tab:word_embeddings}. Different from GloVe-300 and Word2Vec-300, 
 which are static, ELMo embeddings are context dependent and need to be recalculated for the specific dataset. 
 This adds significant overhead to the model training. In fact, while training the Bi-LSTM-CRF variations
 in a CPU is slow but possible, the training of the same models with ELMo embeddings without a good GPU is almost
-inconceivable. Table~\ref{tab:experiments_word_embeddings} compares the performance of \textit{Bi-LSTM-CRF} 
-models with \textit{LSTM-based} character representations using different sets of pre-trained word embeddings.
+inconceivable. Table~\ref{tab:experiments_word_embeddings} compares the performance of Bi-LSTM-CRF 
+models with LSTM-based character representations using different sets of pre-trained word embeddings.
 
 \begin{table}[h]
   \small
@@ -3170,7 +3159,7 @@ models with \textit{LSTM-based} character representations using different sets o
                              & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
                              & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
       \midrule
-      GloVe    & 0.928 & 0.950 & 0.939 & 0.920 & 0.886 & 0.902 \\
+      GloVe    & 0.928 & 0.950 & 0.939 & \textbf{0.920} & \textbf{0.886} & \textbf{0.902} \\
       Word2Vec & 0.925 & 0.926 & 0.926 & 0.899 & 0.831 & 0.864 \\
       ELMo     & 0.783 & 0.844 & 0.812 & 0.720 & 0.885 & 0.794 \\
       
@@ -3180,11 +3169,11 @@ models with \textit{LSTM-based} character representations using different sets o
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Word Embeddings}
+  \caption{Bi-LSTM-CRF with LSTM characters and different sets of word embeddings.}
   \label{tab:experiments_word_embeddings}
 \end{table}
 
-Glove embeddings are superior to Word2Vec in our NER setting, agreeing with the reported results for neural 
+GloVe embeddings are superior to Word2Vec in our NER setting, agreeing with the reported results for neural 
 models in the CoNLL-2003 English dataset for NER. But, ELMo embeddings showed a very poor performance, 
 contrasting with the results reported in the CoNLL-2003 English dataset. This is probably due to the fact that,
 different from static embeddings, ELMo considers the context when generating word representations. Since
@@ -3193,9 +3182,9 @@ contextual representations on HTML will not make much sense.
 
 The results obtained with different sets of embeddings are important because they show that the choice of 
 word embeddings makes the performance of the original model vary considerably. In fact, if we used Word2Vec embeddings
-instead of GloVe embeddings, the Bi-LSTM-CRF would lose to the self-trained HMM-2, which reached a 0.879
-F1-score. Also, we cannot trust that only because an embedding shows superior performance in related tasks
-that it will also be effective in the present task (ELMo).
+instead of GloVe embeddings, the Bi-LSTM-CRF would actually lose to the self-trained HMM-2, which reached a 0.879
+$F_1$-score. Also, we cannot trust that only because an embedding shows superior performance in related tasks
+that it will also be effective in the present task.
 
 
 \subsection{F-score Maximization}
@@ -3210,14 +3199,14 @@ Recall over Precision.
 The results presented in the previous sections show that Neural Architectures tend 
 to value Precision over Recall in the name extraction task, however it is arguably better to improve Recall
 and lose a little Precision in this task, since it is easier to filter out false positives from the
-results than to find manually the false negatives in the corpus. 
+results than to find the false negatives manually in the corpus. 
 
 Figure~\ref{fig:fscore_optimization} presents the results on the test set of the NER-on-HTML dataset
-for a \textit{Bi-LSTM-CRF} model with LSTM character representations trained with the expected \textit{F-score} 
-maximization objective and varying the \textit{F-score} $ \alpha $. For example, $ \alpha=0.5 $ means that we 
+for a Bi-LSTM-CRF model with LSTM character representations trained with the expected F-score 
+maximization objective and varying the F-score $ \alpha $. For example, $ \alpha=0.5 $ means that we 
 value Recall as much as Precision, $ \alpha=0.2 $ means that we value Precision twice as much as Recall, and 
-$ \alpha=0.8 $ means that we value Recall twice as much as Precision. The exact formula for the $ F_\alpha-score $
-is given in Equation~\ref{eq:falpha}.
+$ \alpha=0.8 $ means that we value Recall twice as much as Precision. The exact formula for the $F_\alpha$-score
+was given in Equation~\ref{eq:falpha}.
 
 \begin{figure}[h!]
   \begin{center}
@@ -3270,16 +3259,16 @@ is given in Equation~\ref{eq:falpha}.
 
 The experiment shows that the capacity to control how much the model optimizes for one measure over the
 other is limited. Even when giving a lot more priority to Precision ($ \alpha=0.1 $), the model is still
-less precise than the variant that optimizes for the F1-score ($ \alpha=0.5 $). Actually, the model that achieves
+less precise than the variant that optimizes for the $F_1$-score ($ \alpha=0.5 $). Actually, the model that achieves
 top Precision (0.864) and the second best Recall (0.922) is the one with $ \alpha=0.5 $. The model with 
 $ \alpha=0.8 $ achieves the best Recall (0.923).
 
 An interesting result that we can observe in the models that optimized the expected F-score function is that
 all of them valued Recall over Precision. A result that contrasts with the Neural Networks that were presented 
-earlier, which prioritized Precision. This is very useful because, the F1-score optimized Bi-LSTM-CRF obtains
+earlier, which prioritized Precision. This is very useful because, the $F_1$-score optimized Bi-LSTM-CRF obtains
 a Recall of 0.922 in the test set without losing a lot of Precision, contrasting with the best model so far,
 the Hard-Attention Bi-LSTM-CRF, that achieved a 0.890 Recall and had better Precision. Table~\ref{tab:fscore_optimization}
-shows the detailed results from the models discussed in this Section.
+shows the detailed results for the models discussed in this Section.
 
 \begin{table}[h]
   \small
@@ -3328,8 +3317,8 @@ shows the detailed results from the models discussed in this Section.
 \subsection{Technical Details for Neural Networks}
 
 All neural models were trained with the Adam Optimizer using a learning rate of 0.001 over 20 epochs on 
-mini batches of size 10. We used early stopping~\cite{Caruana2000} to select the best parameters, considering 
-the F1 measure in the validation set. All \textit{Bi-LSTM-CRF} models contained a 
+mini batches of size 10. We used early stopping~\citep{Caruana2000} to select the best parameters, considering 
+the F1 measure in the validation set. All Bi-LSTM-CRF models contained a 
 single LSTM layer with 100 weights. Dropout layers with 0.5 dropout rates were added after the LSTM, 
 the character representations, and the attention matrix when applicable. The neural models were trained on 
 Amazon G3.4xlarge instances, which have NVIDIA Tesla M60 GPUs with 8GB internal memory. The implementations
@@ -3342,8 +3331,8 @@ were done entirely in Python using Google's Tensorflow deep learning library~\fo
 We finally reach the point where we try to answer the main question of this dissertation. 
 We have experimented with multiple sequence labeling methods in the previous Sections and now we provide
 an overview of the best variants of each category.
-In Table~\ref{tab:best_models}, we compare the performance of the best \textit{HMMs}, 
-\textit{CRFs} and \textit{Neural Networks} in the NER on HTML dataset.
+In Table~\ref{tab:best_models}, we compare the performance of the best HMMs, 
+CRFs and Neural Networks in the NER on HTML dataset.
 
 \begin{table}[h]
   \small
@@ -3378,17 +3367,17 @@ In Table~\ref{tab:best_models}, we compare the performance of the best \textit{H
   \label{tab:best_models}
 \end{table}
 
-If we take the F1 score as the comparison criterion, then the Bi-LSTM-CRF model with LSTM 
-character representations, Glove-300 embeddings, and a Hard Attention Layer is the winning model with an
-F1 of 0.907. However, as we previously argued, Recall should be privileged over 
+If we take the $F_1$-score as the comparison criterion, then the Bi-LSTM-CRF model with LSTM 
+character representations, Glove-300 embeddings, and a Hard Attention Layer is the winning model with a
+$F_1$ of 0.907. However, as we previously argued, Recall should be privileged over 
 Precision in this task. When we take this in consideration, the Bi-LSTM-CRF optimized
 with the Expected F1-score objective is probably a better option.
 
 Despite the superior performance of Neural Networks in this task, there remains an important 
 consideration to be made. As we increase the complexity and training time required by our models, there 
 is only a scant gain in terms of Precision and Recall. For example, the 
-Bi-LSTM-CRF with a Hard Attention Layer achieved an 0.907 $ \pm 0.005 $ \textit{F1-score} (considering 
-the standard deviation), while the HMM-2 using a Self-training strategy achieved an 0.879 
+Bi-LSTM-CRF with a Hard Attention Layer achieved an 0.907 $ \pm 0.005 $ $F_1$-score, while 
+the HMM-2 using a Self-Training strategy achieved an 0.879 
 F1-score. This is a 0.028 increase, which is not bad, but it comes to mind if the additional
 complexity is entirely justifiable. 
 
@@ -3407,7 +3396,7 @@ selecting features is really a more arduous struggle.
 
 To the best of our abilities, the Tensorflow implementation of the Bi-LSTM-CRF + LSTM chars + 
 Hard Attention model running on an AWS GPU instance took approximately 6075 seconds to train 
-and run predictions in the test set. While, the \textit{HMM-2} did the same in approximately
+and run predictions in the test set. While, the HMM-2 did the same in approximately
 64 seconds, running in a conventional CPU with unoptimized code. That is almost a hundred times 
 faster. Finally, if we consider the intellectual cost of understanding and implementing both 
 models and the code maintainability of both implementations, the difference is even more profound.
@@ -3423,7 +3412,7 @@ many extraction tasks. Unfortunately, unsupervised and semi supervised approache
 are still far from serviceable.
 
 
-\subsection{Filtering Strategy}
+\subsection{Filtering False Positives}
 
 Many times in this dissertation we argue that Recall is more valuable than Precision in named
 entity extraction tasks. To verify this empirically, we consider the results of the best models
@@ -3446,10 +3435,10 @@ relabeled tokens that were labeled as a person ("B-PER" or "I-PER") to an outsid
 
 The results of this simple filtering strategy for the best models is presented in 
 Table~\ref{tab:heuristic_filtering}. The strategy could improve the precision of all 
-models considerably with a very simple approach, showing that filtering out false 
-positives can be accomplished with a small effort. A viable idea for future research is to incorporate
+models considerably, showing that filtering out all false positives can probably be 
+accomplished with a small effort. A viable idea for future research is to incorporate
 these filters in the models, especially filters 3 and 5, to prevent them from making
-the mistakes and allow them some flexibility to derive new filters depending on the task.
+the mistakes and allow the models some flexibility to derive new filters depending on the task.
 
 \begin{table}[h]
   \small
@@ -3466,7 +3455,7 @@ the mistakes and allow them some flexibility to derive new filters depending on 
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Overview of the best models for the name extraction task in the NER on HTML dataset after the filtering strategy.}
+  \caption{Overview of the best models for the name extraction task in the NER on HTML test dataset after the filtering strategy.}
   \label{tab:heuristic_filtering}
 \end{table}
 
@@ -3475,12 +3464,12 @@ the mistakes and allow them some flexibility to derive new filters depending on 
 In this chapter, we presented experimental results for various HMMs, CRFs, and Neural Networks in the
 researcher name extraction task. We learned that, despite being very simple models, HMMs can perform
 incredibly well with the right selection of features and the self-training strategy, obtaining a
-0.879 F1 in the test set. When we consider featureless models, the best performance
+0.879 $F_1$ in the test set. When we consider featureless models, the best performance
 is achieved by the Bi-LSTM-CRF model with LSTM character representations and a Hard-Attention layer, achieving
-0.907 F1, however this model is much more complex than HMMs. After applying the filtering strategy, both
-models gain an increase in the F1, but the overall best performance is achieved by the Bi-LSTM-CRF model
-with LSTM character representations optimized with a F1-score optimization objective, achieving a
-0.9323 F1.
+0.907 $F_1$, however this model is much more complex than HMMs. After applying the filtering strategy, both
+models gain an increase in the $F_1$, but the overall best performance is achieved by the Bi-LSTM-CRF model
+with LSTM character representations optimized with a $F_1$-score optimization objective, achieving a
+0.9323 $F_1$.
 
 
 \chapter{Related Work}
@@ -3505,15 +3494,15 @@ break frequently because they rely on webpage features that can change
 often. So, in the late nineties, several authors advocated for wrapper induction, a technique 
 that consists of automatically constructing wrappers from a small set of examples by 
 identifying delimiters or context tokens that single out the desired attributes. 
-Some remarkable wrapper induction methods are WIEN by~\cite{Kushmerick2000}, Soft 
-Mealy by~\cite{Hsu1998} and STALKER by~\cite{Muslea1999}.
+Some remarkable wrapper induction methods are WIEN~\citep{Kushmerick2000}, Soft 
+Mealy~\citep{Hsu1998} and STALKER~\citep{Muslea1999}.
 
 Despite being better than constructing wrappers manually, wrapper induction methods 
 still suffered from a lack of expressive power and flexibility. These methods had 
 trouble handling records with missing attributes or unusual structures because
 patterns could only be identified if they happened at least once in the examples.
 
-Other approaches such as NoDoSE by~\cite{Adelberg1998} and Debye by~\cite{Laender2002a} 
+Other approaches such as NoDoSE~\citep{Adelberg1998} and Debye~\citep{Laender2002a} 
 brought greater flexibility to wrapper induction methods by requiring a greater level 
 of human interaction through graphical user interfaces. Web Data Extraction techniques often 
 require some sort of assistance from human experts to boost accuracy. One of the main challenges 
@@ -3521,39 +3510,39 @@ in the field lies in determining an adequate trade-off between the degree of aut
 the Precision and Recall of the data extraction tool.
 
 To automate the task of Web data extraction completely some approaches,
-such as Road Runner by~\cite{Crescenzi2001}, removed entirely the need for data examples.
+such as Road Runner~\citep{Crescenzi2001}, removed entirely the need for data examples.
 Road Runner parses documents belonging to a same class (e.g. books in Amazon) and 
 generates wrappers based on their similarities and differences, yielding comparable results 
 to those obtained by wrapper induction methods. However, like previous approaches, it was 
 unsuited for cross site extraction tasks because the learned rules were not general enough.
 
 Early NLP-based approaches aimed at extracting more general rules that could possibly
-be employed over multiple websites. RAPIER by~\cite{Califf1999} is a method of rule
+be employed over multiple websites. RAPIER~\citep{Califf1999} is a method of rule
 extraction that uses information such as part-of-speech tags and semantic classes from
 a lexicon to derive patterns from a set of training examples. This approach is more
 flexible than the wrapper induction methods, however it achieves much lower rates of 
 Precision and Recall.
 
-In 2002, a survey by~\cite{Laender2002} made a thorough classification of the
+In 2002, a survey~\citep{Laender2002} made a thorough classification of the
 early approaches with a taxonomy based on their main technology, being them: languages for
 wrapper development, HTML-aware tools, NLP-based tools, Wrapper Induction Tools,
 Modeling-based tools and Ontology-based tools. Some noteworthy examples from this era
 are: 
 
 \begin{itemize}
-\item TSIMMIS by~\cite{Hammer1997} and WebOQL by~\cite{Arocena1999}, which are special purpose 
+\item TSIMMIS~\citep{Hammer1997} and WebOQL~\citep{Arocena1999}, which are special purpose 
 languages for building wrappers.
 
-\item Road Runner by~\cite{Crescenzi2001}, XWRAP by~\cite{Liu2000} and W4F by~\cite{Sahuguet1999}, 
+\item Road Runner~\citep{Crescenzi2001}, XWRAP~\citep{Liu2000} and W4F~\citep{Sahuguet1999}, 
 which are HTML-aware tools that infer meaningful patterns from the HTML structure.
 
-\item RAPIER by~\cite{Califf1999}, SRV by~\cite{Freitag1998}, WHISK by~\cite{Soderland1999}, which 
+\item RAPIER~\citep{Califf1999}, SRV~\citep{Freitag1998}, WHISK~\citep{Soderland1999}, which 
 are NLP-based tools.
 
-\item WIEN by~\cite{Kushmerick2000}, Soft Mealy by~\cite{Hsu1998} and STALKER by~\cite{Muslea1999} which 
+\item WIEN~\citep{Kushmerick2000}, Soft Mealy~\citep{Hsu1998} and STALKER~\citep{Muslea1999} which 
 are wrapper induction methods.
 
-\item NoDoSE by~\cite{Adelberg1998} and Debye by~\cite{Laender2002a}, which are semi-supervised
+\item NoDoSE~\citep{Adelberg1998} and Debye~\citep{Laender2002a}, which are semi-supervised
 tools that require some interaction with the user by means of a graphical
 user interface.
 \end{itemize}
@@ -3562,12 +3551,12 @@ user interface.
 % https://www.aaai.org/Papers/IJCAI/2007/IJCAI07-429.pdf
 
 \cite{Chang2006} complemented the previous surveys with semi-supervised 
-technologies such as Thresher by~\cite{Hogue2005}, IEPAD by~\cite{Chang2001} and 
-OLERA by~\cite{Chang2004}. They differed from supervised 
+technologies such as Thresher~\citep{Hogue2005}, IEPAD~\citep{Chang2001} and 
+OLERA~\citep{Chang2004}. They differed from supervised 
 and unsupervised methods because they either needed only a rough description of
 data from users for extraction rule generation or some level of post processing
 that needed user attention. The survey also mentioned newer unsupervised methods
-such as DeLa by~\cite{Wang2003}, Exalg by~\cite{Arasu2003} and Depta by~\cite{Zhai2005}.
+such as DeLa~\citep{Wang2003}, Exalg~\citep{Arasu2003} and Depta~\citep{Zhai2005}.
 
 Most of the early information extraction systems were rule-based with either 
 manual rule description or automatic rule learning from examples, thus they
@@ -3592,13 +3581,13 @@ discussed in Section~\ref{sec:ner}.
 Surveys by~\cite{Ferrara2014}, \cite{Schulz2016} and \cite{Varlamov2016} updated the 
 previous surveys on information 
 extraction methods with some interesting innovations. 
-Some examples are: the Visual Box Model by~\cite{Krupl2005}, a data extraction system that produces 
+Some examples are: the Visual Box Model~\citep{Krupl2005}, a data extraction system that produces 
 a visualization of the webpage to exploit visual cues to identify records presented in a tabular form;
-automatic wrapper adaptation by~\cite{Ferrara2011}, a technique that tries to reduce the cost of 
+automatic wrapper adaptation~\citep{Ferrara2011}, a technique that tries to reduce the cost of 
 wrapper maintenance by measuring the similarity of HTML trees and adapting
-wrappers to the new page structure; AutoRM by~\cite{Shi2015}, a method to mine
+wrappers to the new page structure; AutoRM~\citep{Shi2015}, a method to mine
 records from a single webpage by identifying similar data regions through DOM
-tree analysis; and Knowledge Vault by~\cite{Dong2014}, a method that combines different 
+tree analysis; and Knowledge Vault~\citep{Dong2014}, a method that combines different 
 extraction approaches to feed a probabilistic knowledge base.
 
 Most data extraction systems focus on extracting information from single websites
@@ -3612,7 +3601,7 @@ model takes a webpage segmented into data blocks and employs a two dimensional c
 random field model to perform attribute labeling. The model was further improved 
 in~\cite{Zhu2006} to model record segmentation and attribute labeling as a joint task.
 Some of the limitations of early unsupervised methods 
-were also addressed by ObjectRunner \cite{Abdessalem2010} and AMBER \cite{Furche2012}. 
+were also addressed by ObjectRunner~\citep{Abdessalem2010} and AMBER~\citep{Furche2012}. 
 These methods work by annotating webpages automatically with regular expressions, gazetteers and 
 knowledge bases. They can rectify low quality annotations and even improve the annotators
 by exploring regular structures in the DOM during the record segmentation phase.
@@ -3629,10 +3618,10 @@ flexible extraction tools.
 
 Named Entity Recognition is an important subtask in Information Extraction.
 The Named Entity Recognition task was defined in the Third Message 
-Understanding Conference (MUC-3), described in~\cite{Sundheim1991}, where researchers were asked to extract
+Understanding Conference (MUC-3)~\citep{Sundheim1991}, where researchers were asked to extract
 entities from a news corpus about terrorist incidents. However, it was the 
 language-independent Named Entity Recognition shared task at the Conference 
-on Computational Natural Language Learning in 2003 (CoNLL-2003), described in~\cite{KimSang2003},
+on Computational Natural Language Learning in 2003 (CoNLL-2003)~\citep{KimSang2003},
 that established an enduring labeled dataset constructed with news texts from Reuters.
 Despite its reduced size and the limited variability of its documents, the CoNLL-2003 
 dataset is still used to compare the performance of NER systems in English, and 
@@ -3657,14 +3646,13 @@ conditional probability $ P(Y|X) $. They assumed conditional independence for th
 therefore, they could not handle overlapping features. This lack of flexibility led to the 
 development of discriminative approaches to sequence labeling.
 
-Some early examples are Maximum Entropy Taggers for NER by~\cite{Borthwick1998} and
-POS-Tagging by~\cite{Ratnaparkhi1998}. The Maximum Entropy Markov Model introduced in~\cite{McCallum2000} 
+Some early examples are Maximum Entropy Taggers for NER~\citep{Borthwick1998} and
+POS-Tagging~\citep{Ratnaparkhi1998}. The Maximum Entropy Markov Model introduced in~\cite{McCallum2000} 
 was developed just a while later, building up on the intuition of HMMs combined with
 the flexibility of discriminative approaches. However, because of the label bias problem,
-this model was superseded by Conditional Random Fields in~\cite{Lafferty2001} and~\cite{McCallum2003}. 
+this model was superseded by Conditional Random Fields~\citep{Lafferty2001, McCallum2003}. 
 At this time, the best performing systems almost always resorted to external gazetteers 
-and hand-chosen features, as is the case for the CoNLL-2003 winning model, described
-in~\cite{Florian2003}.
+and hand-chosen features, as is the case for the CoNLL-2003 winning model~\citep{Florian2003}.
 
 With the advancement of Machine Learning in recent years, we saw the rise
 of Neural Networks applied to sequence labeling. In 2011, \cite{Collobert2011} 
@@ -3683,8 +3671,8 @@ made use of pre-trained GloVe word embeddings, described in~\cite{Pennington2014
 
 Small improvements to NER systems have been made since then, primarily due to the 
 introduction of new word embeddings on variations of the Bi-LSTM-CRF architecture. From
-this group, we can mention ELMo by~\cite{Peters2018}, BERT by~\cite{Devlin2018}, and
-Flair by~\cite{Akbik2018}. 
+this group, we can mention ELMo~\citep{Peters2018}, BERT~\citep{Devlin2018}, and
+Flair~\citep{Akbik2018}. 
 All of them were introduced in 2018 and they differ primarily 
 in how to construct contextual embeddings from the internal states of a language model.
 
@@ -3732,7 +3720,7 @@ HMMs and the attention models for Neural Networks. Also, NER is only a subtask t
 is hardly useful by itself, so ideally, it should be discussed in the context of a
 larger task, such as WDE. Because, as we saw in the experiments described in 
 Chapter~\ref{cha:experiments}, improvements to NER in plain text, such as ELMo, are
-not always great for NER in the web.
+not always great for NER on the web.
 
 
 \chapter{Conclusions and Future Work}
@@ -3772,37 +3760,35 @@ strategy and the attention models to incorporate this knowledge in HMMs and Neur
 And finally, we argued that we should value Recall a little more that Precision in web extraction tasks, 
 because filtering out false positives is easier than finding false negatives in the corpus. Two ways for 
 incorporating this intuition in our models is through the optimization of the expected F-score and the 
-filtering strategy, which is task-specific. Overall, we have many proposed solid approaches to
-NER in the web.
+filtering strategy, which is task-specific. 
 
 
-\section{Summary of Contributions}
-
-The main contributions of this dissertation were already summarized in the first chapter,
-but in this section, we condense them in two general contributions, using the knowledge
-obtained from previous chapters: 
-
-\begin{itemize}
-
-\item \textbf{The NER on HTML dataset} was created to assess the performance of NER methods
-on webpages with a structure that vary significantly from what is typical in plain text. By
-creating this dataset and testing NER models in it, we learned some valuable things. First,
-not all methods that work well in plain text also work well in webpages. Second, some NER
-tasks can be solved effectively with rather simple models, such as HMMs, as long as we 
-incorporate task specific knowledge in the model. Third, different extraction tasks are 
-likely to demand the creation of task-specific datasets. Finally, the researcher affiliation 
-data obtained with the models trained in this dataset can be used to perform research group
-academic impact comparison. The dataset is also available to conduct further research~\footnote{
-https://github.com/jmfveneroso/ner-on-html.
-}.
-
-\item \textbf{The new NER methods for the web.} Namely, the Self-Training strategy for HMMs,
-the Hard-Attention model for neural networks and the F-score optimization objective are likely
-to be useful in other web extraction tasks. Additionally, we present results for many variations of 
-plain HMMs, CRFs, and Bi-LSTM-CRFs in the researcher name extraction task, providing a way to 
-assess their expected performance in other web named entity extraction tasks.
-
-\end{itemize}
+% \section{Summary of Contributions}
+% 
+% The main contributions of this dissertation, using the knowledge
+% obtained from previous chapters: 
+% 
+% \begin{itemize}
+% 
+% \item \textbf{The NER on HTML dataset} was created to assess the performance of NER methods
+% on webpages with a structure that vary significantly from what is typical in plain text. By
+% creating this dataset and testing NER models in it, we learned some valuable things. First,
+% not all methods that work well in plain text also work well in webpages. Second, some NER
+% tasks can be solved effectively with rather simple models, such as HMMs, as long as we 
+% incorporate task specific knowledge in the model. Third, different extraction tasks are 
+% likely to demand the creation of task-specific datasets. Finally, the researcher affiliation 
+% data obtained with the models trained in this dataset can be used to perform research group
+% academic impact comparison. The dataset is also available to conduct further research~\footnote{
+% https://github.com/jmfveneroso/ner-on-html.
+% }.
+% 
+% \item \textbf{The new NER methods for the web.} Namely, the Self-Training strategy for HMMs,
+% the Hard-Attention model for neural networks and the F-score optimization objective are likely
+% to be useful in other web extraction tasks. Additionally, we present results for many variations of 
+% plain HMMs, CRFs, and Bi-LSTM-CRFs in the researcher name extraction task, providing a way to 
+% assess their expected performance in other web named entity extraction tasks.
+% 
+% \end{itemize}
 
 
 \section{Future Work}

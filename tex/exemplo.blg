@@ -1,5 +1,5 @@
-This is BibTeX, Version 0.99d (TeX Live 2018)
-Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+This is BibTeX, Version 0.99d (TeX Live 2015/Debian)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: exemplo.aux
 The style file: ppgccufmg.bst
 Database file #1: bibfile.bib
@@ -7,45 +7,45 @@ Warning--empty booktitle in Lafferty2001
 Warning--empty booktitle in Rabiner1990
 Warning--can't use both author and editor fields in Ramshaw1999
 Warning--empty school in Ratnaparkhi1998
-You've used 85 entries,
+You've used 86 entries,
             2043 wiz_defined-function locations,
-            1156 strings with 22003 characters,
-and the built_in function-call counts, 40031 in all, are:
-= -- 4083
-> -- 1467
-< -- 80
-+ -- 506
-- -- 491
-* -- 3652
-:= -- 6484
-add.period$ -- 308
-call.type$ -- 85
-change.case$ -- 663
-chr.to.int$ -- 84
-cite$ -- 89
-duplicate$ -- 1544
-empty$ -- 2800
-format.name$ -- 620
-if$ -- 8196
+            1164 strings with 22147 characters,
+and the built_in function-call counts, 40307 in all, are:
+= -- 4108
+> -- 1474
+< -- 81
++ -- 508
+- -- 493
+* -- 3671
+:= -- 6535
+add.period$ -- 311
+call.type$ -- 86
+change.case$ -- 668
+chr.to.int$ -- 85
+cite$ -- 90
+duplicate$ -- 1557
+empty$ -- 2822
+format.name$ -- 623
+if$ -- 8250
 int.to.chr$ -- 2
 int.to.str$ -- 0
-missing$ -- 165
-newline$ -- 462
-num.names$ -- 257
-pop$ -- 597
+missing$ -- 168
+newline$ -- 467
+num.names$ -- 260
+pop$ -- 605
 preamble$ -- 1
-purify$ -- 667
+purify$ -- 673
 quote$ -- 0
-skip$ -- 1335
+skip$ -- 1346
 stack$ -- 0
-substring$ -- 2977
+substring$ -- 2989
 swap$ -- 319
 text.length$ -- 37
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 502
+type$ -- 506
 warning$ -- 4
-while$ -- 338
+while$ -- 340
 width$ -- 0
-write$ -- 1216
+write$ -- 1228
 (There were 4 warnings)

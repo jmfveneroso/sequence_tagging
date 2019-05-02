@@ -194,6 +194,12 @@
   {242}.
 \newblock ISSN \ppgccissndoformat {00359246}.
 
+\bibitem[Cramer, 1946]{Cramer1946}
+\ppgccbibauthordoformat {Cramer, H.} (\ppgccyeardoformat {1946}).
+\newblock \ppgccbibbtitledoformat {Mathematical methods of statistics / by
+  Harald Cramer}.
+\newblock Princeton University Press Princeton.
+
 \bibitem[Crescenzi et~al.\@, 2001]{Crescenzi2001}
 \ppgccbibauthordoformat {Crescenzi, V.\ppgccbibauthorsep {} Mecca,
   G.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Merialdo, P.}
