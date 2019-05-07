@@ -15,10 +15,12 @@ def load_raw_dataset(f):
     for i, s in enumerate(X):
       tkns, labels = [], []
       for j, t in enumerate(s):
-        l = ['O', 'B-PER', 'I-PER'].index(t[1])
+        # l = ['O', 'B-PER', 'I-PER'].index(t[1])
+        l = ['O', 'B-PER', 'I-PER'].index(t[3])
         labels.append(l)
         tkns.append(t[0])
-        X[i][j] = [X[i][j][0]] + X[i][j][2:]
+        # X[i][j] = [X[i][j][0]] + X[i][j][2:]
+        X[i][j] = [X[i][j][0], str(X[i][j][0]).lower()]
 
       Y.append(labels)
       T.append(tkns)
@@ -37,7 +39,8 @@ class HiddenMarkov:
     self.naive_bayes = naive_bayes
 
     self.num_labels   = 3
-    self.num_features = 11
+    # self.num_features = 11
+    self.num_features = 1
     self.num_secondary_features = 2
     self.num_all_features = self.num_features + self.num_secondary_features
     self.num_states = self.num_labels ** self.time_steps

@@ -46,6 +46,7 @@
 \usepackage{multirow}
 \usepackage[cal=boondox]{mathalfa}
 \usepackage{pgfplots}
+\usepackage{glossaries}
 
 \usepackage{tikz}
 \usetikzlibrary{arrows,automata}
@@ -54,6 +55,18 @@
 \renewcommand{\arraystretch}{1.2}
 
 \usepackage{filecontents}
+
+
+% Glossary.
+
+\makeglossaries
+\newacronym{nlp}{NLP}{Natural Language Processing}
+\newacronym{wde}{WDE}{Web Data Extraction}
+\newacronym{ner}{NER}{Named Entity Recognition}
+\newacronym{hmm}{HMM}{Hidden Markov Model}
+\newacronym{crf}{CRF}{Conditional Random Fields}
+\newacronym{lstm}{LSTM}{Long Short-Term Memory Networks}
+\newacronym{ie}{IE}{Information Extraction}
 
 \begin{document}
 
@@ -77,7 +90,9 @@
   ack={agradecimentos},
   epigraphtext={$ x = 2 $.}{Unknown},
   keywords={Reconhecimento de Entidades Nomeadas, Extração de Informação, Aprendizado de Máquina},
+  beforetoc={\printglossary[type=\acronymtype]}
 }
+
 
 \chapter{Introduction}
 
@@ -86,25 +101,30 @@ an accelerating pace, and the astonishing growth of the web is perhaps the most 
 manifestation of this movement. The recurrent appearance of terms such as \textit{Big Data} 
 and \textit{Artificial Intelligence} in mass media testify to the growing attention 
 devoted to this topic. People, companies and academia are all interested in taming the
-colossal flood of data, each for their own reasons. The web is a practically endless 
+colossal flood of data, each for their own reasons. The web is a vast 
 repository of knowledge, but meaningful information gets lost over torrents of unimportant 
-data and to extract structured information from this immense haystack we need incredibly 
+data and to extract structured information from this haystack we need
 sophisticated solutions.
 
-Web Data Extraction (WDE) methods are often employed when there is a need to 
-extract massive amounts of structured information from webpages. Some examples of 
-these needs are extracting product descriptions and their prices from online 
-shops, or extracting person names and their relationships from news texts. 
-web documents most often lie in between the structured/unstructured data paradigm. This
+\gls{wde} methods are often employed when there is a need to 
+extract massive amounts of structured information from webpages. \gls{wde} is basically 
+the task of extracting useful information from unstructured web sources. In this sense,
+it is a specific setting of the more general problem of \gls{ie}, that regards extraction tasks
+in any type of document.
+Some examples of such tasks are the extraction of product descriptions and their prices from online 
+shops, or the extraction of house locations and number of bedrooms from real estate portals. 
+Web documents most often lie in between the structured/unstructured data paradigm. This
 means that they are not structured in the same sense that a relational database is structured, 
 neither are they unstructured in the same sense that plain text is unstructured. The way that
-elements are organized and displayed in a webpage contribute to their meaning,
-yet we cannot expect that these organizational patterns will be completely constrained 
+elements are organized and displayed in a webpage contribute to their meaning. For example,
+an entry in a list is more meaningful than an isolated entry, because the entry's meaning 
+becomes evident once we know the listed category.
+Yet we cannot expect that such organizational patterns will be completely constrained 
 by an underlying set of rules. Patterns tend to follow some guidelines but they are in 
-no way subject to strict rules. 
+no way subject to strict rules.
 
-Traditional WDE methods often relied on the identification of
-webpage patterns to build wrappers, that are simple programs aimed at extracting relevant 
+Traditional \gls{wde} methods often relied on the identification of
+webpage patterns such as listings and tables to build wrappers, that are simple programs aimed at extracting relevant 
 entities from text by identifying their common boundaries. These programs were somewhat prone to failure 
 when the webpage changed, and for this reason they demanded constant maintenance. Some improvement 
 was made with the invention of automatic wrapper generators such as WIEN~\citep{Kushmerick2000}, 
@@ -117,44 +137,56 @@ such as ObjectRunner \citep{Abdessalem2010}, Automatic Wrapper Adaptation~\citep
 AMBER~\citep{Furche2012}, and AutoRM~\citep{Shi2015}, among others.
 
 Comparatively, statistical machine learning provides more robust and flexible methods
-to WDE. In recent years, we saw amazing progress in 
-the field of Natural Language Processing (NLP) that is extremely relevant to
-the WDE community, particularly with the introduction of Deep Neural Networks 
-for Sequence Labeling by~\cite{Collobert2011}. But, these advancements were 
-not widely incorporated by WDE systems. Also, most of the attention of the NLP community 
-is devoted to solving Information Extraction tasks in plain text, and more 
-specifically, news texts.
-However, the difference between some types of webpages and news texts is significant, so
-Information Extraction systems trained in news datasets tend to perform very poorly 
-in WDE tasks. 
+to \gls{wde}. In recent years, we saw amazing progress in 
+the field of \gls{nlp} that is extremely relevant to
+the \gls{wde} community, particularly with the introduction of Deep Neural Networks 
+for Sequence Labeling by~\cite{Collobert2011}, but these advancements were 
+not widely incorporated by \gls{wde} systems. Also, most of the attention of the NLP community 
+regarding this topic is devoted to solving \gls{ie} tasks in plain text, such as 
+the identification of people and organizations in news texts.
+However, the difference between some types of webpages and plain text is significant, so
+\gls{ie} systems trained in plain text datasets tend to perform poorly 
+when confronted with some web extraction tasks, as we have confirmed in this dissertation.
 
-A concrete example of a WDE problem that demands the type of
+A concrete example of a \gls{wde} problem that demands the type of
 flexible solution provided by statistical machine learning methods is the extraction of 
 researcher names from faculty directories. Automatically extracting researcher information 
 from university websites is important, for example, to construct researcher affiliation databases 
-and compare the academic impact of research groups using bibliographic indices~\citep{Ribas2015a}. 
-The problem of researcher name extraction can be solved with machine learning methods of NER, as long 
-as we deal with the specificities of university webpages. 
+and compare the academic impact of research groups using bibliographic indices~\citep{Ribas2015a, Hirsch2005}. 
+The problem of researcher name extraction can be solved with machine learning methods of 
+\gls{ner}, the task of finding entities such as
+people, organizations, and locations in a text.
+
+Many \gls{ie} tasks in the web share a common
+factor with the researcher name extraction task. That is, they need to extract similar
+entities from different webpages or they need to extract entities from short snippets of text 
+instead of complete sentences. Some examples would be comment extraction from blog
+posts and \gls{ner} in tweets. Because of the lack of context in tweets, \gls{ner} methods trained 
+in conventional plain text corpora tend to perform badly for more or less the same reasons 
+they perform badly in other \gls{wde} tasks.
 
 In this dissertation, we compare different machine learning approaches to 
-sequence labeling on the web by evaluating their performance in the researcher 
-name extraction task. With this purpose in mind, we introduce a novel NER dataset 
+\gls{ner} on the web by evaluating their performance in the researcher 
+name extraction task. With this purpose in mind, we introduce a novel \gls{ner} dataset 
 with labeled entities, consisting of faculty directories from universities across the world. 
 We compare the models in terms of their Precision, Recall, F-scores and their 
-overall complexity. The tested models were Hidden Markov Models (HMM) up to third 
-order, Conditional Random Fields (CRF), and a range of Deep Learning 
-architectures based on Bidirectional Long Short-Term Memory Networks (LSTM). We also 
+overall complexity. That is, even if a model has a slightly worse performance in terms of the
+objective evaluation metrics in comparison to other approaches, it may still be useful if it 
+is considerably simpler and faster to train.
+The tested models were the \gls{hmm} up to third 
+order, \gls{crf}, and a range of Deep Learning 
+architectures based on Bidirectional \gls{lstm}. We also 
 introduce three strategies that can boost the performance of sequence labeling methods for
 HTML. The self-training strategy for HMMs, the Self-Attention layer with HTML features 
 for Neural Networks, and the direct F-score optimization, also 
 for Neural Networks.
 
 The usability of the evaluated models is not limited to the particular problem of researcher
-name extraction. By reliably detecting named entities on the web, we can improve the performance 
-of existing WDE approaches or even construct an end-to-end architecture that
-solves cross website extraction with good flexibility. Also, the researcher affiliation database
-constructed with the application of these methods can be used later on bibliometric
-studies.
+name extraction. By reliably detecting named entities on the web, we can boost the performance 
+of existing \gls{wde} approaches or even construct an end-to-end architecture that
+solves the problem of data extraction across different websites with improved robustness. Also, 
+the researcher affiliation database constructed with the application of these methods can be used 
+later on bibliometric studies.
 
 
 \section{Motivation}
@@ -170,38 +202,35 @@ faculty directories for each department, extract researcher names and link these
 to their public profiles (when they exist). 
 
 The crawling stage is relatively simple once we have a somewhat reliable way of 
-detecting faculty webpages, but the extraction stage is trickier. Faculty listings
+detecting faculty webpages, but the researcher name extraction stage is trickier. Faculty listings
 vary widely between different universities, and they are not always available in English,
-so we need an extraction system that can handle the possible variations without having
+so we need an extraction system that can handle the possible variations without needing
 to be trained again for each website.
 
-There is a lack of Web Data Extraction methods that can handle extraction
-tasks across different websites. Also, Named Entity Recognition research 
+There are not many \gls{wde} methods that can handle extraction
+tasks across different websites effectively. Also, \gls{ner} research 
 that could be useful to solve this problem is almost entirely focused in detecting 
 named entities in plain text. Both of these facts lead to the conclusion 
-that, to perform the researcher name extraction task, we either need a new WDE method that
-can handle cross-website extraction or a new labeled dataset specific for this extraction
+that, to perform the researcher name extraction task, we need a \gls{wde} method that
+can handle cross-website extraction and a new labeled dataset tailored for this extraction
 task. 
 
-Many Information Extraction tasks in the web share a common
-factor with the researcher name extraction task. That is, they need to extract similar
-entities from different webpages. Some examples would be comment extraction from blog
-posts and NER in tweets. Because of the lack of context in tweets, NER methods trained 
-in news corpora tend to perform badly for more or less the same reasons 
-they perform badly in general web extraction tasks.
-
-Finally, Information Extraction is a very broad field, so systems that perform
-well in a specific scenario are not likely to be as effective in other cases. Therefore,
-when possible, it is desirable that the models be as simple as possible, so we can fine
-tune them for specific extraction tasks. Taking this in consideration, we want to find 
-the best NER methods for a specific task, but trying to derive general conclusions
+Finally, \gls{ie} is a very broad field, so systems that perform
+well in a specific scenario are not likely to be as effective in other cases, as we concluded
+from our experiments concerning researcher name extraction.
+Therefore, when possible, it is desirable that the models be simple to tune for specific extraction 
+tasks. Taking this in consideration, we want to find 
+the best \gls{ner} methods for a specific task, but trying to derive general conclusions
 about their expected performance in other similar tasks.
 
 \section{Objective}
 
-The main objective of this dissertation is to find the best NER method for the web
-in terms of its Precision, Recall, and F-scores in the researcher name extraction task,
-and its overall complexity and flexibility.
+The main objective of this dissertation is to find the best \gls{ner} methods for the web
+in terms of their Precision, Recall, and F-scores in the researcher name extraction task,
+considering their overall complexity and flexibility, taking into consideration that there is a 
+trade-off between model complexity and objective performance. Therefore, to accomplish 
+this goal we need to perform both a quantitative and qualitative assessment of different 
+methods.
 
 
 \section{Contributions}
@@ -209,23 +238,25 @@ and its overall complexity and flexibility.
 The main contributions of this dissertation are:
 
 \begin{itemize}
-\item \textbf{Contribution 1}: Labeled NER on HTML dataset. We introduce a labeled NER 
-dataset specific for the task of extracting researcher names from faculty directories 
-with the aim of comparing different extraction systems.
+\item \textbf{Labeled Researcher Name Extraction dataset:} we introduce a labeled \gls{ner}
+dataset specific for the task of extracting researcher names from faculty directories in different 
+languages across 42 countries with the aim of comparing different extraction systems.
 
-\item \textbf{Contribution 2}: Comparison of models for NER on HTML. We compare the 
-performance of multiple machine learning approaches to NER on HTML.
+\item \textbf{Comparison of models for \gls{ner} on the web:} we compare the 
+performance of multiple machine learning approaches to \gls{ner} on the web, describing their
+relative advantages and disadvantages in terms of quantitative measures such as the F-measure
+and qualitative aspects such as complexity and difficulty of training.
 
-\item \textbf{Contribution 3}: Self-training strategy for Hidden Markov Models. 
-We propose a self-training strategy to improve the performance of Hidden Markov Models 
-on HTML sequence labeling.
+\item \textbf{Self-training strategy for Hidden Markov Models:}
+we propose a self-training strategy to improve the performance of Hidden Markov Models 
+on HTML \gls{ner}.
 
-\item \textbf{Contribution 4}: Attention mechanism for Neural Networks on HTML. 
-We propose an attention mechanism for improving the performance of Neural Networks 
-on HTML sequence labeling.
+\item \textbf{Attention mechanism for Neural Network sequence taggers:}
+we propose an attention mechanism for improving the performance of Neural Networks 
+on HTML \gls{ner}.
 
-\item \textbf{Contribution 5}: F-score optimization for Neural Networks. We propose 
-an optimization objective based on the F-score measure to control how much a 
+\item \textbf{F-measure optimization for Neural Networks:} We propose 
+an optimization objective based on the F-measure to control how much a 
 Neural Network values Recall over Precision.
 
 \end{itemize}
@@ -240,25 +271,25 @@ The organization of this dissertation takes the following structure:
 name extraction and discusses how it relates to the broader problems of 
 Web Data Extraction and Named Entity Recognition.
 
-\item \textbf{Chapter 3: Researcher Name Dataset} presents the Researcher Name
-Dataset that concerns the NER on HTML task of extracting research names from
-faculty directories.
+\item \textbf{Chapter 3: Related Work} describes the literature concerning 
+\gls{wde} and \gls{ner} that is related to the models explored in this 
+dissertation.
 
 \item \textbf{Chapter 4: Techniques for Sequence Labeling} describes 
 Hidden Markov Models, Conditional Random Fields and 
 Deep Neural Networks for performing Named Entity Recognition.
 
 \item \textbf{Chapter 5: Sequence Labeling on HTML} describes variations and
-improvements to the models described in Chapter 4 to handle sequence labeling
+improvements to the models described in Chapter 4 to handle NER
 on HTML documents.
 
-\item \textbf{Chapter 6: Experiments} presents the results of multiple experiments
-with the models from Chapter 4 and 5 in the Researcher Name Dataset introduced in 
-Chapter 3.
+\item \textbf{Chapter 6: Researcher Name Dataset} presents the Researcher Name
+Dataset that concerns the NER on HTML task of extracting research names from
+faculty directories.
 
-\item \textbf{Chapter 7: Related Work} describes the literature concerning 
-Web Data Extraction and Named Entity Recognition that is 
-related to the models explored in this dissertation.
+\item \textbf{Chapter 7: Experiments} presents the results of multiple experiments
+with the models from Chapter 4 and 5 in the Researcher Name Dataset introduced in 
+Chapter 6.
 
 \item \textbf{Chapter 8: Conclusion} discusses the conclusions to the research
 questions that guided the experiments and proposes future work to be done in
@@ -269,33 +300,35 @@ the field.
 
 \chapter{Problem Definition}
 
-Web Data Extraction is the problem of Information Extraction 
-in web documents. WDE is a task constituted of many overlapping
-problems that demand integrated and sophisticated solutions. Often, information
-extraction tools that work exceptionally well on a given task perform poorly 
-when given a slightly different task. Traditional methods of WDE
-were mainly concerned with the extraction of entities described by a simple ontology
-from web pages generated by the same source (e.g. collecting house prices and addresses 
-from real estate portals). The extraction of complex entities from a plethora of sources 
-presents a different class of problems. The former case could be solved by rigid tools
-with hard coded rules that many times yielded close to perfect results. The latter case,
-however, demands far more flexible approaches since the extraction tools are required to 
-deal with a greater variety of page arrangements and also with entities that are ambiguously 
+\gls{wde} is the task of extracting relevant information from web documents. 
+Traditional methods of WDE were mainly concerned with the extraction of entities described by 
+a simple ontology from web pages generated with the same template (e.g. collecting house prices 
+and addresses from real estate portals). This case could be solved with rigid tools
+employing hard coded rules. For example, a simple pattern matching strategy can
+yield close to perfect results in a price extraction task, since there is not a lot of
+variation in the way prices are presented in a webpage.
+However, the extraction of complex entities from many sources presents a different class 
+of problems. These problems demand more flexible approaches since the extraction tools are required to 
+deal with a greater variety of page arrangements and with entities that are ambiguously 
 defined. In many aspects, the flexible extraction of entities from web pages is more similar 
-to the tasks of Named Entity Recognition and Relationship Extraction
- from plain text than to the tasks that concerned the early information extraction methods.
+to the tasks of \gls{ner} in plain text than to the tasks that concerned
+early \gls{wde} methods.
 
-Recent advancements in sequence models for natural language led to important 
-breakthroughs in applications such as speech recognition, machine translation, 
-sentence segmentation, and sequence labeling (which concerns us more directly). 
+Recent advancements in sequence modelling for natural language (i.e. modelling text 
+as a sequence of words or characters) led to important 
+breakthroughs in applications such as language modelling~\citep{Peters2018,Devlin2018}, 
+machine translation~\citep{Bahdanau2014, Vaswani2017}, 
+and sequence labeling~\citep{Collobert2011,Lample2016,Ma2016} 
+(which concerns us more directly). 
 In fact, if we treat all sentences in a web page as sequences extracted from an 
-underlying presentation graph (i.e. the DOM tree), the problem of information 
-extraction can be solved through the consecutive application of three NLP tasks: 
+underlying presentation graph (i.e. the DOM tree), the problem of \gls{ie}
+can be, in many cases, solved with the consecutive application of three NLP techniques: 
 sentence segmentation, named entity recognition, and relationship extraction. 
 First, we need to segment the relevant grouping structures (e.g. sentences, rows in a table, 
 items in a list). Then, we must identify relevant named entities (e.g. person names,
 companies, locations). And finally, we need to discover the relationships between 
-these named entities (e.g. person X works in company Y). The work flow is the same
+these named entities (e.g. person X works in company Y). This last step is optional depending
+on the task at hand. The work flow is the same
 for plain text and web pages, but there are important differences chiefly related
 to the structure of the data or rather the lack of structure.
 
@@ -305,11 +338,13 @@ name extraction from faculty directories of universities across the world.
 We will be mainly concerned with NER, but a brief
 discussion of the challenges involved in the task of sentence segmentation for HTML 
 will be provided in Chapter~\ref{cha:dataset}. The task of relationship extraction,
-however, is not relevant to the problem of researcher name extraction and will not be
-explored. 
+however, is not relevant to the problem of researcher name extraction because we only
+consider one type of named entity (researchers) and we are only concerned with mapping 
+relations between researchers and universities (affiliations) that are obvious since
+we know which university website produced each faculty listing.
 
 The remainder of this chapter will describe in more depth the subject of this dissertation.
-Section~\ref{sec:information_extraction} discusses the problem of information extraction.
+Section~\ref{sec:information_extraction} discusses the problem of Information Extraction.
 Section~\ref{sec:named_entity_recognition} discusses the importance of NER
 for WDE. Finally, Section~\ref{sec:researcher_name_extraction} describes the 
 specific problem of Researcher Name Extraction.
@@ -317,59 +352,59 @@ specific problem of Researcher Name Extraction.
 \section{Information Extraction}
 \label{sec:information_extraction}
 
-Information Extraction consists of mapping unstructured or poorly structured 
+\gls{ie} consists of mapping unstructured or poorly structured 
 data to a semantically well defined structure. It "is the process of filling the fields and 
 records of a database from unstructured or loosely formatted text"~\cite{McCallum2005}. 
 Usually, the input consists of a corpus containing useful entities that
-are scattered in the text and the information extraction system is responsible
+are scattered in the text and the Information Extraction system is responsible
 for finding these entities and organizing them according to a rigid hierarchy, such as
 the one defined by the schema of a relational database. It must be stated that it is somewhat
 misleading to refer to plain text as unstructured data, since prose has a loosely defined structure 
-that ultimately renders it comprehensible. However, in the context of Information Extraction 
-we refer to unstructured data in contraposition to tabular data, which are in most cases 
-easier to work with than plain text.
+that ultimately renders it comprehensible. However, in the context of \gls{ie},
+we refer to unstructured data in contraposition to tabular data (e.g. XML, SQL tables, etc.), 
+which are in most cases easier to work with than plain text.
 
-Information Extraction is a multifaceted problem that spans communities 
+\gls{ie} is a multifaceted research topic that spans communities 
 of researchers in the fields of Text Mining, Information Retrieval, and 
 Natural Language Processing. That is:
 
 \begin{itemize}
 \item Text mining is the search of patterns in unstructured text.
-This may involve document clustering, document summarization, Information Extraction,
-and other subtasks. 
+This may involve document clustering, document summarization, 
+\gls{ie}, and other subtasks. 
 
 \item Information Retrieval is typically concerned with the parsing, 
-indexing and retrieval of documents. In this case, Information Extraction methods
+indexing and retrieval of documents. In this case, \gls{ie} methods
 can help giving a more precise answer to the user's information needs. 
 
-\item Natural Language Processing
+\item \gls{nlp} 
 is a field of Computer Science concerned with how computers process and understand natural 
-language of which two subtasks, namely Named Entity Recognition and 
-Relationship Extraction, are of special importance to Information Extraction.
+language of which two subtasks, namely \gls{ner} and 
+Relationship Extraction, are of special importance to \gls{ie}.
 \end{itemize}
 
-A popular application of Information Extraction is the identification of 
+A popular application of \gls{ie} is the identification of 
 entities such as people, organizations, or events in news sources and the determination
 of their relations. For example, one could be interested in determining who is the CEO of a company
 that was mentioned in the news or which politicians support a bill that is being considered
-by Congress. Another interesting news-related application of Information Extraction 
+by Congress. Another interesting news-related application of \gls{ie} 
 is tracking disease outbreaks through the extraction of disease names and locations 
 from news sources and determining their relation to outline the geographical area affected 
 by an epidemy~\citep{Grishman2002}. 
 
 The field of bio-informatics has also found important applications for 
-Information Extraction. The first BioCreAtIvE challenge dealt with the "extraction 
+Information Extraction. The first BioCreative challenge dealt with the "extraction 
 of gene or protein names from text, and their mapping into standardized gene identifiers 
 for three model organism databases"~\cite{Hirschman2005}.
 In the BioCreative/OHNLP Challenge 2018~\citep{Rastegar-Mojarad2018}, researchers 
-were required to investigate methods of family history information extraction. Family
-history is a critical piece of information in the decision process for diagnosis and 
+were required to investigate methods of \gls{ie} for acquiring family history 
+data. Family history is a critical piece of information in the decision process for diagnosis and 
 treatment of diseases, however the main sources of data are unstructured electronic 
 health records. The task is divided in two subtasks: 1) Entity recognition 
 (family members and disease names); and 2) Relation Extraction (family members and
 corresponding observations).
 
-A scientific application for Information Extraction methods that 
+An application of \gls{ie} that 
 concerns this dissertation specifically is the 
 extraction of information from research papers to populate citation 
 databases and bibliography search engines such as Citeseer~\citep{Lawrence1999}, 
@@ -377,28 +412,29 @@ DBLP~\footnote{http://dblp.uni-trier.de/},
 Semantic Scholar~\footnote{https://www.semanticscholar.org}, and 
 Google Scholar~\footnote{https://scholar.google.com/}.
 The vast amount of scientific knowledge produced daily demands automatic
-methods for extracting authors, titles, affiliations, references, venues 
-and the year of publication from research papers and online resources such
-as university websites, individual researcher home pages and conference
-websites. This application is especially important to the evaluation and 
+methods for to extract bibliometric information such as authors, titles, affiliations, 
+references, venues and the year of publication from research papers
+and academic websites. This application is especially important to the evaluation and 
 bibliometrics research communities, that are concerned with the measure of
 academic impact and researcher productivity through the usage of quantitative
-indices of academic impact such as the H-index~\citep{Hirsch2005} and 
+indices of academic impact such as raw citation counts, the H-index~\citep{Hirsch2005} and 
 P-score~\citep{Ribas2015a}. 
 
-Web Data Extraction works different from
-Information Extraction in plain text because HTML documents frequently
-have more structure but less context than plain text. Relevant entities 
+\gls{wde} is different from \gls{ie} in plain text because HTML documents frequently
+have more structured content with less context than plain text. In HTML, relevant entities 
 may occur inside tables, lists, or other types of visual elements that provide 
-little to no contextual information that could give hints about their category.
+little to no contextual information that could give hints about an entity's category.
+That is, sentences in HTML tables or lists are very short and provide little textual 
+information. Contrastingly, in plain text, entities are usually preceded and succeeded by 
+discourse that may provide textual evidence about an entity (e.g. John is a man, Mary is a woman).
 Web pages have a two dimensional tabular structure that is usually more similar
-to a spreadsheet than to text found in news corpora. For this reason, features
+to a spreadsheet than to text from news corpora or literary works. For this reason, features
 extracted from the DOM hierarchy such as element disposition, CSS classes, and
 nesting structure can provide valuable information in identifying entities and
 extracting their attributes. 
 
-Most existing WDE methods are tailored to extract data 
-from a single webpage, producing different compromises between efficacy and 
+Most existing \gls{wde} methods are tailored to extract data 
+from webpages generated from the same template, producing different compromises between efficacy and 
 degree of human supervision. Usually, these methods work in two steps. In the 
 record segmentation step, we seek to cluster visually and structurally 
 similar webpage regions and identify repeating data records. In the attribute 
@@ -406,7 +442,7 @@ labeling stage, we seek to identify the correct attributes for each data record,
 maybe resorting to regular expressions or simple dictionary matching strategies
 depending on the task at hand. The outcome of each step can aid one 
 another. The inner patterns of data records can help identifying attributes 
-of other data records. Also, by properly identifying attributes, 
+in other data records. Also, by properly identifying attributes, 
 it becomes easier to determine boundaries and perform record segmentation 
 correctly. 
 
@@ -414,10 +450,8 @@ Some tasks can likely be solved by a rather inflexible system that operates main
 hard coded rules and simple regular expressions, especially if we only 
 consider pages with a very similar template (e.g. Amazon product listings).
 Traditional wrapper generators are well suited for this type of task. However, 
-when we need to identify more 
-complex and ambiguous entities such as researcher names in different 
-contexts, we might be better off with a more 
-flexible approach. The task of Named Entity Recognition aims to identify
+when we need to identify more complex entities such as researcher names, we might be better 
+off with a more flexible approach. The task of \gls{ner} aims to identify
 named entities (e.g. people, organizations, etc.) usually in plain text, but we will see
 that the sequence models that work well in plain text can also be employed successfully 
 in WDE, sometimes with a few alterations.
@@ -429,8 +463,8 @@ of the field is given in the survey by~\cite{Sarawagi2008}.
 \section{Named Entity Recognition}
 \label{sec:named_entity_recognition}
 
-Named Entity Recognition is a task in Natural Language Processing that
-aims to identify Named Entities in a text. The NER 
+\gls{ner} is a task in Natural Language Processing that
+aims to identify Named Entities in a text. The \gls{ner} 
 problem definition first appeared as a subtask of 
 Information Extraction in the context of the Message Understanding 
 Conference (MUC) promoted by the American Naval Ocean Systems Center. In 
@@ -445,16 +479,16 @@ In MUC-7, the task was expanded to handle multilingual evaluation and
 interest. Person, organization, and location names were marked as well 
 as dates, times, percentages, and monetary amounts"~\cite{Chinchor1998}.
 The shared-task at the Conference on Computational Natural Language Learning 
-in 2003, CoNLL-2003~\citep{KimSang2003}, concerned language-independent NER
+in 2003, {CoNLL-2003}~\citep{KimSang2003}, concerned language-independent NER
 and is especially important because it established an enduring data format for
 NER and it introduced a dataset of articles extracted from news sources that is
-still used to evaluate the quality of NER systems.
+commonly used to evaluate the quality of NER systems.
 
 NER is essentially a sequence labeling
 task. That is, given a sequence of tokens, we want to attribute labels to each
 token, classifying them into one of a limited set of predefined classes. Figure~\ref{fig:ner_example}
 shows how to attribute Named Entity labels to a sentence according to the
-format defined in CoNLL-2003. 
+format defined in {CoNLL-2003}.
 
 \begin{figure}[h]
 \centering{
@@ -468,15 +502,15 @@ Regular entities such as dates and prices can be extracted with almost perfect a
 using regular expressions, which are search patterns that describe a regular language and 
 that can be easily implemented in most programming languages. Entities that belong to a 
 limited set, such as the names of states in a country, can also be easily extracted with
-simple dictionary matching. Other types of entities, such as the ones investigated in
-the CoNLL-2003 challenge, require more sophisticated methods for sequence labeling.
+simple dictionary matching. However, other types of entities, such as the ones investigated in
+the {CoNLL-2003} challenge, require more sophisticated methods for sequence labeling.
 
 Some traditional statistical methods that can label
 complex entities with good accuracy are Hidden Markov Models~\citep{Leek1997}, 
 Maximum Entropy Markov Models~\citep{McCallum2000},
 and Conditional Random Fields~\citep{Lafferty2001}. These statistical 
-approaches have had remarkable resiliency in sequence labeling tasks and still provide 
-fairly good solutions because of their simplicity, speed and accuracy. However, these approaches
+approaches have been frequently employed to sequence labeling tasks and still provide 
+fairly good solutions because of their simplicity, speed and accuracy. However, they
 are rapidly being replaced by Deep Neural Networks.
 
 Recent research in deep learning has brought great advancements to NER. Some examples are
@@ -491,466 +525,353 @@ consists of a word embedding layer, where words are mapped to a continuous vecto
 reduced dimensionality, and the next layer usually consists of a multi-layered 
 recurrent neural network or a convolutional neural network. 
 
-Essentially all the best scoring models to date at the CoNLL-2003 task employ some form of 
+Essentially all the best scoring models to date at the {CoNLL-2003} task employ some form of 
 deep learning, and most often Long Short-Term Memory Networks (LSTM). When combined with pre-trained
 word embeddings, neural networks provide a powerful method of sequence labeling without
 any feature engineering or dictionary matching. However, these models have 
 become quite complex, contrasting with earlier approaches, that
 only required the estimation of a comparatively small number of weights. The training time
-required by these deep models is many orders of magnitude larger than that of traditional approaches, 
+required by these deep models is many orders of magnitude longer than that of traditional approaches, 
 and if we take into consideration the training of word embeddings such as Word2Vec's skip gram model 
 in a billion token corpus~\citep{Mikolov2013}, the difference gets even more substantial. Additionally, 
 deep learning models usually require expensive hardware for training to become practical options. 
 
 In summary, the aforementioned sequence labeling models are exactly what we are looking for in the 
 researcher name extraction task. By labeling tokens in a webpage with machine learning
-models, we can extract researcher names with more flexibility than that provided by WDE 
-tools.
+models, we can extract researcher names with more flexibility than that provided by traditional 
+tools for \gls{wde}.
 
 \section{Researcher Name Extraction}
 \label{sec:researcher_name_extraction}
 
-The objective of this dissertation is to find the best sequence models for the researcher
-name extraction problem and to NER in the web in general. 
-The researcher name extraction task consists of extracting researchers names from university 
+The objective of this dissertation is to find the best sequence models for 
+\gls{ner} in the web by assessing their performance in the researcher name extraction task.
+This task consists of extracting researchers names from university 
 faculty listings across the world with the purpose of discovering their affiliations and linking 
 their profiles to public databases such as DBLP or Google Scholar~\footnote{
   This is useful, for instance, if one needs to compare the research output of 
   departments in a country, or study international publication patterns.
 }. Public researcher databases only have sparse information about author affiliation and 
 even in fields for which the information is more easily available, such as Computer Science,
-only a small fraction of the records have reliable affiliation information. 
+only a small fraction of the records have reliable affiliation information, as we have verified
+in our preliminary studies. 
 
 \begin{figure}
   \centering
   \includegraphics[width=0.75\textwidth]{pics/jap_osaka_lab}
-  \caption{Example of a faculty directory}
+  \caption{Example of a faculty webpage.}
   \label{fig:faculty_directory}
 \end{figure}
 
 To acknowledge the complexity of this task, take for example a snippet extracted from
 the staff page for the intelligent robotics laboratory from Osaka University shown in 
-Figure~\ref{fig:faculty_directory}. There is some structure to the way member profiles are arranged, 
-but the organization is rather flexible. Other pages, even from the same website, can show very different 
+Figure~\ref{fig:faculty_directory}.
+There is some pattern to the way member profiles are arranged, but the organization is 
+rather flexible. There are different character encodings in the page, there is some variation 
+to the presentation style of each researcher data record
+(some are links, some are text, the font varies, etc.), and also, even the laboratory's
+android makes an appearance in a way that could be easily confused with a researcher.
+Other pages, even from the same website, can show very different 
 patterns, ranging from tables and lists to free form.
 Researcher names can appear inside plain text, similar to the case of NER in
 news texts or in a more tabular structure. Names may also be part of larger sentences such as in 
 "Michael Johnson Chair" and "John Doe Avenue" yielding false positives. Or they can be composed 
-of common words (e.g. Summer Hall) yielding false negatives. There is no rule that fits all cases,
-so we need flexible solutions.
+of common words (e.g. Summer Hall) yielding false negatives. There is no extraction rule that can
+fit all cases, so we need flexible solutions.
 
-State-of-the-art NER models trained on news datasets do not
-perform well at this task, because in many webpages, textual information alone is insufficient to provide proper 
-contextual information about the semantic category of a word. The absence of context demands
-extraction systems to rely on information from sources outside the dataset, being them 
+State-of-the-art \gls{ner} models trained on news datasets do not
+perform well at this task, because in many webpages, textual information alone is insufficient to
+indicate the semantic category of a word. The absence of context demands
+extraction systems to rely on information from sources outside the text, being them 
 features extracted from unlabeled corpora obtained through unsupervised pre-training, 
 dictionaries containing instances of the relevant entities, HTML structural features, 
 or other clever solutions. Although, entity instances will rather 
-frequently be unique occurrences, rendering dictionary matching approaches
-insufficient. Therefore, a key problem in the task of entity name extraction is accounting for all
-possible name combinations, even those that seem unlikely. Since there is no database with all 
+frequently be unique, rendering dictionary matching approaches ineffective. Therefore, 
+a key problem in the task of entity name extraction is accounting for every
+possible name combination. Since there is no database with all 
 possible named entity combinations, we need holistic statistical methods that can handle 
 unknown tokens with relative efficacy.
+In Chapter~\ref{cha:dataset}, we introduce the researcher name dataset to evaluate the 
+performance of different sequence models in the researcher name extraction task.
 
-Considering that NER datasets built from news corpora such as CoNLL-2003 do not provide an adequate 
-measure for the performance of sequence models on HTML, we introduce in Chapter~\ref{cha:dataset} 
-the NER-on-HTML dataset to evaluate the performance of different sequence models at the researcher 
-name extraction task.
-
-Another important related task in the context of researcher name extraction is performing named 
+Lastly, another important related task in the context of researcher name extraction is performing named 
 entity disambiguation, which consists of linking the extracted named entities to a unique profile in a 
-unified database. This task is called \textit{Named Entity Linking}. Roughly half the records found in 
-faculty webpages can be linked to their records in public databases without great difficulty. For the 
-other half, we may need to employ more complex systems or perform manual classification. This task 
-is also important, but it will not be covered in the present study.
+database. This task is called Named Entity Linking. In preliminary studies, we verified 
+that roughly half the records found in faculty webpages can be linked to the respective records in public databases 
+with the aid of string matching techniques. For the other half, we may need to employ more complex systems 
+or perform manual classification. This task is also important, but it will not be covered in the present study.
 
 \section{Summary}
 
-This chapter discussed the broad problem of Information Extraction in 
+This chapter discussed the broad problem of \gls{ie} in 
 Section~\ref{sec:information_extraction}, presenting its challenges and relations to 
 different fields of Computer Science, and showing how it encompasses the problem of 
-Web Data Extraction and researcher name extraction. In 
-Section~\ref{sec:named_entity_recognition} we discussed the related task of Named Entity
-Recognition. Finally, in Section~\ref{sec:researcher_name_extraction} we discussed the
-problem of researcher name extraction and how NER methods can be useful to solve this
-task.
+\gls{wde}. Despite being a specific setting of \gls{ie}, \gls{wde} has specificities
+that demand solutions that are different from those used for plain text.
+In Section~\ref{sec:named_entity_recognition}, we discussed the related task 
+of \gls{ner}, which is very useful to \gls{ie} both in plain text and 
+web extraction tasks. Recent developments in \gls{ner} can help \gls{wde} systems become
+more flexible, handling extraction tasks across many website formats.
+Lastly, in Section~\ref{sec:researcher_name_extraction}, we discussed the
+problem of researcher name extraction, which is the main topic of this dissertation, 
+showing how it can be challenging and why traditional solutions to \gls{wde} and \gls{ner}
+may have difficulty handling this specific setting. In fact, by combining the valuable 
+knowledge from both fields of study, we can get a more robust approach to researcher 
+name extraction.
 
 
-\chapter{NER-on-HTML Dataset}
-\label{cha:dataset}
+\chapter{Related Work}
 
-This chapter describes the dataset used to evaluate the performance of sequence models
-on the WDE task of researcher name extraction. We call it the NER-on-HTML dataset.
-The task consists of finding researcher names in faculty listings from university 
-webpages across the world, mainly from Computer Science departments.
-This would be a necessary step when linking researcher profiles from university 
-websites to their entries in public databases. Unlike many
-information extraction datasets, each webpage in the dataset comes from a different 
-website, and therefore has a different format, what makes many information
-extraction approaches impractical. The idea is to explore systems that are general 
-enough to allow efficient entity extraction from different sources while requiring
-no supervision between different websites. 
+The researcher name extraction task is a problem of Web Data Extraction that
+we solved with machine learning models for Named Entity Recognition.
+This chapter presents the related research in the fields of Web Data Extraction 
+in Section~\ref{sec:wde} and Named Entity Recognition in Section~\ref{sec:ner}.
 
-We collected 145 Computer Science and Engineering faculty pages from 42 different countries in
-multiple languages, although the English version was preferred when it was available.
-We gathered faculty webpages randomly in proportion to
-the number of universities in each country\footnote{A detailed list of universities can
-be found in https://univ.cc/world.php}. 
+\section{Web Data Extraction}
+\label{sec:wde}
 
-This chapter is divided as follows. Section~\ref{sec:data_description} describes the 
-dataset format and how it was split in
-three data files. Section~\ref{sec:evaluation} describes how the evaluation of results in this 
-dataset was carried on. Section~\ref{sec:dictionary} describes how we obtained a dictionary
-of relevant named entities for this dataset, and discusses some baseline results. Finally,
-Section~\ref{sec:conll_comparison} compares the characteristics of the NER-on-HTML dataset
-with another popular NER dataset, the CoNLL-2003 English NER dataset.
+In the last 20 years, the astonishing growth of public information in the Web has 
+led to the development of a number of different approaches to the problem of Web 
+Data Extraction. Traditionally, the task was solved by designing special purpose
+programs called wrappers to recognize relevant data and store records in a structured
+format. These early tools varied wildly relative to their degree of automation. 
+
+It was readily perceived that manual wrapper generation was a rather tedious and
+error prone process, unsuited for large scale operations. Wrappers tend to
+break frequently because they rely on webpage features that can change 
+often. So, in the late nineties, several authors advocated for wrapper induction, a technique 
+that consists of automatically constructing wrappers from a small set of examples by 
+identifying delimiters or context tokens that single out the desired attributes. 
+Some remarkable wrapper induction methods are WIEN~\citep{Kushmerick2000}, Soft 
+Mealy~\citep{Hsu1998} and STALKER~\citep{Muslea1999}.
+
+Despite being better than constructing wrappers manually, wrapper induction methods 
+still suffered from a lack of expressive power and flexibility. These methods had 
+trouble handling records with missing attributes or unusual structures because
+patterns could only be identified if they happened at least once in the examples.
+
+Other approaches such as NoDoSE~\citep{Adelberg1998} and Debye~\citep{Laender2002a} 
+brought greater flexibility to wrapper induction methods by requiring a greater level 
+of human interaction through graphical user interfaces. Web Data Extraction techniques often 
+require some sort of assistance from human experts to boost accuracy. One of the main challenges 
+in the field lies in determining an adequate trade-off between the degree of automation and 
+the Precision and Recall of the data extraction tool.
+
+To automate the task of Web data extraction completely some approaches,
+such as Road Runner~\citep{Crescenzi2001}, removed entirely the need for data examples.
+Road Runner parses documents belonging to a same class (e.g. books in Amazon) and 
+generates wrappers based on their similarities and differences, yielding comparable results 
+to those obtained by wrapper induction methods. However, like previous approaches, it was 
+unsuited for cross site extraction tasks because the learned rules were not general enough.
+
+Early NLP-based approaches aimed at extracting more general rules that could possibly
+be employed over multiple websites. RAPIER~\citep{Califf1999} is a method of rule
+extraction that uses information such as part-of-speech tags and semantic classes from
+a lexicon to derive patterns from a set of training examples. This approach is more
+flexible than the wrapper induction methods, however it achieves much lower rates of 
+Precision and Recall.
+
+In 2002, a survey~\citep{Laender2002} made a thorough classification of the
+early approaches with a taxonomy based on their main technology, being them: languages for
+wrapper development, HTML-aware tools, NLP-based tools, Wrapper Induction Tools,
+Modeling-based tools and Ontology-based tools. Some noteworthy examples from this era
+are: 
+
+\begin{itemize}
+\item TSIMMIS~\citep{Hammer1997} and WebOQL~\citep{Arocena1999}, which are special purpose 
+languages for building wrappers.
+
+\item Road Runner~\citep{Crescenzi2001}, XWRAP~\citep{Liu2000} and W4F~\citep{Sahuguet1999}, 
+which are HTML-aware tools that infer meaningful patterns from the HTML structure.
+
+\item RAPIER~\citep{Califf1999}, SRV~\citep{Freitag1998}, WHISK~\citep{Soderland1999}, which 
+are NLP-based tools.
+
+\item WIEN~\citep{Kushmerick2000}, Soft Mealy~\citep{Hsu1998} and STALKER~\citep{Muslea1999} which 
+are wrapper induction methods.
+
+\item NoDoSE~\citep{Adelberg1998} and Debye~\citep{Laender2002a}, which are semi-supervised
+tools that require some interaction with the user by means of a graphical
+user interface.
+\end{itemize}
+
+% Text Runner.
+% https://www.aaai.org/Papers/IJCAI/2007/IJCAI07-429.pdf
+
+\cite{Chang2006} complemented the previous surveys with semi-supervised 
+technologies such as Thresher~\citep{Hogue2005}, IEPAD~\citep{Chang2001} and 
+OLERA~\citep{Chang2004}. They differed from supervised 
+and unsupervised methods because they either needed only a rough description of
+data from users for extraction rule generation or some level of post processing
+that needed user attention. The survey also mentioned newer unsupervised methods
+such as DeLa~\citep{Wang2003}, Exalg~\citep{Arasu2003} and Depta~\citep{Zhai2005}.
+
+Most of the early Information Extraction systems were rule-based with either 
+manual rule description or automatic rule learning from examples, thus they
+suffered from a lack of flexibility when dealing with noisy and unstructured data.
+Huge progress in the field of statistical learning led to the development of
+models that tried to solve this problem.
+
+\cite{Sarawagi2008} introduced a classification that segmented wrappers in
+rule-based methods, statistical methods and hybrid models, bringing together 
+the fields of Named Entity Recognition, Relationship Extraction and Web Data Extraction. 
+The rule based methods encompass most of the previous models. While the statistical methods 
+convert the extraction task into a token labeling task, solved with Named Entity Recognition 
+and Relationship Extractions methods. Traditionally, these subtasks were solved with 
+generative models based on Hidden Markov Models or discriminative models based on the 
+Maximum Entropy principle, but recently these have been largely superseded by Deep Neural 
+Networks. Different from automatic wrapper generators, statistical methods are suitable for
+a large variety of tasks, especially when we want the system to handle cross website Information 
+Extraction and plain text Information Extraction. That is why this class of methods is of 
+special interest to our application. The progress of Statistical models will be 
+discussed in Section~\ref{sec:ner}.
+
+Surveys by~\cite{Ferrara2014}, \cite{Schulz2016} and \cite{Varlamov2016} updated the 
+previous surveys on Information Extraction methods with some interesting innovations. 
+Some examples are: the Visual Box Model~\citep{Krupl2005}, a data extraction system that produces 
+a visualization of the webpage to exploit visual cues to identify records presented in a tabular form;
+automatic wrapper adaptation~\citep{Ferrara2011}, a technique that tries to reduce the cost of 
+wrapper maintenance by measuring the similarity of HTML trees and adapting
+wrappers to the new page structure; AutoRM~\citep{Shi2015}, a method to mine
+records from a single webpage by identifying similar data regions through DOM
+tree analysis; and Knowledge Vault~\citep{Dong2014}, a method that combines different 
+extraction approaches to feed a probabilistic knowledge base.
+
+Most data extraction systems focus on extracting information from single websites
+and are therefore unsuited for cross website extraction tasks. Even unsupervised
+approaches that are domain independent, such as RoadRunner and EXALG only work well 
+for extracting data from pages generated from a same template. 
+
+A statistical approach to unsupervised domain 
+independent Web data extraction was described by~\cite{Zhu2005}. The 2D CRF 
+model takes a webpage segmented into data blocks and employs a two dimensional conditional 
+random field model to perform attribute labeling. The model was further improved 
+in~\cite{Zhu2006} to model record segmentation and attribute labeling as a joint task.
+Some of the limitations of early unsupervised methods 
+were also addressed by ObjectRunner~\citep{Abdessalem2010} and AMBER~\citep{Furche2012}. 
+These methods work by annotating webpages automatically with regular expressions, gazetteers and 
+knowledge bases. They can rectify low quality annotations and even improve the annotators
+by exploring regular structures in the DOM during the record segmentation phase.
+
+Web Data Extraction methods have undoubtedly improved extraordinarily, but
+as pointed by \cite{Schulz2016}, it is difficult to compare the results 
+achieved by competing tools, and many seem to rely excessively on heuristic methods.
+In that regard, the recent advancements in sequence taggers may provide more robust and
+flexible extraction tools.
 
 
-\section{Data Description} 
-\label{sec:data_description}
+\section{Named Entity Recognition}
+\label{sec:ner}
 
-Each of the 145 faculty pages was preprocessed and converted
-to the CoNLL-2003 data format. That is, one word per line with empty lines representing
-sentence boundaries. Sentence boundaries were determined by line break HTML tags
-(div, p, table, li, br, etc.) in contrast to inline tags (span, em, a, td, etc.). 
-Sentences that were more than fifty tokens long were also split according to the
-punctuation. 
-% The algorithm used for sentence segmentation is described in
-% Appendix~\ref{app:html_segmenter}.
+Named Entity Recognition is an important subtask in Information Extraction.
+The Named Entity Recognition task was defined in the Third Message 
+Understanding Conference (MUC-3)~\citep{Sundheim1991}, where researchers were asked to extract
+entities from a news corpus about terrorist incidents. However, it was the 
+language-independent Named Entity Recognition shared task at the Conference 
+on Computational Natural Language Learning in 2003 ({CoNLL-2003})~\citep{KimSang2003},
+that established an enduring labeled dataset constructed with news texts from Reuters.
+Despite its reduced size and the limited variability of its documents, the {CoNLL-2003}
+dataset is still used to compare the performance of NER systems in English, and 
+German. 
 
-A proper HTML segmenter poses many challenges by itself. We wanted to evaluate 
-models without relying on any sophisticated data record segmentation system.
-In many cases, entity annotation may precede the segmentation
-phase on WDE methods. Also, depending on the task (as is the case
-for researcher name extraction), a good annotator that is able to work 
-with raw HTML can provide a solution by itself.
+Sequence labeling for NER and part-of-speech tagging (labeling nouns, verbs, pronouns, etc.) 
+is very similar, so many times, research articles that propose new methods for NER
+also report results for the POS-tagging task. And frequently, the best methods for 
+POS-Tagging are also the best methods for NER.
 
-Finally, all tokens were tagged using the IOB scheme put forward by~\cite{Ramshaw1999}
-and used in CoNLL-2003, this is:
+Traditionally, the NER task was solved with generative models based on 
+Hidden Markov Models (HMMs). The first appearances of HMMs in the
+field of Natural Language Processing occurred in the mid-seventies and were
+primarily focused on the problem of Speech Recognition. 
+But in the late nineties, HMMs also found important applications in Information 
+Extraction and NER as in the works by~\cite{Leek1997}, \cite{Bikel1999}, 
+\cite{Freitag1999}, and \cite{Freitag2000}.
 
-\begin{quote}
-Words tagged with O are outside of named entities
-and the I-XXX tag is used for words inside a
-named entity of type XXX. Whenever two entities of
-type XXX are immediately next to each other, the
-first word of the second entity will be tagged B-XXX
-in order to show that it starts another entity~\citep{KimSang2003}.
-\end{quote}
+The problem with HMMs was that they modeled the joint probability between 
+sequences of observations and labels $ P(X, Y) $, a harder problem than modelling the corresponding 
+conditional probability $ P(Y|X) $. They assumed conditional independence for the observations $ X $, and
+therefore, they could not handle overlapping features. This lack of flexibility led to the 
+development of discriminative approaches to sequence labeling.
 
-The NER-on-HTML dataset only has entities of type person PER, therefore a classifier has to
-label each token with one of the labels: O, B-PER, or I-PER. This is an example 
-sentence from the dataset:
+Some early examples are Maximum Entropy Taggers for NER~\citep{Borthwick1998} and
+POS-Tagging~\citep{Ratnaparkhi1998}. The Maximum Entropy Markov Model introduced in~\cite{McCallum2000} 
+was developed just a while later, building up on the intuition of HMMs combined with
+the flexibility of discriminative approaches. However, because of the label bias problem,
+this model was superseded by Conditional Random Fields~\citep{Lafferty2001, McCallum2003}. 
+At this time, the best performing systems almost always resorted to external gazetteers 
+and hand-chosen features, as is the case for the {CoNLL-2003} winning model~\citep{Florian2003}.
+
+With the advancement of Machine Learning in recent years, we saw the rise
+of Neural Networks applied to sequence labeling. In 2011, \cite{Collobert2011} 
+introduced Neural Networks free of feature engineering to sequence labeling tasks,
+using a Convolutional Neural Network over word embeddings with a CRF output layer to tackle 
+the problems of POS-tagging, Chunking, Semantic Role Labeling, and NER. A similar architecture 
+proposed in 2015 by~\cite{Huang2015}, the Bi-LSTM-CRF, replaced the CNN in \cite{Collobert2011} 
+with a bidirectional LSTM, achieving better results.
+
+In 2016, further advancement to the NER models was achieved by incorporating character 
+representations at the bottom of the Bi-LSTM-CRF architecture to extract morphological 
+features from words automatically. The model by~\cite{Lample2016} uses a 
+bidirectional LSTM over character embeddings and the model by~\cite{Ma2016} uses a
+one dimensional CNN with max pooling over character embeddings. Both models also 
+made use of pre-trained GloVe word embeddings, described in~\cite{Pennington2014}.
+
+Small improvements to NER systems have been made since then, primarily due to the 
+introduction of new word embeddings on variations of the Bi-LSTM-CRF architecture. From
+this group, we can mention ELMo~\citep{Peters2018}, BERT~\citep{Devlin2018}, and
+Flair~\citep{Akbik2018}. 
+All of them were introduced in 2018 and they differ primarily 
+in how to construct contextual embeddings from the internal states of a language 
+modelling neural network.
+
+To our knowledge, the best NER system up to this date (considering the performance in the
+{CoNLL-2003} dataset) is the bidirectional transformer model proposed by~\cite{Baevski2019} that uses
+a stack of self attention modules and ELMo embeddings. Table~\ref{tab:ner_model_comparison}
+shows a comparison of the history of reported F1 scores in the English test set of the {CoNLL-2003} dataset
+for the NER systems that were mentioned in this section. Each of the mentioned systems held the 
+record for the task at a given time, but some models that held the best F1-score at a given time
+were omitted from this table.
 
 \begin{table}[h]
   \small
   \begin{center}
-    \begin{tabular}{ lllll }
-      Token & Correct Label & Features \\
-      \midrule
-      Kasper    & I-PER & ... \\ 
-      Rasmussen & I-PER & ... \\
-      Associate & O     & ... \\
-      Professor & O     & ... \\    
-      ,         & O     & ... \\    
-      Royal     & O     & ... \\    
-      Society   & O     & ... \\    
-      Research  & O     & ... \\    
-      Fellow    & O     & ... \\    
-    \end{tabular}     
-  \end{center}
-\end{table}
-
-We also extracted features alongside each token that will be discussed in
-Chapter~\ref{cha:experiments}, where we consider the experimental results.
-
-The NER-on-HTML dataset is comparable in size to other popular NER datasets.
-It was divided in training, validation and test sets, which are described in 
-Table~\ref{tab:dataset}. The validation set was used in the early stopping 
-validation strategy to avoid overfitting classifiers, but model performance 
-was only evaluated by comparing the performance in the test set, which is
-never seen during training.
-
-\begin{table}[h]
-  \small
-  \begin{center}
-    \begin{tabular}{ lllll }
+    \begin{tabular}{ ll }
       \toprule
-      Data file & Documents & Sentences & Tokens & Names \\
+      Model & Test F1 \\
       \midrule
-      Training    & 85  & 24728 & 110269 & 5822  \\  
-      Validation  & 30  & 8743  & 36757  & 1788  \\
-      Test        & 30  & 10399 & 44795  & 2708  \\
-      \midrule
-      Total       & 145 & 43870 & 151821 & 10318 \\
+       \cite{Florian2003} ({CoNLL-2003} Winner)    & 88.76 \\
+       \cite{Collobert2011}                        & 89.59 \\
+       \cite{Huang2015}                            & 90.10 \\
+       \cite{Lample2016}                           & 90.94 \\
+       \cite{Ma2016}                               & 91.21 \\
+       \cite{Peters2018}                           & 92.22 \\
+       \cite{Devlin2018}                           & 92.80 \\
+       \cite{Akbik2018}                            & 93.09 \\
+       \cite{Baevski2019}                          & 93.50 \\
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Description of the data files in the NER-on-HTML dataset}
-  \label{tab:dataset}
+  \caption{Model performances in the {CoNLL-2003} English test set.}
+  \label{tab:ner_model_comparison}
 \end{table}
 
-
-Most webpages in this dataset are faculty directories with informative
-text in small passages, however long prose is not absent. 
-Size and structure varies wildly, therefore some documents 
-may contain up to a few hundred names whereas other documents may contain 
-only twenty or thirty names. This difference in document size and characteristics 
-may be problematic when comparing different extraction systems, because a system 
-that performs well on some types of pages may perform poorly in other types.
-To avoid this problem, we tried to keep the selection of pages as varied as possible
-in the three data files.
-
-
-\section{Evaluation}
-\label{sec:evaluation}
-
-The performance of classifiers in the researcher name extraction task in
-the NER-on-HTML dataset was evaluated according to their Precision, Recall and F-scores
-in the test set. The Precision and Recall 
-measures are defined in terms of the number of true positives, false negatives, and false 
-positives made by the classifier when extracting named entities. That is:
-
-\begin{equation*}
-\text{Precision} = \frac{\text{true (+)}}{\text{true (+)} + \text{false (+)}}      
-\qquad
-\text{Recall} = \frac{\text{true (+)}}{\text{true (+)} + \text{false (-)}}
-\end{equation*}
-
-Precision accounts for the proportion of named entities found by the model that are 
-correct relative to all predicted named entities.
-Recall is the proportion of named entities correctly predicted by the model relative to
-all named entities in the dataset. Precision measures Type I errors 
-(false positives) and Recall measures Type II errors (false negatives). Partial matches are
-not considered, so a classification only counts as a true positive if the entire named entity
-has been correctly extracted.
-
-The F-score, proposed by~\cite{Rijsbergen1979}, is a composite measure that combines Precision and Recall 
-with the formula:
-
-\begin{equation}
-F_{\beta} = (1 + \beta^2) \cdot \frac{\text{Precision} \cdot \text{Recall}}{(\beta^2 \cdot \text{Precision}) + \text{Recall}}
-\label{eq:fscore_formula}
-\end{equation}
-
-The choice for $ \beta $ depends on the relative importance attributed to the Precision and Recall measures.
-This formula "measures the effectiveness of retrieval with respect to a user who attaches 
-$ \beta$ times as much importance to recall as precision"~\cite{Rijsbergen1979}. A common choice
-for the value of $ \beta $ is $ 1 $, this measure is called the $ F_1 $-score. That is, we attribute 
-as much importance to Recall as to Precision.
-
-In our experiments, we considered the Precision, Recall and $ F_1 $-scores for each data file relative to 
-all named entities in that file. Considering that each webpage has a different number of named entities,
-this naturally privileges models that work well for pages with more named entities. 
-A different approach might be to consider the averaged Precision, Recall and $ F_1 $-scores 
-per webpage, privileging systems that have more regularity between different websites. However, 
-this approach would cover other deficiencies, since a system that produced 100 false 
-positives in a page with 500 names would account for the same level of drop in average 
-Precision as a system that missed 10 names in a page with 50 names. 
-
-
-\section{Dictionary}
-\label{sec:dictionary}
-
-A dictionary of named entities can be a powerful aid to sequence labeling systems,
-especially when considering traditional statistical methods. For the researcher name 
-extraction task, we extracted 
-a list of 1,595,771 researcher names from the DBLP database and annotated tokens in the
-NER-on-HTML dataset with exact and partial match tags. That is, if a sequence of tokens
-corresponded exactly to a name from the DBLP list, the entire sequence was annotated as 
-an exact match. Otherwise, if only some tokens in the sequence matched a name from the DBLP
-list partially, the matching tokens were annotated with a partial match tag. 
-
-\begin{table}[h]
-  \small
-  \begin{center}
-    \begin{tabular}{ lllll }
-      \toprule
-      Data file & Precision & Recall & F1 & Correct names \\
-      \midrule
-      Training   & 0.7316 & 0.2303 & 0.3504 & 1341 of 5822 \\ 
-      Validation & 0.8474 & 0.2858 & 0.4274 & 511 of 1788 \\ 
-      Test       & 0.8717 & 0.3287 & 0.4773 & 890 of 2708 \\ 
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \caption{DBLP dictionary coverage in each data file of the NER-on-HTML dataset.}
-  \label{tab:gazetteer}
-\end{table}
-
-To understand how this dictionary can be useful in the researcher name extraction task, 
-we consider the Precision, Recall and $ F_1 $-scores for a exact dictionary matching 
-strategy in each NER-on-HTML data file. The results are described in 
-Table~\ref{tab:gazetteer}. These results also provide a baseline with which to compare
-other methods of sequence labeling in the NER-on-HTML dataset.
-This is the performance obtained by only extracting named entities that corresponded to an exact 
-match. As expected, recall is very low and precision falls short of
-top performing extraction methods. With this baseline in place, any useful extraction 
-method should at least beat the dictionary exact matching approach.
-
-
-\section{Comparison with CoNLL-2003}
-\label{sec:conll_comparison}
-
-The CoNLL-2003 dataset introduced in the NER
-shared-task in 2003 is still used to attest 
-the performance of state-of-the-art sequence labeling systems. 
-The English data is composed of news stories extracted from the Reuters Corpus, and 
-provides annotations for four types of entities: people (PER), organizations (ORG), 
-locations (LOC), and miscellaneous (MISC), which includes entities that cannot be 
-classified in one of the former groups. The statistics for the CoNLL-2003 dataset 
-are described in Table~\ref{tab:conll}.
-
-\begin{table}[h]
-  \small
-  \begin{center}
-    \begin{tabular}{ llllllll }
-      \toprule
-      Data file & Documents & Sentences & Tokens & LOC & MISC & ORG & PER \\
-      \midrule
-      Training    & 946  & 14987 & 203621 & 7140 & 3438 & 6321 & 6600 \\  
-      Validation  & 216  & 3466  & 51362 & 1837 & 922 & 1341 & 1842  \\
-      Test        & 231  & 3684  & 46435 & 1668 & 702 & 1661 & 1617  \\
-      \midrule
-      Total       & 1393 & 22137 & 301418 & 10645 & 5062 & 9323 & 10059 \\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \caption{Description of the CoNLL-2003 English dataset}
-  \label{tab:conll}
-\end{table}
-
-Considering this, it comes to mind why exactly do we need a NER dataset for HTML. 
-If the CoNLL-2003 English dataset is used to both train and evaluate 
-state-of-the-art models, it is to be expected that models trained in this dataset will
-be able to extract the same named entities in other documents with reasonable 
-effectiveness. However, this is hardly the case. By intuition, we know that tabular HTML 
-documents, such as faculty listings, are very different from plain text. But now, having a
-labeled dataset for NER on HTML, we can understand how different they really are.
-
-We trained a LSTM-CRF classifier, a close to state-of-the-art sequence labeling model
-introduced by~\cite{Huang2015}, using the CoNLL-2003 training set. We
-relabeled the dataset, so that the classifier only extracts person entities (PER labels), and
-we used the trained classifier to extract person entities from the NER-on-HTML test set.
-Table~\ref{tab:conll_to_ner_on_html} describes the results obtained with this classifier
-in the CoNLL-2003 test set and the NER-on-HTML test set.
-
-\begin{table}[h]
-  \small
-  \begin{center}
-    \begin{tabular}{ llllll }
-      \toprule
-      \multicolumn{3}{c}{CoNLL-2003} & \multicolumn{3}{c}{NER-on-HTML} \\
-      \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} &
-      \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
-      \midrule
-      0.969 & 0.931 & 0.950 & 0.282 & 0.258 & 0.269 \\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \caption{
-    Performance of the LSTM-CRF model trained with the CoNLL-2003 training set and tested in
-    the NER-on-HTML test set.
-  }
-  \label{tab:conll_to_ner_on_html}
-\end{table}
-
-The very low $ F_1 $-score obtained in the NER-on-HTML test set is worse than our
-baseline. It shows that a sequence model trained for plain text does not necessarily perform 
-very well in a HTML extraction task. Also, most public NER datasets are entirely composed of 
-plain text documents. 
-
-Lets consider some differences between both datasets.
-The number of documents in the NER-on-HTML dataset is much smaller: only 145 against 
-1393. However, the number of sentences in the NER-on-HTML 
-dataset is higher: 43870 against 22137. Also, the number of tokens in the NER-on-HTML 
-is roughly half the number present in the CoNLL-2003 dataset. These numbers show that 
-the HTML documents relevant to the researcher name extraction task are longer than news 
-stories and, more importantly, they are composed of much shorter sentences when compared 
-to the text from news corpora (~3.46 words per sentence in NER-on-HTML against ~13.62 
-words per sentence in CoNLL-2003). This attests to the fact that HTML provides far 
-less context to be made use by sequence models. This means that the models must 
-make use of information that is not directly present in the text.
-
-Another aspect that differs among NER datasets is the word distributions. Word frequencies
-tend to vary considerably in documents with different topics. Table~\ref{tab:frequent_words}
-shows the ten most frequent words for each dataset, including punctuation signs. 
-The CoNLL-2003 English dataset contains a more generic selection of terms whereas the 
-subject of the NER-on-HTML becomes evident with words such as "professor" and "university" 
-happening with a high frequency in the corpus. Finally, Figure~\ref{fig:word_frequency_plot}
-plots the word frequencies for the hundred most frequent words in the CoNLL-2003 and 
-the NER-on-HTML datasets. In both plots we have a few very frequent words and a long tail of
-infrequent words. Most named entities are located in this long tail, therefore a good sequence
-labeling method needs to be able to handle the labeling of infrequent or unique tokens effectively.
-
-\begin{table}[h]
-  \small
-  \begin{center}
-    \begin{tabular}{ llll }
-      \toprule
-      \multicolumn{2}{c}{CoNLL-2003} & \multicolumn{2}{c}{NER-on-HTML} \\
-      \multicolumn{1}{c}{Word} & \multicolumn{1}{c}{Frequency} &
-      \multicolumn{1}{c}{Word} & \multicolumn{1}{c}{Frequency} \\
-      \midrule
-      the & 12310 & , & 10439      \\
-      , & 10876 & - & 8140         \\
-      . & 10874 & ) & 3655         \\
-      of & 5502 & ( & 3641         \\
-      in & 5405 & : & 3484         \\
-      to & 5129 & of & 3345        \\
-      a & 4731 & and & 2499        \\
-      ( & 4226 & professor & 2456  \\
-      ) & 4225 & university & 1611 \\
-      and & 4223 & research & 1315 \\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \caption{Ten most frequent words for the CoNLL-2003 dataset and the NER-on-HTML dataset.}
-  \label{tab:frequent_words}
-\end{table}
-
-\begin{figure}[h!]
-  \begin{center}
-    \begin{tikzpicture}
-      \begin{axis}[
-        title={Word frequencies},
-        xmin=0, xmax=100,
-        ymin=0, ymax=12000,
-        ylabel={Frequency},
-        xlabel={Words (most to least frequent)},
-        ymajorgrids=true,
-        grid style=dashed,
-        legend pos=north east,
-        % scaled y ticks=false,
-      ]
-
-      \addplot[color=blue, color=blue] coordinates {
-        (0,12310)(1,10876)(2,10874)(3,5502)(4,5405)(5,5129)(6,4731)(7,4226)(8,4225)(9,4223)(10,3239)(11,3115)(12,2694)(13,2339)(14,2109)(15,1866)(16,1845)(17,1679)(18,1593)(19,1342)(20,1267)(21,1264)(22,1232)(23,1212)(24,1166)(25,1146)(26,1113)(27,1082)(28,1057)(29,984)(30,973)(31,920)(32,867)(33,841)(34,804)(35,796)(36,786)(37,786)(38,780)(39,768)(40,754)(41,738)(42,656)(43,645)(44,643)(45,636)(46,591)(47,584)(48,579)(49,567)(50,558)(51,546)(52,545)(53,524)(54,523)(55,517)(56,512)(57,510)(58,486)(59,486)(60,474)(61,470)(62,470)(63,457)(64,448)(65,444)(66,442)(67,441)(68,419)(69,415)(70,413)(71,405)(72,402)(73,386)(74,377)(75,375)(76,369)(77,358)(78,354)(79,348)(80,346)(81,340)(82,338)(83,328)(84,327)(85,325)(86,320)(87,319)(88,310)(89,308)(90,300)(91,296)(92,293)(93,292)(94,291)(95,289)(96,278)(97,272)(98,271)(99,271)
-      };
-      \addplot[color=red, color=red] coordinates {
-        (0,10439)(1,8140)(2,3655)(3,3641)(4,3484)(5,3345)(6,2499)(7,2456)(8,1611)(9,1315)(10,1053)(11,1046)(12,1006)(13,963)(14,897)(15,863)(16,849)(17,838)(18,773)(19,749)(20,720)(21,713)(22,695)(23,668)(24,652)(25,626)(26,602)(27,593)(28,581)(29,580)(30,569)(31,553)(32,539)(33,527)(34,520)(35,499)(36,492)(37,490)(38,469)(39,454)(40,446)(41,444)(42,429)(43,429)(44,422)(45,420)(46,419)(47,403)(48,403)(49,394)(50,390)(51,379)(52,379)(53,371)(54,362)(55,356)(56,355)(57,346)(58,342)(59,337)(60,324)(61,318)(62,314)(63,311)(64,298)(65,297)(66,288)(67,282)(68,279)(69,265)(70,263)(71,259)(72,259)(73,258)(74,258)(75,254)(76,250)(77,245)(78,243)(79,236)(80,236)(81,235)(82,234)(83,232)(84,225)(85,219)(86,218)(87,215)(88,212)(89,212)(90,210)(91,209)(92,208)(93,208)(94,205)(95,198)(96,197)(97,196)(98,191)(99,191)
-      };
-      \legend{CoNLL-2003, NER-on-HTML};
-       
-      \end{axis}
-    \end{tikzpicture}
-    \caption{
-      Word frequencies plot for the CoNLL-2003 dataset and the NER-on-HTML dataset.
-    }
-    \label{fig:word_frequency_plot}
-  \end{center}
-\end{figure}
 
 \section{Summary}
 
-In this chapter, we introduced the NER-on-HTML dataset and the researcher name extraction
-task. In Section~\ref{sec:data_description} we defined the data format for the training,
-validation and test data files. In Section~\ref{sec:evaluation} we discussed how to evaluate
-models with the Precision, Recall and F-scores. In Section~\ref{sec:dictionary}, we 
-introduced a dictionary of useful named entities for the researcher name extraction task and 
-established some baseline results. Finally, in Section~\ref{sec:conll_comparison} we
-compared the NER-on-HTML dataset with the popular CoNLL-2003 English dataset, showing why
-a new NER dataset is necessary to complete the researcher name extraction task and why most
-NER tasks in HTML will probably demand specific datasets.
+In this chapter, we discussed the related work in \gls{wde} and \gls{ner}. 
+The models discussed in this dissertation and employed in
+the experiments section are methods for \gls{ner} that were each deemed the best machine learning 
+techniques for solving the problem at a given time. However, the researcher name extraction 
+task is essentially a \gls{wde} task, so some ideas from this field are extremely useful, 
+such as using HTML structural features, as we did in the Self-Training strategy for 
+HMMs and the attention models for Neural Networks, that will be introduced in later chapters. Also, 
+\gls{ner} is a subtask that is mostly useful when we think of it in the context of a larger task,
+such as a specific setting of \gls{wde}. Because, \gls{ner} approaches may be more or less effective
+depending on the objective extraction task. For example, we will see in the experiments section 
+that, despite the significant improvements brought by ELMo embeddings to NER in plain text
+(as attested by the results reported in the {CoNLL-2003} English dataset), their performance is far
+from great when we consider the researcher name extraction task, being surpassed by much simpler
+methods.
 
 
 \chapter{Techniques for Sequence Labeling}
@@ -1710,7 +1631,7 @@ The BI-LSTM-CRF is described in Figure~\ref{fig:bi_lstm_crf}.
   \label{fig:bi_lstm_crf}
 \end{figure}
 
-This architecture achieved an F1 score of 90.10 on the English data from the CoNLL-2003 
+This architecture achieved an F1 score of 90.10 on the English data from the {CoNLL-2003}
 NER dataset, in contrast to 85.17 for a bidirectional LSTM without a CRF layer. 
 
 
@@ -2225,11 +2146,449 @@ this formulation is sufficient for the researcher name extraction task.
 \section{Summary}
 
 In this chapter we have discussed several methods for improving the performance of sequence
-labeling models in NER on HTML. Section~\ref{sec:self_training} and Section~\ref{sec:attention_models} 
+labeling models in \gls{ner} on HTML. Section~\ref{sec:self_training} and Section~\ref{sec:attention_models} 
 discussed methods for incorporating HTML features in Hidden Markov Models and Neural Networks. 
 Section~\ref{sec:fscore_optimization} discussed the usage of a modified F-measure function as
 an optimization objective for neural networks to allow the choice of specific Precision or Recall 
 goals.
+
+
+\chapter{Researcher Name Dataset}
+\label{cha:dataset}
+
+This chapter describes the dataset used to evaluate the performance of sequence models
+on the \gls{wde} task of researcher name extraction. We call it the Researcher Name dataset.
+We attested experimentally that 
+models trained in a popular \gls{ner} dataset (the {CoNLL-2003} English dataset) do not perform 
+well in the researcher name extraction task and this is likely due to the differences
+between plain text and HTML, as we will discuss in this section. The lack of other \gls{ner} 
+datasets built for HTML name extraction imposed the need to construct the Researcher Name dataset.
+
+The researcher name extraction task consists of finding researcher names in faculty listings from university 
+webpages across the world, mainly from Computer Science departments.
+This would be a necessary step when linking researcher profiles from university 
+websites to their entries in public databases. Unlike many
+\gls{wde} datasets, each webpage in the dataset comes from a different 
+website, and therefore has a different format, what makes many \gls{wde}
+approaches impractical. The idea is to explore systems that are general 
+enough to allow accurate entity extraction from different sources while requiring
+no supervision between different websites. 
+
+We collected 145 Computer Science and Engineering faculty pages from 42 different countries in
+multiple languages, although the English version was preferred when it was available.
+We gathered faculty webpages in proportion to
+the number of universities in each country\footnote{A detailed list of universities can
+be found in https://univ.cc/world.php}. 
+The dataset size was limited to a number of pages that could represent a large portion of 
+countries while still being viable to label manually. Also, university pages that contained 
+corrupt HTML or JavaScript code that performed lazy loading of researcher data records were
+not included in this dataset.
+
+This chapter is divided as follows. Section~\ref{sec:data_description} describes the 
+dataset format and how it was split in
+three data files. Section~\ref{sec:evaluation} describes how the evaluation of results in this 
+dataset was carried on. Section~\ref{sec:dictionary} describes how we obtained a dictionary
+of relevant named entities for this dataset, and discusses some baselines. Finally,
+Section~\ref{sec:conll_comparison} compares the characteristics of the Researcher Name dataset
+with another popular \gls{ner} dataset, the {CoNLL-2003} English NER dataset.
+
+
+\section{Data Description} 
+\label{sec:data_description}
+
+Each of the 145 faculty pages was preprocessed and converted
+to the {CoNLL-2003} data format. That is, one word per line with empty lines representing
+sentence boundaries. Sentence boundaries were determined by line break HTML tags
+(div, p, table, li, br, etc.) in contrast to inline tags (span, em, a, td, etc.). For example,
+the sentence: 
+
+\begin{quote}
+\centering
+<p>E. <b>Smith</b> is a <a href="/link">professor</a>.<p>
+\end{quote}
+
+\noindent
+becomes:
+
+\begin{quote}
+\centering
+E. Smith is a professor.
+\end{quote}
+
+Sentences that were more than fifty tokens long were also split according to the
+punctuation. Some algorithms have trouble handling very big sentences, so we verified
+experimentally that fifty tokens provide a large enough context to be made use by sequence 
+taggers and allows efficient training using a GPU. A few sentences in the dataset would be 
+more than a thousand tokens long if this step was not performed, what would make batch training
+for neural networks less efficient.
+
+% The algorithm used for sentence segmentation is described in
+% Appendix~\ref{app:html_segmenter}.
+
+A robust tool for HTML segmentation poses many challenges by itself, but the simple approach 
+adopted here has proved to be sufficient for the researcher name dataset. 
+Also, it is best to evaluate \gls{ner} models without relying on any sophisticated data 
+record segmentation system.
+In many cases, entity annotation may precede the segmentation
+phase on \gls{wde} methods. Also, depending on the task (as is the case
+for researcher name extraction), a good annotator that is able to work 
+with raw HTML provides a good solution to the problem.
+
+Finally, all tokens were tagged using the IOB scheme put forward by~\cite{Ramshaw1999}
+and used in {CoNLL-2003}, this is:
+
+\begin{quote}
+Words tagged with O are outside of named entities
+and the I-XXX tag is used for words inside a
+named entity of type XXX. Whenever two entities of
+type XXX are immediately next to each other, the
+first word of the second entity will be tagged B-XXX
+in order to show that it starts another entity~\citep{KimSang2003}.
+\end{quote}
+
+The Researcher Name dataset only has entities of type person PER, therefore a classifier has to
+label each token with one of the labels: O, B-PER, or I-PER. This is an example 
+sentence from the dataset:
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ ll }
+      Token & Correct Label \\
+      \midrule
+      Kasper    & I-PER \\ 
+      Rasmussen & I-PER \\
+      Associate & O     \\
+      Professor & O     \\    
+      ,         & O     \\    
+      Royal     & O     \\    
+      Society   & O     \\    
+      Research  & O     \\    
+      Fellow    & O     \\    
+    \end{tabular}     
+  \end{center}
+\end{table}
+
+It was divided in training, validation and test sets, which are described in 
+Table~\ref{tab:dataset}. The sizes of the data files were chosen with more or 
+less the same proportion adopted in other sequence labeling datasets such
+as {CoNLL-2003}, that is described in Table~\ref{tab:conll}. The validation set 
+was used in the early stopping 
+validation strategy to avoid overfitting classifiers, but model performance 
+was only evaluated by comparing the performance in the test set, which is
+never observed during training.
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      Data file & Documents & Sentences & Tokens & Names \\
+      \midrule
+      Training    & 85  & 24728 & 110269 & 5822  \\  
+      Validation  & 30  & 8743  & 36757  & 1788  \\
+      Test        & 30  & 10399 & 44795  & 2723  \\
+      \midrule
+      Total       & 145 & 43870 & 151821 & 10333 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Description of the data files in the Researcher Name dataset}
+  \label{tab:dataset}
+\end{table}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ llllllll }
+      \toprule
+      Data file & Documents & Sentences & Tokens & LOC & MISC & ORG & PER \\
+      \midrule
+      Training    & 946  & 14987 & 203621 & 7140 & 3438 & 6321 & 6600 \\  
+      Validation  & 216  & 3466  & 51362 & 1837 & 922 & 1341 & 1842  \\
+      Test        & 231  & 3684  & 46435 & 1668 & 702 & 1661 & 1617  \\
+      \midrule
+      Total       & 1393 & 22137 & 301418 & 10645 & 5062 & 9323 & 10059 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Description of the {CoNLL-2003} English dataset}
+  \label{tab:conll}
+\end{table}
+
+
+Most webpages in this dataset are faculty directories with informative
+text in small passages, however long prose is not absent. 
+Size and structure varies wildly, therefore some documents 
+may contain up to a few hundred names whereas other documents may contain 
+only a dozen names. This difference in document size and characteristics 
+may be problematic when comparing different extraction systems, because a system 
+that performs well on some types of pages may perform poorly in other types.
+To avoid this problem, we tried to keep the proportion between the number of tokens
+and the number of documents roughly the same for all data files.
+
+
+\section{Dictionary}
+\label{sec:dictionary}
+
+A dictionary of named entities can be a powerful aid to sequence labeling systems,
+especially when considering traditional statistical methods. For the researcher name 
+extraction task, we extracted 
+a list of 1,595,771 researcher names from the DBLP database and annotated tokens in the
+Researcher Name dataset with exact and partial match tags. That is, if a sequence of tokens
+corresponded exactly to a name from the DBLP list, the entire sequence was annotated as 
+an exact match. Otherwise, if only some tokens in the sequence matched a name from the DBLP
+list partially, the matching tokens were annotated with a partial match tag. This dictionary
+was used by some of the models that will be discussed in the experiments chapter, however it 
+must be stated that one of the main advantages of Deep Neural Networks relative to other
+approaches is the fact that they can perform well even without the aid of a dictionary.
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      Data file & Precision & Recall & F1 & Correct names \\
+      \midrule
+      Training   & 0.7316 & 0.2303 & 0.3504 & 1341 of 5822 \\ 
+      Validation & 0.8474 & 0.2858 & 0.4274 & 511 of 1788 \\ 
+      Test       & 0.8717 & 0.3287 & 0.4773 & 890 of 2708 \\ 
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{DBLP dictionary coverage in each data file of the Researcher Name dataset.}
+  \label{tab:gazetteer}
+\end{table}
+
+To understand how this dictionary can be useful for some models in the researcher name extraction task, 
+we consider the Precision, Recall and $ F_1 $-scores for a exact dictionary matching 
+strategy in each Researcher Name data file. The results are described in 
+Table~\ref{tab:gazetteer}. These results also provide a baseline with which to compare
+other methods of sequence labeling in the Researcher Name dataset. 
+The reported performance was obtained by only extracting named entities that corresponded to an exact 
+match. Any useful extraction method should at least improve upon this approach.
+Recall is very low because the dictionary is incomplete and precision falls short of
+top performing extraction methods. This last result is surprising since we are only extracting 
+exact matches. The reason for the low precision is that exact dictionary matches may actually 
+only correspond to partial matches in the dataset. For example, if the dictionary has an entry
+for "Ann Smith", it may partially overlap an entry in the dataset for "Mary Ann Smith".
+
+
+\section{Comparison with {CoNLL-2003}}
+\label{sec:conll_comparison}
+
+The {CoNLL-2003} dataset introduced in the \gls{ner}
+shared-task in 2003 is frequently used to attest 
+the performance of state-of-the-art sequence labeling systems~\cite{Huang2015,Lample2016,Ma2016,Peters2018}. 
+The English data is composed of news stories extracted from the Reuters Corpus, and 
+provides annotations for four types of entities: people (PER), organizations (ORG), 
+locations (LOC), and miscellaneous (MISC), which includes entities that cannot be 
+classified in one of the former groups. The statistics for the {CoNLL-2003} dataset 
+are described in Table~\ref{tab:conll}.
+
+Considering this, it comes to mind why exactly do we need a NER dataset for HTML. 
+If the {CoNLL-2003} English dataset is used to both train and evaluate 
+state-of-the-art models, it is to be expected that models trained in this dataset will
+be able to extract the same named entities in other documents with reasonable 
+effectiveness. However, this is hardly the case. By intuition, we know that tabular HTML 
+documents, such as faculty listings, are very different from plain text. But now, having a
+labeled dataset for \gls{ner} on HTML, we can understand how different they really are.
+
+We trained three classifiers to perform the task of person name extraction using
+the {CoNLL-2003} training set. The {CoNLL-2003} dataset was relabeled so that classifiers only have to extract
+person entities (PER labels), thus other entity types (LOC, ORG, and MISC) were relabeled as
+not an entity (O label). We trained the classifiers with the relabeled {CoNLL-2003} training set,
+and validated the results with the relabeled validation set. The models were tested with the relabeled {CoNLL-2003}
+test set and the Researcher Name test set.
+In Table~\ref{tab:conll_to_ner_on_html}, we present the results for a first order \gls{hmm}, 
+a Linear Chain \gls{crf}, and a LSTM-CRF classifier with GloVe embeddings~\cite{Huang2015} in this
+setting.
+
+
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllllll }
+      \toprule
+      \multirow{2}{*}{Model} & \multicolumn{3}{c}{CoNLL-2003} & \multicolumn{3}{c}{Researcher Name} \\
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
+      \midrule
+      HMM      & 0.777 & 0.452 & 0.571 & 0.189 & 0.180 & 0.184 \\
+      CRF      & 0.774 & 0.754 & 0.764 & 0.138 & 0.129 & 0.133 \\
+      LSTM-CRF & 0.969 & 0.931 & 0.950 & 0.282 & 0.258 & 0.269 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{
+    Performance of three classifiers trained with the {CoNLL-2003} training set and tested in
+    the CoNLL-2003 and Researcher Name test sets.
+  }
+  \label{tab:conll_to_ner_on_html}
+\end{table}
+
+The very low $ F_1 $-score obtained by all models in the Researcher Name test set is worse than the established
+dictionary baseline. We cannot use these results to properly compare the relative performances 
+between the models (this topic will be explored in the next chapter), but it is possible to conclude
+that machine learning models trained in plain text do not necessarily perform very well in HTML 
+extraction tasks. The LSTM-CRF model obtained a 0.269 $ F_1 $-score in the Researcher Name test
+set, what is surprising considering that it is a very efficient approach to sequence labeling in plain 
+text. By looking at some of its mistakes we can shed some light on this result. The LSTM-CRF model
+extracted "Dean Emeritus" and "14101 INF" as names, and it missed the last names in "George E. Elliott"
+and "Carl J. Galligan". These mistakes are representative of some of the major flaws with the systems
+trained with the CoNLL-2003 training set. 
+
+Lets consider some differences between both datasets. The names in the Researcher Name dataset 
+are usually longer than in CoNLL-2003 and the word distributions are vastly different, what may
+account for some of the mistakes of the LSTM-CRF model.
+The number of documents in the Researcher Name dataset is much smaller: only 145 against 
+1393. However, the number of sentences in the Researcher Name
+dataset is higher: 43870 against 22137. Also, the number of tokens in the Researcher Name dataset
+is roughly half the number present in the {CoNLL-2003} dataset. These numbers show that 
+the HTML documents relevant to the researcher name extraction task are longer than news 
+stories and, more importantly, they are composed of much shorter sentences when compared 
+to the text from news corpora (\~3.46 words per sentence in the Researcher Name dataset
+against \~13.62 words per sentence in {CoNLL-2003}). Most faculty webpages have a lot of 
+boilerplate text that contributes to their size, while the news stories in {CoNLL-2003}
+are usually rather short. These numbers show that HTML provides far less context to be made 
+use by sequence models so we should seek other sources of evidence in addition to the text, 
+such as dictionaries and the HTML structure.
+
+Another aspect that differs among the NER datasets is the word distributions. Word frequencies
+tend to vary considerably in documents with different topics. Table~\ref{tab:frequent_words}
+shows the ten most frequent words for each dataset, including punctuation signs. Punctuation
+signs are frequently present in proper names, as in Mary B., Susan (Susie) Williams, John Al-Azzawi, etc.
+Also, they can be useful to detect boundaries between named entities, so their distributions are very relevant 
+to this problem.
+The {CoNLL-2003} English dataset contains a more generic selection of terms whereas the 
+subject of the Researcher Name dataset becomes evident with words such as "professor" and "university" 
+happening with a high frequency in the corpus. Also, punctuation signs are much more frequent in
+the Researcher Name dataset. Lastly, Figure~\ref{fig:word_frequency_plot}
+plots the word frequencies for the hundred most frequent words in the {CoNLL-2003} and 
+the Researcher Name datasets. In both plots we have a few very frequent words and a long tail of
+infrequent words. Most named entities are located in this long tail, therefore a good sequence
+labeling method needs to be able to handle the labeling of infrequent tokens effectively. 
+The probabilities attributed to unseen tokens is another aspect where models will vary significantly 
+between different datasets.
+
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ llll }
+      \toprule
+      \multicolumn{2}{c}{CoNLL-2003} & \multicolumn{2}{c}{Researcher Name} \\
+      \multicolumn{1}{c}{Word} & \multicolumn{1}{c}{Frequency} &
+      \multicolumn{1}{c}{Word} & \multicolumn{1}{c}{Frequency} \\
+      \midrule
+      the & 12310 & , & 10439      \\
+      , & 10876 & - & 8140         \\
+      . & 10874 & ) & 3655         \\
+      of & 5502 & ( & 3641         \\
+      in & 5405 & : & 3484         \\
+      to & 5129 & of & 3345        \\
+      a & 4731 & and & 2499        \\
+      ( & 4226 & professor & 2456  \\
+      ) & 4225 & university & 1611 \\
+      and & 4223 & research & 1315 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Ten most frequent words for the {CoNLL-2003} dataset and the Researcher Name dataset.}
+  \label{tab:frequent_words}
+\end{table}
+
+\begin{figure}[h!]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        title={Word frequencies},
+        xmin=0, xmax=100,
+        ymin=0, ymax=12000,
+        ylabel={Frequency},
+        xlabel={Words (most to least frequent)},
+        ymajorgrids=true,
+        grid style=dashed,
+        legend pos=north east,
+        % scaled y ticks=false,
+      ]
+
+      \addplot[color=blue, color=blue] coordinates {
+        (0,12310)(1,10876)(2,10874)(3,5502)(4,5405)(5,5129)(6,4731)(7,4226)(8,4225)(9,4223)(10,3239)(11,3115)(12,2694)(13,2339)(14,2109)(15,1866)(16,1845)(17,1679)(18,1593)(19,1342)(20,1267)(21,1264)(22,1232)(23,1212)(24,1166)(25,1146)(26,1113)(27,1082)(28,1057)(29,984)(30,973)(31,920)(32,867)(33,841)(34,804)(35,796)(36,786)(37,786)(38,780)(39,768)(40,754)(41,738)(42,656)(43,645)(44,643)(45,636)(46,591)(47,584)(48,579)(49,567)(50,558)(51,546)(52,545)(53,524)(54,523)(55,517)(56,512)(57,510)(58,486)(59,486)(60,474)(61,470)(62,470)(63,457)(64,448)(65,444)(66,442)(67,441)(68,419)(69,415)(70,413)(71,405)(72,402)(73,386)(74,377)(75,375)(76,369)(77,358)(78,354)(79,348)(80,346)(81,340)(82,338)(83,328)(84,327)(85,325)(86,320)(87,319)(88,310)(89,308)(90,300)(91,296)(92,293)(93,292)(94,291)(95,289)(96,278)(97,272)(98,271)(99,271)
+      };
+      \addplot[color=red, color=red] coordinates {
+        (0,10439)(1,8140)(2,3655)(3,3641)(4,3484)(5,3345)(6,2499)(7,2456)(8,1611)(9,1315)(10,1053)(11,1046)(12,1006)(13,963)(14,897)(15,863)(16,849)(17,838)(18,773)(19,749)(20,720)(21,713)(22,695)(23,668)(24,652)(25,626)(26,602)(27,593)(28,581)(29,580)(30,569)(31,553)(32,539)(33,527)(34,520)(35,499)(36,492)(37,490)(38,469)(39,454)(40,446)(41,444)(42,429)(43,429)(44,422)(45,420)(46,419)(47,403)(48,403)(49,394)(50,390)(51,379)(52,379)(53,371)(54,362)(55,356)(56,355)(57,346)(58,342)(59,337)(60,324)(61,318)(62,314)(63,311)(64,298)(65,297)(66,288)(67,282)(68,279)(69,265)(70,263)(71,259)(72,259)(73,258)(74,258)(75,254)(76,250)(77,245)(78,243)(79,236)(80,236)(81,235)(82,234)(83,232)(84,225)(85,219)(86,218)(87,215)(88,212)(89,212)(90,210)(91,209)(92,208)(93,208)(94,205)(95,198)(96,197)(97,196)(98,191)(99,191)
+      };
+      \legend{CoNLL-2003, Researcher Name};
+       
+      \end{axis}
+    \end{tikzpicture}
+    \caption{
+      Word frequencies plot for the {CoNLL-2003} dataset and the Researcher Name dataset.
+    }
+    \label{fig:word_frequency_plot}
+  \end{center}
+\end{figure}
+
+
+\section{Evaluation}
+\label{sec:evaluation}
+
+The performance of classifiers in the researcher name extraction task in
+the Researcher Name dataset was evaluated according to their Precision (P), Recall (R) and F-scores
+in the test set. The Precision and Recall 
+measures are defined in terms of the number of true positives, false negatives, and false 
+positives made by the classifier when extracting named entities. That is:
+
+\begin{equation*}
+\text{Precision} = \frac{\text{TruePos}}{\text{TruePos} + \text{FalsePos}}      
+\qquad
+\text{Recall} = \frac{\text{TruePos}}{\text{TruePos} + \text{FalseNeg}}
+\end{equation*}
+
+Precision accounts for the proportion of named entities found by the model that are 
+correct relative to all predicted named entities.
+Recall is the proportion of named entities correctly predicted by the model relative to
+all named entities in the dataset. Precision measures Type I errors 
+(false positives) and Recall measures Type II errors (false negatives). Partial matches are
+not considered, so a classification only counts as a true positive if the entire named entity
+has been correctly extracted. Additionally, the F-score, proposed by~\cite{Rijsbergen1979}, 
+is a composite measure that combines Precision and Recall defined as:
+
+\begin{equation}
+F_{\beta} = (1 + \beta^2) \cdot \frac{\text{Precision} \cdot \text{Recall}}{(\beta^2 \cdot \text{Precision}) + \text{Recall}}
+\label{eq:fscore_formula}
+\end{equation}
+
+The choice for $ \beta $ depends on the relative importance attributed to Precision over Recall.
+This formula ``measures the effectiveness of retrieval with respect to a user who attaches 
+$ \beta$ times as much importance to recall as precision''~\citep{Rijsbergen1979}. A common choice
+for the value of $ \beta $ is $ 1 $, this measure is called the $ F_1 $-score (F1). That is, we attribute 
+as much importance to Recall as to Precision.
+
+In our experiments, we considered the Precision, Recall and $ F_1 $-scores over the entire 
+data files. Considering that each webpage has a different number of named entities,
+this naturally privileges models that work well for pages with more named entities. 
+A different approach might be to consider the averaged Precision, Recall and $ F_1 $-scores 
+per webpage, privileging systems that have more regularity between different websites. However, 
+this approach would cover other deficiencies. That is, the impact of errors in pages with many 
+named entities would diminish and the impact of errors in pages with few named entities would
+increase. That is why we considered that this approach was not preferable.
+
+
+
+\section{Summary}
+
+In this chapter, we introduced the Researcher Name dataset and the Researcher Name Extraction
+Task. In Section~\ref{sec:data_description} we defined the data format for the training,
+validation and test data files. In Section~\ref{sec:evaluation} we discussed how to evaluate
+models with the Precision, Recall and F-scores. In Section~\ref{sec:dictionary}, we 
+introduced a dictionary of useful named entities for the researcher name extraction task and 
+established some baseline results. Finally, in Section~\ref{sec:conll_comparison} we
+compared the Researcher Name dataset with the popular {CoNLL-2003} English dataset, showing why
+a new NER dataset is necessary to adequately solve the researcher name extraction task and 
+why most NER tasks in HTML will probably demand specific datasets.
 
 
 \chapter{Experiments}
@@ -2344,7 +2703,7 @@ the features.
 We hypothesized that the performance of HMMs on sequence labeling tasks for NLP can be improved by
 raising the number of previous states checked at each timestep, that is the order of the HMM.
 Table~\ref{fig:hmm_no_features} shows the performance of \textit{HMMs} up to third 
-order in the test sets of the NER on HTML dataset. To allow comparison with the baselines, we also 
+order in the test sets of the Researcher Name dataset. To allow comparison with the baselines, we also 
 add the results of a Naive Bayes classifier. The Naive Bayes classifier can be thought of as a
 HMM of zeroth-order.
 
@@ -2392,7 +2751,7 @@ HMM of zeroth-order.
     \end{tikzpicture}
     \caption{
       Performance of the Naive Bayes classifier and Hidden Markov Models without 
-      features besides the current word on the test set of the NER on HTML dataset.
+      features besides the current word on the test set of the Researcher Name dataset.
     }
     \label{fig:hmm_no_features}
   \end{center}
@@ -2439,7 +2798,7 @@ The selected features are presented in Table~\ref{tab:features}.
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Features used in the NER-on-HTML dataset}
+  \caption{Features used in the Researcher Name dataset}
   \label{tab:features}
 \end{table}
 
@@ -2801,7 +3160,7 @@ and a CRF without features in the name extraction task.
     \end{tikzpicture}
     \caption{
       Performance of the Logistic Classifier, second-order Hidden Markov Models and 
-      Linear Chain CRFs without features besides the current word on the test set of the NER on HTML dataset.
+      Linear Chain CRFs without features besides the current word on the test set of the Researcher Name dataset.
     }
     \label{fig:crf_no_features}
   \end{center}
@@ -3174,8 +3533,8 @@ models with LSTM-based character representations using different sets of pre-tra
 \end{table}
 
 GloVe embeddings are superior to Word2Vec in our NER setting, agreeing with the reported results for neural 
-models in the CoNLL-2003 English dataset for NER. But, ELMo embeddings showed a very poor performance, 
-contrasting with the results reported in the CoNLL-2003 English dataset. This is probably due to the fact that,
+models in the {CoNLL-2003} English dataset for NER. But, ELMo embeddings showed a very poor performance, 
+contrasting with the results reported in the {CoNLL-2003} English dataset. This is probably due to the fact that,
 different from static embeddings, ELMo considers the context when generating word representations. Since
 the pre-trained language model that generates ELMo embeddings was trained on plain text, it is natural that the
 contextual representations on HTML will not make much sense. 
@@ -3201,7 +3560,7 @@ to value Precision over Recall in the name extraction task, however it is arguab
 and lose a little Precision in this task, since it is easier to filter out false positives from the
 results than to find the false negatives manually in the corpus. 
 
-Figure~\ref{fig:fscore_optimization} presents the results on the test set of the NER-on-HTML dataset
+Figure~\ref{fig:fscore_optimization} presents the results on the test set of the Researcher Name dataset
 for a Bi-LSTM-CRF model with LSTM character representations trained with the expected F-score 
 maximization objective and varying the F-score $ \alpha $. For example, $ \alpha=0.5 $ means that we 
 value Recall as much as Precision, $ \alpha=0.2 $ means that we value Precision twice as much as Recall, and 
@@ -3332,7 +3691,7 @@ We finally reach the point where we try to answer the main question of this diss
 We have experimented with multiple sequence labeling methods in the previous Sections and now we provide
 an overview of the best variants of each category.
 In Table~\ref{tab:best_models}, we compare the performance of the best HMMs, 
-CRFs and Neural Networks in the NER on HTML dataset.
+CRFs and Neural Networks in the Researcher Name dataset.
 
 \begin{table}[h]
   \small
@@ -3363,7 +3722,7 @@ CRFs and Neural Networks in the NER on HTML dataset.
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Overview of the best models for the name extraction task in the NER on HTML dataset.}
+  \caption{Overview of the best models for the name extraction task in the Researcher Name dataset.}
   \label{tab:best_models}
 \end{table}
 
@@ -3455,7 +3814,7 @@ the mistakes and allow the models some flexibility to derive new filters dependi
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Overview of the best models for the name extraction task in the NER on HTML test dataset after the filtering strategy.}
+  \caption{Overview of the best models for the name extraction task in the Researcher name test set after the filtering strategy.}
   \label{tab:heuristic_filtering}
 \end{table}
 
@@ -3470,257 +3829,6 @@ is achieved by the Bi-LSTM-CRF model with LSTM character representations and a H
 models gain an increase in the $F_1$, but the overall best performance is achieved by the Bi-LSTM-CRF model
 with LSTM character representations optimized with a $F_1$-score optimization objective, achieving a
 0.9323 $F_1$.
-
-
-\chapter{Related Work}
-
-The researcher name extraction task is a problem of Web Data Extraction that
-we solved with machine learning models for Named Entity Recognition.
-This chapter presents the related research in the fields of Web Data Extraction 
-in Section~\ref{sec:wde} and Named Entity Recognition in Section~\ref{sec:ner}.
-
-\section{Web Data Extraction}
-\label{sec:wde}
-
-In the last 20 years, the astonishing growth of public information in the Web has 
-led to the development of a number of different approaches to the problem of Web 
-Data Extraction. Traditionally, the task was solved by designing special purpose
-programs called wrappers to recognize relevant data and store records in a structured
-format. These early tools varied wildly relative to their degree of automation. 
-
-It was readily perceived that manual wrapper generation was a rather tedious and
-error prone process, unsuited for large scale operations. Wrappers tend to
-break frequently because they rely on webpage features that can change 
-often. So, in the late nineties, several authors advocated for wrapper induction, a technique 
-that consists of automatically constructing wrappers from a small set of examples by 
-identifying delimiters or context tokens that single out the desired attributes. 
-Some remarkable wrapper induction methods are WIEN~\citep{Kushmerick2000}, Soft 
-Mealy~\citep{Hsu1998} and STALKER~\citep{Muslea1999}.
-
-Despite being better than constructing wrappers manually, wrapper induction methods 
-still suffered from a lack of expressive power and flexibility. These methods had 
-trouble handling records with missing attributes or unusual structures because
-patterns could only be identified if they happened at least once in the examples.
-
-Other approaches such as NoDoSE~\citep{Adelberg1998} and Debye~\citep{Laender2002a} 
-brought greater flexibility to wrapper induction methods by requiring a greater level 
-of human interaction through graphical user interfaces. Web Data Extraction techniques often 
-require some sort of assistance from human experts to boost accuracy. One of the main challenges 
-in the field lies in determining an adequate trade-off between the degree of automation and 
-the Precision and Recall of the data extraction tool.
-
-To automate the task of Web data extraction completely some approaches,
-such as Road Runner~\citep{Crescenzi2001}, removed entirely the need for data examples.
-Road Runner parses documents belonging to a same class (e.g. books in Amazon) and 
-generates wrappers based on their similarities and differences, yielding comparable results 
-to those obtained by wrapper induction methods. However, like previous approaches, it was 
-unsuited for cross site extraction tasks because the learned rules were not general enough.
-
-Early NLP-based approaches aimed at extracting more general rules that could possibly
-be employed over multiple websites. RAPIER~\citep{Califf1999} is a method of rule
-extraction that uses information such as part-of-speech tags and semantic classes from
-a lexicon to derive patterns from a set of training examples. This approach is more
-flexible than the wrapper induction methods, however it achieves much lower rates of 
-Precision and Recall.
-
-In 2002, a survey~\citep{Laender2002} made a thorough classification of the
-early approaches with a taxonomy based on their main technology, being them: languages for
-wrapper development, HTML-aware tools, NLP-based tools, Wrapper Induction Tools,
-Modeling-based tools and Ontology-based tools. Some noteworthy examples from this era
-are: 
-
-\begin{itemize}
-\item TSIMMIS~\citep{Hammer1997} and WebOQL~\citep{Arocena1999}, which are special purpose 
-languages for building wrappers.
-
-\item Road Runner~\citep{Crescenzi2001}, XWRAP~\citep{Liu2000} and W4F~\citep{Sahuguet1999}, 
-which are HTML-aware tools that infer meaningful patterns from the HTML structure.
-
-\item RAPIER~\citep{Califf1999}, SRV~\citep{Freitag1998}, WHISK~\citep{Soderland1999}, which 
-are NLP-based tools.
-
-\item WIEN~\citep{Kushmerick2000}, Soft Mealy~\citep{Hsu1998} and STALKER~\citep{Muslea1999} which 
-are wrapper induction methods.
-
-\item NoDoSE~\citep{Adelberg1998} and Debye~\citep{Laender2002a}, which are semi-supervised
-tools that require some interaction with the user by means of a graphical
-user interface.
-\end{itemize}
-
-% Text Runner.
-% https://www.aaai.org/Papers/IJCAI/2007/IJCAI07-429.pdf
-
-\cite{Chang2006} complemented the previous surveys with semi-supervised 
-technologies such as Thresher~\citep{Hogue2005}, IEPAD~\citep{Chang2001} and 
-OLERA~\citep{Chang2004}. They differed from supervised 
-and unsupervised methods because they either needed only a rough description of
-data from users for extraction rule generation or some level of post processing
-that needed user attention. The survey also mentioned newer unsupervised methods
-such as DeLa~\citep{Wang2003}, Exalg~\citep{Arasu2003} and Depta~\citep{Zhai2005}.
-
-Most of the early information extraction systems were rule-based with either 
-manual rule description or automatic rule learning from examples, thus they
-suffered from a lack of flexibility when dealing with noisy and unstructured data.
-Huge progress in the field of statistical learning led to the development of
-models that tried to solve this problem.
-
-\cite{Sarawagi2008} introduced a classification that segmented wrappers in
-rule-based methods, statistical methods and hybrid models, bringing together 
-the fields of Named Entity Recognition, Relationship Extraction and Web Data Extraction. 
-The rule based methods encompass most of the previous models. While the statistical methods 
-convert the extraction task into a token labeling task, solved with Named Entity Recognition 
-and Relationship Extractions methods. Traditionally, these subtasks were solved with 
-generative models based on Hidden Markov Models or discriminative models based on the 
-Maximum Entropy principle, but recently these have been largely superseded by Deep Neural 
-Networks. Different from automatic wrapper generators, statistical methods are suitable for
-a large variety of tasks, especially when we want the system to handle cross website information 
-extraction and plain text information extraction. That is why this class of methods is of 
-special interest to our application. The progress of Statistical models will be 
-discussed in Section~\ref{sec:ner}.
-
-Surveys by~\cite{Ferrara2014}, \cite{Schulz2016} and \cite{Varlamov2016} updated the 
-previous surveys on information 
-extraction methods with some interesting innovations. 
-Some examples are: the Visual Box Model~\citep{Krupl2005}, a data extraction system that produces 
-a visualization of the webpage to exploit visual cues to identify records presented in a tabular form;
-automatic wrapper adaptation~\citep{Ferrara2011}, a technique that tries to reduce the cost of 
-wrapper maintenance by measuring the similarity of HTML trees and adapting
-wrappers to the new page structure; AutoRM~\citep{Shi2015}, a method to mine
-records from a single webpage by identifying similar data regions through DOM
-tree analysis; and Knowledge Vault~\citep{Dong2014}, a method that combines different 
-extraction approaches to feed a probabilistic knowledge base.
-
-Most data extraction systems focus on extracting information from single websites
-and are therefore unsuited for cross website extraction tasks. Even unsupervised
-approaches that are domain independent, such as RoadRunner and EXALG only work well 
-for extracting data from pages generated from a same template. 
-
-A statistical approach to unsupervised domain 
-independent Web data extraction was described by~\cite{Zhu2005}. The 2D CRF 
-model takes a webpage segmented into data blocks and employs a two dimensional conditional 
-random field model to perform attribute labeling. The model was further improved 
-in~\cite{Zhu2006} to model record segmentation and attribute labeling as a joint task.
-Some of the limitations of early unsupervised methods 
-were also addressed by ObjectRunner~\citep{Abdessalem2010} and AMBER~\citep{Furche2012}. 
-These methods work by annotating webpages automatically with regular expressions, gazetteers and 
-knowledge bases. They can rectify low quality annotations and even improve the annotators
-by exploring regular structures in the DOM during the record segmentation phase.
-
-Web Data Extraction methods have undoubtedly improved extraordinarily, but
-as pointed by \cite{Schulz2016}, it is difficult to compare the results 
-achieved by competing tools, and many seem to rely excessively on heuristic methods.
-In that regard, the recent advancements in sequence taggers may provide more robust and
-flexible extraction tools.
-
-
-\section{Named Entity Recognition}
-\label{sec:ner}
-
-Named Entity Recognition is an important subtask in Information Extraction.
-The Named Entity Recognition task was defined in the Third Message 
-Understanding Conference (MUC-3)~\citep{Sundheim1991}, where researchers were asked to extract
-entities from a news corpus about terrorist incidents. However, it was the 
-language-independent Named Entity Recognition shared task at the Conference 
-on Computational Natural Language Learning in 2003 (CoNLL-2003)~\citep{KimSang2003},
-that established an enduring labeled dataset constructed with news texts from Reuters.
-Despite its reduced size and the limited variability of its documents, the CoNLL-2003 
-dataset is still used to compare the performance of NER systems in English, and 
-German. 
-
-Sequence labeling for NER and part-of-speech tagging (labeling nouns, verbs, pronouns, etc.) 
-is very similar, so many times, research articles that propose new methods for NER
-also report results for the POS-tagging task. And frequently, the best methods for 
-POS-Tagging are also the best methods for NER.
-
-Traditionally, the NER task was solved with generative models based on 
-Hidden Markov Models (HMMs). The first appearances of HMMs in the
-field of Natural Language Processing occurred in the mid-seventies and were
-primarily focused on the problem of Speech Recognition. 
-But in the late nineties, HMMs also found important applications in Information 
-Extraction and NER as in the works by~\cite{Leek1997}, \cite{Bikel1999}, 
-\cite{Freitag1999}, and \cite{Freitag2000}.
-
-The problem with HMMs was that they modeled the joint probability between 
-sequences of observations and labels $ P(X, Y) $, a harder problem than modelling the corresponding 
-conditional probability $ P(Y|X) $. They assumed conditional independence for the observations $ X $, and
-therefore, they could not handle overlapping features. This lack of flexibility led to the 
-development of discriminative approaches to sequence labeling.
-
-Some early examples are Maximum Entropy Taggers for NER~\citep{Borthwick1998} and
-POS-Tagging~\citep{Ratnaparkhi1998}. The Maximum Entropy Markov Model introduced in~\cite{McCallum2000} 
-was developed just a while later, building up on the intuition of HMMs combined with
-the flexibility of discriminative approaches. However, because of the label bias problem,
-this model was superseded by Conditional Random Fields~\citep{Lafferty2001, McCallum2003}. 
-At this time, the best performing systems almost always resorted to external gazetteers 
-and hand-chosen features, as is the case for the CoNLL-2003 winning model~\citep{Florian2003}.
-
-With the advancement of Machine Learning in recent years, we saw the rise
-of Neural Networks applied to sequence labeling. In 2011, \cite{Collobert2011} 
-introduced Neural Networks free of feature engineering to sequence labeling tasks,
-using a Convolutional Neural Network over word embeddings with a CRF output layer to tackle 
-the problems of POS-tagging, Chunking, Semantic Role Labeling, and NER. A similar architecture 
-proposed in 2015 by~\cite{Huang2015}, the Bi-LSTM-CRF, replaced the CNN in \cite{Collobert2011} 
-with a bidirectional LSTM, achieving better results.
-
-In 2016, further advancement to the NER models was achieved by incorporating character 
-representations at the bottom of the Bi-LSTM-CRF architecture to extract morphological 
-features from words automatically. The model by~\cite{Lample2016} uses a 
-bidirectional LSTM over character embeddings and the model by~\cite{Ma2016} uses a
-one dimensional CNN with max pooling over character embeddings. Both models also 
-made use of pre-trained GloVe word embeddings, described in~\cite{Pennington2014}.
-
-Small improvements to NER systems have been made since then, primarily due to the 
-introduction of new word embeddings on variations of the Bi-LSTM-CRF architecture. From
-this group, we can mention ELMo~\citep{Peters2018}, BERT~\citep{Devlin2018}, and
-Flair~\citep{Akbik2018}. 
-All of them were introduced in 2018 and they differ primarily 
-in how to construct contextual embeddings from the internal states of a language model.
-
-To our knowledge, the best NER system up to this date (considering the performance in the
-CoNLL-2003 dataset) is the bidirectional transformer model proposed by~\cite{Baevski2019} that uses
-a stack of self attention modules and ELMo embeddings. Table~\ref{tab:ner_model_comparison}
-shows a comparison of the history of reported F1 scores in the English test set of the CoNLL-2003 dataset
-for the NER systems that were mentioned in this section. Each of the mentioned systems held the 
-record for the task at a given time, but some models that held the best F1-score were also omitted 
-from this table.
-
-\begin{table}[h]
-  \small
-  \begin{center}
-    \begin{tabular}{ ll }
-      \toprule
-      Model & Test F1 \\
-      \midrule
-       \cite{Florian2003} (CoNLL-2003 Winner)      & 88.76 \\
-       \cite{Collobert2011}                        & 89.59 \\
-       \cite{Huang2015}                            & 90.10 \\
-       \cite{Lample2016}                           & 90.94 \\
-       \cite{Ma2016}                               & 91.21 \\
-       \cite{Peters2018}                           & 92.22 \\
-       \cite{Devlin2018}                           & 92.80 \\
-       \cite{Akbik2018}                            & 93.09 \\
-       \cite{Baevski2019}                          & 93.50 \\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \caption{Model performances in the CoNLL-2003 English test set.}
-  \label{tab:ner_model_comparison}
-\end{table}
-
-
-\section{Summary}
-
-In this chapter, we discussed the related work in Web Data Extraction and Named
-Entity Recognition. The models discussed in this dissertation and employed in
-the experiments are mainly NER methods that were deemed the best machine learning 
-techniques for solving the problem at a given time. However, the researcher name extraction 
-task is essentially a WDE task, so some ideas from the field are extremely useful, 
-such as using HTML structural features, as we did in the Self-Training strategy for 
-HMMs and the attention models for Neural Networks. Also, NER is only a subtask that 
-is hardly useful by itself, so ideally, it should be discussed in the context of a
-larger task, such as WDE. Because, as we saw in the experiments described in 
-Chapter~\ref{cha:experiments}, improvements to NER in plain text, such as ELMo, are
-not always great for NER on the web.
 
 
 \chapter{Conclusions and Future Work}
@@ -3770,7 +3878,7 @@ filtering strategy, which is task-specific.
 % 
 % \begin{itemize}
 % 
-% \item \textbf{The NER on HTML dataset} was created to assess the performance of NER methods
+% \item \textbf{The Researcher Name dataset} was created to assess the performance of NER methods
 % on webpages with a structure that vary significantly from what is typical in plain text. By
 % creating this dataset and testing NER models in it, we learned some valuable things. First,
 % not all methods that work well in plain text also work well in webpages. Second, some NER

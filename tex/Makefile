@@ -1,7 +1,7 @@
 .PHONY: run
 
 run:
-	pdflatex exemplo.tex && bibtex exemplo && pdflatex exemplo.tex && tput reset
+	pdflatex exemplo.tex && bibtex exemplo && makeglossaries exemplo.glo && pdflatex exemplo.tex && tput reset
 
 .PHONY: clean
 
