@@ -67,6 +67,7 @@
 \newacronym{crf}{CRF}{Conditional Random Fields}
 \newacronym{lstm}{LSTM}{Long Short-Term Memory Networks}
 \newacronym{ie}{IE}{Information Extraction}
+\newacronym{rne}{RNE}{Researcher Name Extraction}
 
 \begin{document}
 
@@ -353,8 +354,8 @@ specific problem of Researcher Name Extraction.
 \label{sec:information_extraction}
 
 \gls{ie} consists of mapping unstructured or poorly structured 
-data to a semantically well defined structure. It "is the process of filling the fields and 
-records of a database from unstructured or loosely formatted text"~\cite{McCallum2005}. 
+data to a semantically well defined structure. It ``is the process of filling the fields and 
+records of a database from unstructured or loosely formatted text''~\citep{McCallum2005}. 
 Usually, the input consists of a corpus containing useful entities that
 are scattered in the text and the Information Extraction system is responsible
 for finding these entities and organizing them according to a rigid hierarchy, such as
@@ -393,9 +394,9 @@ from news sources and determining their relation to outline the geographical are
 by an epidemy~\citep{Grishman2002}. 
 
 The field of bio-informatics has also found important applications for 
-Information Extraction. The first BioCreative challenge dealt with the "extraction 
+Information Extraction. The first BioCreative challenge dealt with the ``extraction 
 of gene or protein names from text, and their mapping into standardized gene identifiers 
-for three model organism databases"~\cite{Hirschman2005}.
+for three model organism databases''~\citep{Hirschman2005}.
 In the BioCreative/OHNLP Challenge 2018~\citep{Rastegar-Mojarad2018}, researchers 
 were required to investigate methods of \gls{ie} for acquiring family history 
 data. Family history is a critical piece of information in the decision process for diagnosis and 
@@ -412,7 +413,7 @@ DBLP~\footnote{http://dblp.uni-trier.de/},
 Semantic Scholar~\footnote{https://www.semanticscholar.org}, and 
 Google Scholar~\footnote{https://scholar.google.com/}.
 The vast amount of scientific knowledge produced daily demands automatic
-methods for to extract bibliometric information such as authors, titles, affiliations, 
+methods to extract bibliometric information such as authors, titles, affiliations, 
 references, venues and the year of publication from research papers
 and academic websites. This application is especially important to the evaluation and 
 bibliometrics research communities, that are concerned with the measure of
@@ -2153,22 +2154,22 @@ an optimization objective for neural networks to allow the choice of specific Pr
 goals.
 
 
-\chapter{Researcher Name Dataset}
+\chapter{Researcher Name Extraction Dataset}
 \label{cha:dataset}
 
-This chapter describes the dataset used to evaluate the performance of sequence models
-on the \gls{wde} task of researcher name extraction. We call it the Researcher Name dataset.
+This chapter describes the dataset used to evaluate the performance of sequence labeling models
+on the \gls{wde} task of \gls{rne}. We call it the \gls{rne} dataset.
 We attested experimentally that 
 models trained in a popular \gls{ner} dataset (the {CoNLL-2003} English dataset) do not perform 
-well in the researcher name extraction task and this is likely due to the differences
-between plain text and HTML, as we will discuss in this section. The lack of other \gls{ner} 
-datasets built for HTML name extraction imposed the need to construct the Researcher Name dataset.
+well in the \gls{rne} task and this is likely due to the differences
+between plain text and HTML, as we will discuss later in this chapter. The lack of other \gls{ner} 
+datasets built for HTML name extraction imposes the need to construct a dataset specific for \gls{rne}.
 
-The researcher name extraction task consists of finding researcher names in faculty listings from university 
+The \gls{rne} task consists of finding researcher names in faculty listings from university 
 webpages across the world, mainly from Computer Science departments.
 This would be a necessary step when linking researcher profiles from university 
 websites to their entries in public databases. Unlike many
-\gls{wde} datasets, each webpage in the dataset comes from a different 
+\gls{wde} datasets, each webpage in the \gls{rne} dataset comes from a different 
 website, and therefore has a different format, what makes many \gls{wde}
 approaches impractical. The idea is to explore systems that are general 
 enough to allow accurate entity extraction from different sources while requiring
@@ -2179,19 +2180,22 @@ multiple languages, although the English version was preferred when it was avail
 We gathered faculty webpages in proportion to
 the number of universities in each country\footnote{A detailed list of universities can
 be found in https://univ.cc/world.php}. 
-The dataset size was limited to a number of pages that could represent a large portion of 
-countries while still being viable to label manually. Also, university pages that contained 
-corrupt HTML or JavaScript code that performed lazy loading of researcher data records were
+The dataset size was limited to a number of pages that could be viably labeled manually and
+that could still represent many different countries. 
+Also, university pages that contained 
+corrupt HTML or JavaScript code that performed lazy loading of data records were
 not included in this dataset.
 
 This chapter is divided as follows. Section~\ref{sec:data_description} describes the 
 dataset format and how it was split in
-three data files. Section~\ref{sec:evaluation} describes how the evaluation of results in this 
-dataset was carried on. Section~\ref{sec:dictionary} describes how we obtained a dictionary
-of relevant named entities for this dataset, and discusses some baselines. Finally,
-Section~\ref{sec:conll_comparison} compares the characteristics of the Researcher Name dataset
-with another popular \gls{ner} dataset, the {CoNLL-2003} English NER dataset.
-
+three data files. 
+Section~\ref{sec:evaluation} describes how the evaluation of results in this 
+dataset was carried on. 
+Section~\ref{sec:dictionary} describes how we obtained a dictionary
+of relevant named entities for this dataset, and discusses some baselines.
+Lastly,
+Section~\ref{sec:conll_comparison} compares the characteristics of the \gls{rne} dataset
+with another popular \gls{ner} dataset, the {CoNLL-2003} English \gls{ner} dataset.
 
 \section{Data Description} 
 \label{sec:data_description}
@@ -2226,7 +2230,7 @@ for neural networks less efficient.
 % Appendix~\ref{app:html_segmenter}.
 
 A robust tool for HTML segmentation poses many challenges by itself, but the simple approach 
-adopted here has proved to be sufficient for the researcher name dataset. 
+adopted here has proved to be sufficient to perform \gls{rne} adequately. 
 Also, it is best to evaluate \gls{ner} models without relying on any sophisticated data 
 record segmentation system.
 In many cases, entity annotation may precede the segmentation
@@ -2246,7 +2250,7 @@ first word of the second entity will be tagged B-XXX
 in order to show that it starts another entity~\citep{KimSang2003}.
 \end{quote}
 
-The Researcher Name dataset only has entities of type person PER, therefore a classifier has to
+The \gls{rne} dataset only has entities of type person PER, therefore a classifier has to
 label each token with one of the labels: O, B-PER, or I-PER. This is an example 
 sentence from the dataset:
 
@@ -2293,7 +2297,7 @@ never observed during training.
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Description of the data files in the Researcher Name dataset}
+  \caption{Description of the data files in the \gls{rne} dataset.}
   \label{tab:dataset}
 \end{table}
 
@@ -2327,216 +2331,10 @@ that performs well on some types of pages may perform poorly in other types.
 To avoid this problem, we tried to keep the proportion between the number of tokens
 and the number of documents roughly the same for all data files.
 
-
-\section{Dictionary}
-\label{sec:dictionary}
-
-A dictionary of named entities can be a powerful aid to sequence labeling systems,
-especially when considering traditional statistical methods. For the researcher name 
-extraction task, we extracted 
-a list of 1,595,771 researcher names from the DBLP database and annotated tokens in the
-Researcher Name dataset with exact and partial match tags. That is, if a sequence of tokens
-corresponded exactly to a name from the DBLP list, the entire sequence was annotated as 
-an exact match. Otherwise, if only some tokens in the sequence matched a name from the DBLP
-list partially, the matching tokens were annotated with a partial match tag. This dictionary
-was used by some of the models that will be discussed in the experiments chapter, however it 
-must be stated that one of the main advantages of Deep Neural Networks relative to other
-approaches is the fact that they can perform well even without the aid of a dictionary.
-
-\begin{table}[h]
-  \small
-  \begin{center}
-    \begin{tabular}{ lllll }
-      \toprule
-      Data file & Precision & Recall & F1 & Correct names \\
-      \midrule
-      Training   & 0.7316 & 0.2303 & 0.3504 & 1341 of 5822 \\ 
-      Validation & 0.8474 & 0.2858 & 0.4274 & 511 of 1788 \\ 
-      Test       & 0.8717 & 0.3287 & 0.4773 & 890 of 2708 \\ 
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \caption{DBLP dictionary coverage in each data file of the Researcher Name dataset.}
-  \label{tab:gazetteer}
-\end{table}
-
-To understand how this dictionary can be useful for some models in the researcher name extraction task, 
-we consider the Precision, Recall and $ F_1 $-scores for a exact dictionary matching 
-strategy in each Researcher Name data file. The results are described in 
-Table~\ref{tab:gazetteer}. These results also provide a baseline with which to compare
-other methods of sequence labeling in the Researcher Name dataset. 
-The reported performance was obtained by only extracting named entities that corresponded to an exact 
-match. Any useful extraction method should at least improve upon this approach.
-Recall is very low because the dictionary is incomplete and precision falls short of
-top performing extraction methods. This last result is surprising since we are only extracting 
-exact matches. The reason for the low precision is that exact dictionary matches may actually 
-only correspond to partial matches in the dataset. For example, if the dictionary has an entry
-for "Ann Smith", it may partially overlap an entry in the dataset for "Mary Ann Smith".
-
-
-\section{Comparison with {CoNLL-2003}}
-\label{sec:conll_comparison}
-
-The {CoNLL-2003} dataset introduced in the \gls{ner}
-shared-task in 2003 is frequently used to attest 
-the performance of state-of-the-art sequence labeling systems~\cite{Huang2015,Lample2016,Ma2016,Peters2018}. 
-The English data is composed of news stories extracted from the Reuters Corpus, and 
-provides annotations for four types of entities: people (PER), organizations (ORG), 
-locations (LOC), and miscellaneous (MISC), which includes entities that cannot be 
-classified in one of the former groups. The statistics for the {CoNLL-2003} dataset 
-are described in Table~\ref{tab:conll}.
-
-Considering this, it comes to mind why exactly do we need a NER dataset for HTML. 
-If the {CoNLL-2003} English dataset is used to both train and evaluate 
-state-of-the-art models, it is to be expected that models trained in this dataset will
-be able to extract the same named entities in other documents with reasonable 
-effectiveness. However, this is hardly the case. By intuition, we know that tabular HTML 
-documents, such as faculty listings, are very different from plain text. But now, having a
-labeled dataset for \gls{ner} on HTML, we can understand how different they really are.
-
-We trained three classifiers to perform the task of person name extraction using
-the {CoNLL-2003} training set. The {CoNLL-2003} dataset was relabeled so that classifiers only have to extract
-person entities (PER labels), thus other entity types (LOC, ORG, and MISC) were relabeled as
-not an entity (O label). We trained the classifiers with the relabeled {CoNLL-2003} training set,
-and validated the results with the relabeled validation set. The models were tested with the relabeled {CoNLL-2003}
-test set and the Researcher Name test set.
-In Table~\ref{tab:conll_to_ner_on_html}, we present the results for a first order \gls{hmm}, 
-a Linear Chain \gls{crf}, and a LSTM-CRF classifier with GloVe embeddings~\cite{Huang2015} in this
-setting.
-
-
-
-\begin{table}[h]
-  \small
-  \begin{center}
-    \begin{tabular}{ lllllll }
-      \toprule
-      \multirow{2}{*}{Model} & \multicolumn{3}{c}{CoNLL-2003} & \multicolumn{3}{c}{Researcher Name} \\
-                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
-                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
-      \midrule
-      HMM      & 0.777 & 0.452 & 0.571 & 0.189 & 0.180 & 0.184 \\
-      CRF      & 0.774 & 0.754 & 0.764 & 0.138 & 0.129 & 0.133 \\
-      LSTM-CRF & 0.969 & 0.931 & 0.950 & 0.282 & 0.258 & 0.269 \\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \caption{
-    Performance of three classifiers trained with the {CoNLL-2003} training set and tested in
-    the CoNLL-2003 and Researcher Name test sets.
-  }
-  \label{tab:conll_to_ner_on_html}
-\end{table}
-
-The very low $ F_1 $-score obtained by all models in the Researcher Name test set is worse than the established
-dictionary baseline. We cannot use these results to properly compare the relative performances 
-between the models (this topic will be explored in the next chapter), but it is possible to conclude
-that machine learning models trained in plain text do not necessarily perform very well in HTML 
-extraction tasks. The LSTM-CRF model obtained a 0.269 $ F_1 $-score in the Researcher Name test
-set, what is surprising considering that it is a very efficient approach to sequence labeling in plain 
-text. By looking at some of its mistakes we can shed some light on this result. The LSTM-CRF model
-extracted "Dean Emeritus" and "14101 INF" as names, and it missed the last names in "George E. Elliott"
-and "Carl J. Galligan". These mistakes are representative of some of the major flaws with the systems
-trained with the CoNLL-2003 training set. 
-
-Lets consider some differences between both datasets. The names in the Researcher Name dataset 
-are usually longer than in CoNLL-2003 and the word distributions are vastly different, what may
-account for some of the mistakes of the LSTM-CRF model.
-The number of documents in the Researcher Name dataset is much smaller: only 145 against 
-1393. However, the number of sentences in the Researcher Name
-dataset is higher: 43870 against 22137. Also, the number of tokens in the Researcher Name dataset
-is roughly half the number present in the {CoNLL-2003} dataset. These numbers show that 
-the HTML documents relevant to the researcher name extraction task are longer than news 
-stories and, more importantly, they are composed of much shorter sentences when compared 
-to the text from news corpora (\~3.46 words per sentence in the Researcher Name dataset
-against \~13.62 words per sentence in {CoNLL-2003}). Most faculty webpages have a lot of 
-boilerplate text that contributes to their size, while the news stories in {CoNLL-2003}
-are usually rather short. These numbers show that HTML provides far less context to be made 
-use by sequence models so we should seek other sources of evidence in addition to the text, 
-such as dictionaries and the HTML structure.
-
-Another aspect that differs among the NER datasets is the word distributions. Word frequencies
-tend to vary considerably in documents with different topics. Table~\ref{tab:frequent_words}
-shows the ten most frequent words for each dataset, including punctuation signs. Punctuation
-signs are frequently present in proper names, as in Mary B., Susan (Susie) Williams, John Al-Azzawi, etc.
-Also, they can be useful to detect boundaries between named entities, so their distributions are very relevant 
-to this problem.
-The {CoNLL-2003} English dataset contains a more generic selection of terms whereas the 
-subject of the Researcher Name dataset becomes evident with words such as "professor" and "university" 
-happening with a high frequency in the corpus. Also, punctuation signs are much more frequent in
-the Researcher Name dataset. Lastly, Figure~\ref{fig:word_frequency_plot}
-plots the word frequencies for the hundred most frequent words in the {CoNLL-2003} and 
-the Researcher Name datasets. In both plots we have a few very frequent words and a long tail of
-infrequent words. Most named entities are located in this long tail, therefore a good sequence
-labeling method needs to be able to handle the labeling of infrequent tokens effectively. 
-The probabilities attributed to unseen tokens is another aspect where models will vary significantly 
-between different datasets.
-
-
-\begin{table}[h]
-  \small
-  \begin{center}
-    \begin{tabular}{ llll }
-      \toprule
-      \multicolumn{2}{c}{CoNLL-2003} & \multicolumn{2}{c}{Researcher Name} \\
-      \multicolumn{1}{c}{Word} & \multicolumn{1}{c}{Frequency} &
-      \multicolumn{1}{c}{Word} & \multicolumn{1}{c}{Frequency} \\
-      \midrule
-      the & 12310 & , & 10439      \\
-      , & 10876 & - & 8140         \\
-      . & 10874 & ) & 3655         \\
-      of & 5502 & ( & 3641         \\
-      in & 5405 & : & 3484         \\
-      to & 5129 & of & 3345        \\
-      a & 4731 & and & 2499        \\
-      ( & 4226 & professor & 2456  \\
-      ) & 4225 & university & 1611 \\
-      and & 4223 & research & 1315 \\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \caption{Ten most frequent words for the {CoNLL-2003} dataset and the Researcher Name dataset.}
-  \label{tab:frequent_words}
-\end{table}
-
-\begin{figure}[h!]
-  \begin{center}
-    \begin{tikzpicture}
-      \begin{axis}[
-        title={Word frequencies},
-        xmin=0, xmax=100,
-        ymin=0, ymax=12000,
-        ylabel={Frequency},
-        xlabel={Words (most to least frequent)},
-        ymajorgrids=true,
-        grid style=dashed,
-        legend pos=north east,
-        % scaled y ticks=false,
-      ]
-
-      \addplot[color=blue, color=blue] coordinates {
-        (0,12310)(1,10876)(2,10874)(3,5502)(4,5405)(5,5129)(6,4731)(7,4226)(8,4225)(9,4223)(10,3239)(11,3115)(12,2694)(13,2339)(14,2109)(15,1866)(16,1845)(17,1679)(18,1593)(19,1342)(20,1267)(21,1264)(22,1232)(23,1212)(24,1166)(25,1146)(26,1113)(27,1082)(28,1057)(29,984)(30,973)(31,920)(32,867)(33,841)(34,804)(35,796)(36,786)(37,786)(38,780)(39,768)(40,754)(41,738)(42,656)(43,645)(44,643)(45,636)(46,591)(47,584)(48,579)(49,567)(50,558)(51,546)(52,545)(53,524)(54,523)(55,517)(56,512)(57,510)(58,486)(59,486)(60,474)(61,470)(62,470)(63,457)(64,448)(65,444)(66,442)(67,441)(68,419)(69,415)(70,413)(71,405)(72,402)(73,386)(74,377)(75,375)(76,369)(77,358)(78,354)(79,348)(80,346)(81,340)(82,338)(83,328)(84,327)(85,325)(86,320)(87,319)(88,310)(89,308)(90,300)(91,296)(92,293)(93,292)(94,291)(95,289)(96,278)(97,272)(98,271)(99,271)
-      };
-      \addplot[color=red, color=red] coordinates {
-        (0,10439)(1,8140)(2,3655)(3,3641)(4,3484)(5,3345)(6,2499)(7,2456)(8,1611)(9,1315)(10,1053)(11,1046)(12,1006)(13,963)(14,897)(15,863)(16,849)(17,838)(18,773)(19,749)(20,720)(21,713)(22,695)(23,668)(24,652)(25,626)(26,602)(27,593)(28,581)(29,580)(30,569)(31,553)(32,539)(33,527)(34,520)(35,499)(36,492)(37,490)(38,469)(39,454)(40,446)(41,444)(42,429)(43,429)(44,422)(45,420)(46,419)(47,403)(48,403)(49,394)(50,390)(51,379)(52,379)(53,371)(54,362)(55,356)(56,355)(57,346)(58,342)(59,337)(60,324)(61,318)(62,314)(63,311)(64,298)(65,297)(66,288)(67,282)(68,279)(69,265)(70,263)(71,259)(72,259)(73,258)(74,258)(75,254)(76,250)(77,245)(78,243)(79,236)(80,236)(81,235)(82,234)(83,232)(84,225)(85,219)(86,218)(87,215)(88,212)(89,212)(90,210)(91,209)(92,208)(93,208)(94,205)(95,198)(96,197)(97,196)(98,191)(99,191)
-      };
-      \legend{CoNLL-2003, Researcher Name};
-       
-      \end{axis}
-    \end{tikzpicture}
-    \caption{
-      Word frequencies plot for the {CoNLL-2003} dataset and the Researcher Name dataset.
-    }
-    \label{fig:word_frequency_plot}
-  \end{center}
-\end{figure}
-
-
 \section{Evaluation}
 \label{sec:evaluation}
 
-The performance of classifiers in the researcher name extraction task in
-the Researcher Name dataset was evaluated according to their Precision (P), Recall (R) and F-scores
+The performance of classifiers in the \gls{rne} dataset was evaluated according to their Precision (P), Recall (R) and F-scores
 in the test set. The Precision and Recall 
 measures are defined in terms of the number of true positives, false negatives, and false 
 positives made by the classifier when extracting named entities. That is:
@@ -2574,20 +2372,220 @@ A different approach might be to consider the averaged Precision, Recall and $ F
 per webpage, privileging systems that have more regularity between different websites. However, 
 this approach would cover other deficiencies. That is, the impact of errors in pages with many 
 named entities would diminish and the impact of errors in pages with few named entities would
-increase. That is why we considered that this approach was not preferable.
+increase. So, the former approach was preferred.
 
+
+\section{Dictionary}
+\label{sec:dictionary}
+
+A dictionary of named entities can be a powerful aid to sequence labeling systems,
+especially when considering traditional statistical methods. For the \gls{rne} task, we extracted 
+a list of 1,595,771 researcher names from the DBLP database and annotated tokens in the
+\gls{rne} dataset with exact and partial match tags. That is, if a sequence of tokens
+corresponded exactly to a name from the DBLP list, the entire sequence was annotated as 
+an exact match. Otherwise, if only some tokens in the sequence matched a name from the DBLP
+list partially, the matching tokens were annotated with a partial match tag. This dictionary
+was used by some of the models that will be discussed in the experiments chapter, however it 
+must be stated that one of the main advantages of Deep Neural Networks relative to other
+approaches is the fact that they can perform well even without the aid of a dictionary.
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      Data file & Precision & Recall & F1 & Correct names \\
+      \midrule
+      Training   & 0.7316 & 0.2303 & 0.3504 & 1341 of 5822 \\ 
+      Validation & 0.8474 & 0.2858 & 0.4274 & 511 of 1788 \\ 
+      Test       & 0.8717 & 0.3287 & 0.4773 & 890 of 2708 \\ 
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{DBLP dictionary coverage in each data file of the \gls{rne} dataset.}
+  \label{tab:gazetteer}
+\end{table}
+
+To understand how this dictionary can be useful for some models in the \gls{rne}, 
+we consider the Precision, Recall and $ F_1 $-scores for an exact dictionary matching 
+strategy in each \gls{rne} data file. The results are described in 
+Table~\ref{tab:gazetteer}. These results also provide a baseline with which to compare
+other methods of sequence labeling. 
+The reported performance was obtained by only extracting named entities that corresponded to an exact 
+match. Any useful extraction method should at least improve upon this approach.
+Recall is very low because the dictionary is incomplete and precision falls short of
+top performing extraction methods. This last result is surprising since we are only extracting 
+exact matches. The reason for the low precision is that exact dictionary matches may actually 
+only correspond to partial matches in the dataset. For example, if the dictionary has an entry
+for "Ann Smith", it may partially overlap an entry in the dataset for "Mary Ann Smith", yielding
+a false positive.
+
+
+\section{Comparison with {CoNLL-2003}}
+\label{sec:conll_comparison}
+
+The {CoNLL-2003} dataset introduced in the \gls{ner}
+shared-task in 2003 is frequently used to attest 
+the performance of state-of-the-art sequence labeling systems~\citep{Huang2015,Lample2016,Ma2016,Peters2018}. 
+The English data is composed of news stories extracted from the Reuters Corpus, and 
+provides annotations for four types of entities: people (PER), organizations (ORG), 
+locations (LOC), and miscellaneous (MISC), which includes entities that cannot be 
+classified in one of the former groups. The statistics for the {CoNLL-2003} dataset 
+were already described in Table~\ref{tab:conll}.
+
+Considering this dataset, it comes to mind why exactly do we need a \gls{ner} dataset for HTML. 
+If the {CoNLL-2003} English dataset is used to both train and evaluate 
+state-of-the-art models, it is to be expected that models trained in this dataset will
+be able to extract the same named entities in other documents with reasonable 
+effectiveness. However, this is hardly the case. By intuition, we know that tabular HTML 
+documents, such as faculty listings, are very different from plain text. But now, having a
+labeled dataset for \gls{ner} on HTML, we can understand how different they really are.
+
+We trained three classifiers to perform the task of person name extraction using
+the {CoNLL-2003} training set. The {CoNLL-2003} dataset was relabeled so that classifiers only had to extract
+person entities (PER labels), thus other entity types (LOC, ORG, and MISC) were relabeled as
+not an entity (O label). We trained the classifiers with the relabeled {CoNLL-2003} training set,
+and validated the results with the relabeled validation set. The models were tested with the relabeled {CoNLL-2003}
+test set and the \gls{rne} test set.
+In Table~\ref{tab:conll_to_ner_on_html}, we present the results for a first order \gls{hmm}, 
+a Linear Chain \gls{crf}, and a LSTM-CRF classifier with GloVe embeddings~\citep{Huang2015} in the 
+aforementioned experimental setting.
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllllll }
+      \toprule
+      \multirow{2}{*}{Model} & \multicolumn{3}{c}{CoNLL-2003} & \multicolumn{3}{c}{\gls{rne}} \\
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1}
+                             & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
+      \midrule
+      HMM      & 0.777 & 0.452 & 0.571 & 0.189 & 0.180 & 0.184 \\
+      CRF      & 0.774 & 0.754 & 0.764 & 0.138 & 0.129 & 0.133 \\
+      LSTM-CRF & 0.969 & 0.931 & 0.950 & 0.282 & 0.258 & 0.269 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{
+    Performance of three classifiers trained with the {CoNLL-2003} training set and tested in
+    the CoNLL-2003 and \gls{rne} test sets.
+  }
+  \label{tab:conll_to_ner_on_html}
+\end{table}
+
+The very low $ F_1 $-score obtained by all models in the \gls{rne} test set is worse than the established
+dictionary baseline. We cannot use these results to properly compare the relative performances 
+between the models (this topic will be explored in the next chapter), but it is possible to conclude
+that machine learning models trained in plain text do not necessarily perform very well in HTML 
+extraction tasks. The LSTM-CRF model obtained a 0.269 $ F_1 $-score in the \gls{rne} test
+set, what is surprising considering that it is a very efficient approach to sequence labeling in plain 
+text. By looking at some of its mistakes we can shed some light on this result. The LSTM-CRF model
+extracted "Dean Emeritus" and "14101 INF" as names, and it missed the last names in "George E. Elliott"
+and "Carl J. Galligan". These mistakes are representative of some of the major flaws with the systems
+trained with the CoNLL-2003 training set. The names in the \gls{rne} dataset 
+are usually longer than in CoNLL-2003 and the word distributions are vastly different, what may
+account for some of the mistakes of the LSTM-CRF model.
+
+Lets consider some other differences between both datasets. 
+The number of documents in the \gls{rne} dataset is much smaller: only 145 against 
+1393. However, the number of sentences in the \gls{rne}
+dataset is higher: 43870 against 22137. Also, the number of tokens in the \gls{rne} dataset
+is roughly half the number present in the {CoNLL-2003} dataset. These numbers show that 
+the HTML documents in the \gls{rne} dataset are longer than news 
+stories and, more importantly, they are composed of much shorter sentences when compared 
+to the text from news corpora (3.46 words per sentence in the \gls{rne} dataset
+against 13.62 words per sentence in {CoNLL-2003}). Most faculty webpages have a lot of 
+boilerplate text that contributes to their size, while the news stories in {CoNLL-2003}
+are usually rather short. These numbers show that HTML provides far less context to be made 
+use by sequence models, what imposes the need to seek other sources of evidence in addition to 
+the text, such as dictionaries and the HTML structure.
+
+Another aspect that differs among the NER datasets is the word distributions. Word frequencies
+tend to vary considerably in documents with different topics. Table~\ref{tab:frequent_words}
+shows the ten most frequent words for each dataset, including punctuation signs. Punctuation
+signs are frequently present in proper names, as in: Mary B. Smith, Susan (Susie) Williams, John Al-Azzawi, etc.
+Also, punctuation signs can be useful to detect boundaries between named entities.
+The {CoNLL-2003} English dataset contains a more generic selection of terms whereas the 
+subject of the \gls{rne} dataset becomes evident with words such as "professor" and "university" 
+happening with a high frequency in the corpus. Also, punctuation signs are much more frequent in
+the \gls{rne} dataset. Lastly, Figure~\ref{fig:word_frequency_plot}
+plots the word frequencies for the hundred most frequent words in the {CoNLL-2003} and 
+the \gls{rne} datasets. In both plots we have a few very frequent words and a long tail of
+infrequent words. Most named entities are located in this long tail, therefore a good sequence
+labeling method needs to be able to handle the labeling of infrequent tokens effectively. 
+The probabilities attributed to unseen tokens is another aspect where models vary significantly 
+between different datasets.
+
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ llll }
+      \toprule
+      \multicolumn{2}{c}{CoNLL-2003} & \multicolumn{2}{c}{\gls{rne}} \\
+      \multicolumn{1}{c}{Word} & \multicolumn{1}{c}{Frequency} &
+      \multicolumn{1}{c}{Word} & \multicolumn{1}{c}{Frequency} \\
+      \midrule
+      the & 12310 & , & 10439      \\
+      , & 10876 & - & 8140         \\
+      . & 10874 & ) & 3655         \\
+      of & 5502 & ( & 3641         \\
+      in & 5405 & : & 3484         \\
+      to & 5129 & of & 3345        \\
+      a & 4731 & and & 2499        \\
+      ( & 4226 & professor & 2456  \\
+      ) & 4225 & university & 1611 \\
+      and & 4223 & research & 1315 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Ten most frequent words for the {CoNLL-2003} dataset and the \gls{rne} dataset.}
+  \label{tab:frequent_words}
+\end{table}
+
+\begin{figure}[h!]
+  \begin{center}
+    \begin{tikzpicture}
+      \begin{axis}[
+        title={Word frequencies},
+        xmin=0, xmax=100,
+        ymin=0, ymax=12000,
+        ylabel={Frequency},
+        xlabel={Words (most to least frequent)},
+        ymajorgrids=true,
+        grid style=dashed,
+        legend pos=north east,
+        % scaled y ticks=false,
+      ]
+
+      \addplot[color=blue, color=blue] coordinates {
+        (0,12310)(1,10876)(2,10874)(3,5502)(4,5405)(5,5129)(6,4731)(7,4226)(8,4225)(9,4223)(10,3239)(11,3115)(12,2694)(13,2339)(14,2109)(15,1866)(16,1845)(17,1679)(18,1593)(19,1342)(20,1267)(21,1264)(22,1232)(23,1212)(24,1166)(25,1146)(26,1113)(27,1082)(28,1057)(29,984)(30,973)(31,920)(32,867)(33,841)(34,804)(35,796)(36,786)(37,786)(38,780)(39,768)(40,754)(41,738)(42,656)(43,645)(44,643)(45,636)(46,591)(47,584)(48,579)(49,567)(50,558)(51,546)(52,545)(53,524)(54,523)(55,517)(56,512)(57,510)(58,486)(59,486)(60,474)(61,470)(62,470)(63,457)(64,448)(65,444)(66,442)(67,441)(68,419)(69,415)(70,413)(71,405)(72,402)(73,386)(74,377)(75,375)(76,369)(77,358)(78,354)(79,348)(80,346)(81,340)(82,338)(83,328)(84,327)(85,325)(86,320)(87,319)(88,310)(89,308)(90,300)(91,296)(92,293)(93,292)(94,291)(95,289)(96,278)(97,272)(98,271)(99,271)
+      };
+      \addplot[color=red, color=red] coordinates {
+        (0,10439)(1,8140)(2,3655)(3,3641)(4,3484)(5,3345)(6,2499)(7,2456)(8,1611)(9,1315)(10,1053)(11,1046)(12,1006)(13,963)(14,897)(15,863)(16,849)(17,838)(18,773)(19,749)(20,720)(21,713)(22,695)(23,668)(24,652)(25,626)(26,602)(27,593)(28,581)(29,580)(30,569)(31,553)(32,539)(33,527)(34,520)(35,499)(36,492)(37,490)(38,469)(39,454)(40,446)(41,444)(42,429)(43,429)(44,422)(45,420)(46,419)(47,403)(48,403)(49,394)(50,390)(51,379)(52,379)(53,371)(54,362)(55,356)(56,355)(57,346)(58,342)(59,337)(60,324)(61,318)(62,314)(63,311)(64,298)(65,297)(66,288)(67,282)(68,279)(69,265)(70,263)(71,259)(72,259)(73,258)(74,258)(75,254)(76,250)(77,245)(78,243)(79,236)(80,236)(81,235)(82,234)(83,232)(84,225)(85,219)(86,218)(87,215)(88,212)(89,212)(90,210)(91,209)(92,208)(93,208)(94,205)(95,198)(96,197)(97,196)(98,191)(99,191)
+      };
+      \legend{CoNLL-2003, \gls{rne}};
+       
+      \end{axis}
+    \end{tikzpicture}
+    \caption{
+      Word frequencies plot for the {CoNLL-2003} dataset and the \gls{rne} dataset.
+    }
+    \label{fig:word_frequency_plot}
+  \end{center}
+\end{figure}
 
 
 \section{Summary}
 
-In this chapter, we introduced the Researcher Name dataset and the Researcher Name Extraction
-Task. In Section~\ref{sec:data_description} we defined the data format for the training,
+In this chapter, we introduced the \gls{rne} dataset.
+In Section~\ref{sec:data_description} we defined the data format for the training,
 validation and test data files. In Section~\ref{sec:evaluation} we discussed how to evaluate
 models with the Precision, Recall and F-scores. In Section~\ref{sec:dictionary}, we 
-introduced a dictionary of useful named entities for the researcher name extraction task and 
+introduced a dictionary of useful named entities for \gls{rne} and 
 established some baseline results. Finally, in Section~\ref{sec:conll_comparison} we
-compared the Researcher Name dataset with the popular {CoNLL-2003} English dataset, showing why
-a new NER dataset is necessary to adequately solve the researcher name extraction task and 
+compared the \gls{rne} dataset with the popular {CoNLL-2003} English dataset, showing why
+a new \gls{ner} dataset is necessary to adequately solve the researcher name extraction task and 
 why most NER tasks in HTML will probably demand specific datasets.
 
 
