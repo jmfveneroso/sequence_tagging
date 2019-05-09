@@ -516,6 +516,14 @@
 \newblock \ppgccbibtitledoformat {Information extraction using hidden markov
   models}.
 
+\bibitem[Li \ppgccciteauthorand {} Yang, 2018]{Li2018}
+\ppgccbibauthordoformat {Li, Y. \ppgccbibauthorand {} Yang, T.}
+  (\ppgccyeardoformat {2018}).
+\newblock \ppgccbibbtitledoformat {Word Embedding for Understanding Natural
+  Language: A Survey}, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {83}-\ppgccpagedoformat {}-\ppgccpagedoformat {104}.
+\newblock Springer International Publishing, Cham.
+
 \bibitem[Liu et~al.\@, 2000]{Liu2000}
 \ppgccbibauthordoformat {Liu, L.\ppgccbibauthorsep {} Pu,
   C.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Han, W.}
@@ -754,6 +762,18 @@
   3rd Conference on Message Understanding}, MUC3 '91, \ppgccbibpagesstring {}
   \ppgccpagedoformat {3}-\ppgccpagedoformat {}-\ppgccpagedoformat {16},
   Stroudsburg, PA, USA. Association for Computational Linguistics.
+
+\bibitem[Sutskever et~al.\@, 2013]{Sutskever2013}
+\ppgccbibauthordoformat {Sutskever, I.\ppgccbibauthorsep {} Martens,
+  J.\ppgccbibauthorsep {} Dahl, G.\ppgccbibauthorlastsep {} \ppgccbibauthorand
+  {} Hinton, G.} (\ppgccyeardoformat {2013}).
+\newblock \ppgccbibtitledoformat {On the importance of initialization and
+  momentum in deep learning}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
+  30th International Conference on International Conference on Machine Learning
+  - Volume 28}, ICML'13, \ppgccbibpagesstring {} \ppgccpagedoformat
+  {III}--\ppgccpagedoformat {1139}-\ppgccpagedoformat {}-\ppgccpagedoformat
+  {III}--\ppgccpagedoformat {1147}. JMLR.org.
 
 \bibitem[Sutton \ppgccciteauthorand {} McCallum, 2012]{Sutton2012}
 \ppgccbibauthordoformat {Sutton, C. \ppgccbibauthorand {} McCallum, A.}

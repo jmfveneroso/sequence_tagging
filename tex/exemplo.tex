@@ -68,6 +68,7 @@
 \newacronym{lstm}{LSTM}{Long Short-Term Memory Networks}
 \newacronym{ie}{IE}{Information Extraction}
 \newacronym{rne}{RNE}{Researcher Name Extraction}
+\newacronym{rnn}{RNN}{Recurrent Neural Networks}
 
 \begin{document}
 
@@ -1303,7 +1304,9 @@ features that could potentially be useful in addition to words. Maximum Entropy
 models for sequence labeling were created to address these issues and, among 
 them, \textit{Linear Chain Conditional Random Fields} (CRF) stand out 
 as the discriminative analogue to HMMs. CRFs estimate the conditional probability 
-while HMMs, being generative models, estimate the joint probability.
+while HMMs, being generative models, estimate the joint probability. In this section,
+we derive the maximum entropy classifier and the Linear Chain \gls{crf} from basic 
+principles.
 
 The concept of Information Entropy established by~\cite{Shannon1948}
 quantifies the amount of information expressed in a statistical distribution. 
@@ -1515,8 +1518,7 @@ entropy framework is of great relevance to Neural Networks.
 The recent upsurge in the popularity of neural networks owes to the increasing computational 
 capacity brought by Graphical Processing Units and discoveries such as the fast learning algorithm for 
 Deep Belief Networks~\citep{Hinton2006}, and LSTMs~\citep{Hochreiter1997} that helped overcome 
-the limitations of earlier neural architectures. Deep neural architectures established new state 
-of the art results for problems ranging from computer vision to speech recognition.
+the limitations of earlier neural architectures. 
 
 Neural networks are a family of classification algorithms that were vaguely inspired in the 
 functioning of the human brain. They consist of a weighted graph of
@@ -1528,23 +1530,24 @@ classifier, that we already explored in the previous section.
 For a thorough view of the topic of neural networks, consult~\cite{Bengio2009}.
 
 An extension of the logistic classifier to a neural network with multiple layers can still be trained 
-the same way we trained the original model, that is, by minimizing the cross entropy. However, once we add multiple layers on top of
+by minimizing the cross entropy. However, once we add multiple layers on top of
 the logistic classifier, the optimization problem no longer retains its convexity. This means that 
 numerical optimization methods can get trapped on local minima and miss the best set of parameters
 for the model. For a long time, this limitation hindered the development of neural architectures. Nonetheless, 
 in practice, the rugged shape of the cost function seems to be of minor 
 importance. Even though the global optimization is not guaranteed, in most classification scenarios,
-finding a local optimum solves the parameter estimation problem sufficiently well. Also, heuristic 
-methods such as adding momentum to gradients can help the optimization algorithm avoid being trapped.
+finding a local optimum solves the parameter estimation problem sufficiently well. Also, methods 
+such as adding momentum to gradients can help the optimization algorithm avoid being 
+trapped~\citep{Sutskever2013}.
 
 In contrast to earlier probabilistic models that were more statistically oriented, many improvements 
 to neural networks derive from empirical results obtained in specific applications. 
-In the probabilistic modelling of text, we are especially interested in the subclass of recurrent 
-neural networks (RNN).
-RNNs have been successfully employed on numerous NLP tasks such as
-language modelling, POS tagging, speech recognition and NER. In RNNs, some of the neural layer 
+In the probabilistic modelling of text, we are especially interested in the subclass of 
+\gls{rnn}.
+\gls{rnn}s have been successfully employed on numerous \gls{nlp} tasks such as
+language modelling, POS tagging, speech recognition and \gls{ner}. In \gls{rnn}s, some of the neural layer 
 activations become inputs to the same layer at the next timestep. Additionally,
-different from feed-forward neural networks, RNNs can retain information in their internal state. 
+different from feed-forward neural networks, \gls{rnn}s can retain information in their internal state. 
 This characteristic can function as a memory cell, preserving long distance relationships across the chain,
 and making them more suitable for processing sequences, and consequently for solving text related tasks. 
 Figure~\ref{fig:rnn_network} describes an RNN for sequence labeling unrolled through multiple 
@@ -1560,11 +1563,11 @@ timesteps.
 At each timestep, the neural network computes a hidden state $ h_t $ using an input 
 vector $ x_t $ and the previous hidden 
 state $ h_{t-1} $, that retains information from past 
-iterations. The input vector $ x_t $ for our RNN can consist of word features similar to 
-the ones used in the previously discussed statistical models encoded in dense vectors,
-word embeddings or a combination of both.
-Finally, the RNN produces an output vector $ y_t $ representing the label for that 
-timestep. A common definition for an RNN cell is given by the equations:
+iterations. The input vector $ x_t $ for the \gls{rnn} could consist of word features similar to 
+the ones used in the previously discussed statistical models. However, word embeddings provide 
+better input vectors for language tasks, as we will be discussing in Section~\ref{ssec:word_embeddings}.
+Finally, the \gls{rnn} produces an output vector $ y_t $ representing the label for that 
+timestep. A common definition for an \gls{rnn} cell is given by the equations:
 
 \begin{align*}
 h_t &= tanh(W_x x_t + W_h h_{t-1}) \\
@@ -1588,14 +1591,15 @@ updates are obtained from the partial derivatives of an error function
 the chain rule, we have to multiply numbers that tend to get very small, so training becomes
 less effective. This problem is particularly critical for RNNs, because we have the
 need to propagate weights through a relatively great number of timesteps.
-LSTMs were created by~\cite{Hochreiter1997} with this problem 
-in mind and they have been popularized since then. 
+LSTMs were created by~\cite{Hochreiter1997} with this problem in mind and they have been 
+popularized since then. 
 
 LSTMs incorporate a memory cell $ c $ in the RNN definition and three gates to control 
 the flow of information that comes in and out of the memory cell.
 The input gate $ \Gamma_{i} $ controls the amount of new information that will flow into the memory cell,
 the forget gate $ \Gamma_{f} $ controls the amount of previous information that will be retained in the memory
-cell, and the output gate $ \Gamma_{o} $ controls the amount of information stored in the memory cell that
+cell (despite the misleading name), and the output gate $ \Gamma_{o} $ controls the amount of information 
+stored in the memory cell that
 will be used to compute the output activation of the LSTM unit. 
 LSTM cell implementations vary slightly in the literature. A visual description of 
 our LSTM cell is provided in Figure~\ref{fig:lstm_cell}.
@@ -1630,20 +1634,33 @@ and $ A \cdot B $ represents the dot product of $ A $ and $ B $.
 \subsection{BI-LSTM-CRF}
 \label{ssec:lstm_crf}
 
-On named entity recognition tasks, both past and future words are important 
-to attribute a label at time $ t $, however a regular LSTM network only takes 
-past states into consideration. A bidirectional LSTM solves this problem by stacking 
+On \gls{ner} tasks, knowing both past and future words could be important 
+to attribute a label at time $ t $~\footnote{
+The timesteps in the context of \gls{lstm}s for sequence labeling refer to position in
+a sequence. So future words are words that come later in the sequence and past words are
+words that happen earlier in the sequence.
+}. For example, in the sentences "Summer Smith is a lawyer" 
+and "Summer came early this year", at the first timestep, it might be useful to know the words
+after Summer to correctly label the sequences. When
+we jointly decode label sequences with the Viterbi algorithm in \gls{hmm}s or \gls{crf}s,
+these codependencies are taken into account, however a regular LSTM network only takes 
+past hidden states into consideration. 
+
+A bidirectional LSTM solves this problem by stacking 
 two regular LSTMs, and feeding them with observations in opposite directions. The first LSTM 
 receives forward states and the second LSTM receives backward states. The hidden states from both 
 networks can then be concatenated at each timestep to produce output labels. With this 
 architecture, LSTM cells may use information from past and future timesteps to decide 
-the label at time $ t $.
+the label at time $ t $. However, labels are still decoded individually at each timestep, because
+we are looking at past and future information encoded in the LSTM state but not the actual label
+predictions.
 
 \cite{Huang2015} proposed a bidirectional LSTM with a CRF layer (BI-LSTM-CRF) on 
-the output to tackle the sequence tagging problem. The main benefit of adding a CRF layer 
+the output to overcome this obstacle. The main benefit of adding a CRF layer 
 in the neural sequence model is that the labels are jointly decoded for a whole sentence 
-instead of being predicted individually. Predicted tags should be highly correlated 
-in a named entity recognition task, so it is desirable to predict sequences conjointly.
+instead of being predicted individually. Some predicted tags should be highly correlated 
+in a named entity recognition task (e.g. I-PER is very likely to happen after B-PER), 
+so it is desirable to predict sequences conjointly.
 The BI-LSTM-CRF is described in Figure~\ref{fig:bi_lstm_crf}.
 
 \begin{figure}[h]
@@ -1653,14 +1670,12 @@ The BI-LSTM-CRF is described in Figure~\ref{fig:bi_lstm_crf}.
   \label{fig:bi_lstm_crf}
 \end{figure}
 
-This architecture achieved an F1 score of 90.10 on the English data from the {CoNLL-2003}
-NER dataset, in contrast to 85.17 for a bidirectional LSTM without a CRF layer. 
-
 
 \subsection{Word Embeddings}
+\label{ssec:word_embeddings}
 
 An important element of recurrent neural network architectures for text related tasks 
-is the choice of word embeddings. Word embeddings are lower-dimensional representations of words in
+is the choice of word embeddings~\citep{Li2018}. Word embeddings are lower-dimensional representations of words in
 continuous space. That is, each word is represented by a vector of continuous features (typically a few hundred dimensions), 
 often obtained with unsupervised clustering methods for words in large corpora. In comparison, one-hot encoded word 
 vectors, that were popular before the introduction of word embeddings, are vectors with one dimension per 
@@ -1674,17 +1689,19 @@ between words according to their shared features. Finally, word embeddings
 can be pre-trained without supervision on large corpora and be used on tasks for which there is 
 little labeled data. 
 
-Pre-trained word embeddings are a powerful form of transfer learning, bootstrapping the learning 
-of model parameters by first training it on a bigger dataset. 
-This is especially useful in NER, because named entities that 
+Pre-trained word embeddings are a powerful form of transfer learning, a group of techniques concerned 
+with bootstrapping the learning of model parameters by obtaining information from another dataset not directly
+related to the problem. 
+This is especially useful in \gls{ner}, because named entities that 
 belong to the same class tend to have similar word embeddings. Thus, with good word embeddings, 
 a neural network can predict the correct label for a word that was never seen during training
 because it is similar to other words that occurred in the training set.
 
 Word embeddings can be further improved by fine tuning the feature values in the 
 specific problem of sequence labeling, by allowing backpropagation to alter the embeddings. However, 
-due to the limited size of most sequence labeling datasets, this technique ends up introducing
-noise to the word representations instead of improving them.
+due to the limited size of a dataset, this technique may end up introducing
+noise to the word representations instead of improving them, as we have attested experimentally
+in the case of \gls{rne}.
 
 There are multiple methods to produce word embeddings, and most of the official implementations 
 also provide pre-trained word embeddings for the English language. In this work, we explored
@@ -1710,7 +1727,8 @@ Table~\ref{tab:word_embeddings}.
 \end{table}
 
 Most breakthroughs in sequence labeling in the past few years came through the introduction
-of novel methods for constructing word embeddings. Different from earlier methods such as Word2Vec and
+of novel methods for constructing word embeddings, as was the case for the three methods mentioned earlier. 
+Different from earlier methods such as Word2Vec and
 GloVe that produced static vectorial representations of words, more recent approaches such as
 ELMo produce context dependent embeddings for a specific dataset with a neural network 
 pre-trained on a language modelling task. Also, the word representations in ELMo are entirely character based,
@@ -1735,7 +1753,7 @@ features automatically. The character representations, which are fixed size vect
 that encode morphological features, are concatenated to word embeddings and fed to
 the LSTM.
 
-We describe below two methods to build character representations. Both of them receive 
+Next, we describe two methods to build character representations. Both of them receive 
 character embeddings as inputs. Character embeddings are fixed size dense vectors that work
 the same way as word embeddings, except that the lookup function maps characters to embeddings
 instead of words to embeddings. This means that each word generates a character embedding 
@@ -1792,13 +1810,16 @@ from the CNN method, because CNN filters are positional invariant.
 
 \subsection{Conclusion}
 
-The accuracy of neural networks for sequence labeling is unparalleled, however they are 
-costly to train. And even though word embeddings and character representations can replace the feature engineering 
-that was required by earlier statistical approaches to sequence labeling, there are still some
-technical concerns to be faced. The loss function is not convex, thus the choice of the optimization 
+The accuracy of neural networks for sequence labeling is unparalleled when we consider
+the powerful combination consisting of the Bi-LSTM-CRF model, pre-trained word embeddings, and neural 
+character representations. However, it must be said that Neural Networks are costly to train in 
+terms of time and hardware in comparison to simpler models such as \gls{hmm}s and \gls{crf}s. 
+And even though word embeddings and character representations can replace the feature engineering 
+that was required by earlier statistical approaches, there are still some technical concerns to be faced 
+experimentally. The loss function is not convex, thus the choice of the optimization 
 method and the choice of hyperparameters can alter the results. Also, neural networks are prone
 to overfitting, what can be partially avoided with the addition of dropout layers~\citep{Srivastava2014}
-and with the early stopping strategy over a validation dataset~\citep{Caruana2000}. 
+and with the early stopping strategy over a validation dataset~\citep{Caruana2000}.
 
 
 \section{Summary}
