@@ -3,17 +3,16 @@ identify and extract data from webpages. These methods are
 suited for extracting information from pages within
 the same website, however they perform poorly on extraction 
 tasks across different websites. Alternatively, statistical and 
-machine-learning-based sequence labeling methods provide a more flexible 
-approach to Web Data Extraction. Many times, HTML pages are very different 
+machine-learning-based Named Entity Recognition (NER) methods provide a more flexible 
+approach to Web Data Extraction. However, many times HTML pages are very different 
 from plain text, because sentences are too short to provide adequate 
-context for conventional Named Entity Recognition methods to work 
-properly. Also, the HTML structure may encode information that is not 
-replicated in the text. Nonetheless, these limitations can be overcome by
-adequate feature engineering and the self-training strategy for Hidden
-Markov Models or with the use of pre-trained word embeddings, neural character 
-representations and the hard attention mechanism in Bi-LSTM-CRFs.
-In this dissertation, we 
-evaluate the performance of different methods of Named Entity Recognition 
+context for conventional NER methods to work 
+properly. Nonetheless, the HTML structure also encodes useful information that 
+can be used by NER models to achieve a better performance. We propose two
+methods to use this information: the self-training strategy for Hidden Markov
+Models and the hard attention mechanism for Bi-LSTM-CRFs, a type of neural network.
+Also, in this dissertation we 
+evaluate the performance of different methods of NER
 in the task of Web Data Extraction. In particular, we introduce a novel 
 dataset consisting of faculty listings from university webpages across
 the world in multiple languages and test different NER models in the task of 
@@ -21,10 +20,10 @@ extracting researcher names from these listings. We found that a
 neural network architecture that combines a bidirectional LSTM with
 a Conditional Random Fields output layer, LSTM-based character 
 representations and a Hard Attention mechanism for HTML features
-outperforms other methods achieving an F1-score of 0.902 in the task.
-But with some clever strategies, we can get a much simpler model, the 
-second-order Hidden Markov Model with self-training, to achieve a 0.879 
-F1-score.
+outperforms other methods achieving an F1-score of 90.2 in the task.
+But, with the aid of clever strategies such as self-training, we can get a 
+much simpler model, the second-order Hidden Markov Model with self-training, 
+to achieve a 87.9 F1-score.
 
 
-\keywords{Named entity recognition, Information Extraction, Web Data Extraction}
+\keywords{Named Entity Recognition, Web Data Extraction, Researcher Name Extraction}

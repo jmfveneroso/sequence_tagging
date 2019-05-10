@@ -1,30 +1,30 @@
 Métodos tradicionais de extração de informação na web normalmente
-utilizam regras rígidas para identificar e extrair dados relevantes de
+utilizam regras rígidas para extrair dados relevantes de
 páginas na internet. Estes métodos são adequados para resolver tarefas 
 de extração dentro de um mesmo website, mas eles são bem menos eficientes
-quando a tarefa de extração compreende um conjunto heterogêneo de websites.
-Por outro lado, modelos de rotulamento de sequências baseados em aprendizado
-de máquina apresentam alternativas mais flexíveis para resolver o problema.
-Na maior parte das vezes, páginas HTML tem um organização substancialmente
-diferente do texto em prosa, porque as frases são muito curtas, contribuindo
-negativamente para o desempenho de modelos de aprendizado para o Reconhecimento 
-de Entidades Nomeadas (NER). Em contrapartida, a estrutura do HTML contém informação 
-valiosa que pode ser incorporada nestes modelos para melhorar o seu desempenho
-na tarefa de extração de informação na web. Isso pode ser feito por meio
-de uma boa engenharia de \textit{features}, da estratégia de auto-treinamento 
-para \textit{Hidden Markov Models} e pelo uso de \textit{Word Embeddings},
-representações de caracteres e do mecanismo rígido de atenção na Bi-LSTM-CRF, 
-um tipo de rede neural.
-Nesta dissertação, nós avaliamos o desempenho de diversos métodos de NER
+quando a tarefa compreende um conjunto heterogêneo de websites.
+Por outro lado, modelos de Reconhecimento de Entidades Nomeadas (NER) baseados 
+em aprendizado de máquina oferecem uma alternativa mais flexível para resolver o 
+problema. 
+No entanto, na maior parte das vezes, páginas HTML tem uma organização substancialmente
+diferente do texto em prosa, porque as frases são muito curtas, o que piora o desempenho 
+dos modelos tradicionais de NER. 
+Em contrapartida, a estrutura do HTML contém informação 
+valiosa que pode ser utilizada para melhorar o desempenho dos modelos de NER.
+Nós propomos duas formas de utilizar esta informação: 
+a estratégia de auto-treinamento para \textit{Hidden Markov Models} 
+e o mecanismo de atenção para a Bi-LSTM-CRF, um tipo de rede neural.
+Além disso, nesta dissertação, nós avaliamos o desempenho de diversos métodos de NER
 na tarefa de extração de informação na web. Em particular,
-introduzimos um \textit{dataset} novo que consiste em páginas com listas de pesquisadores 
-extraídas dos sites de múltiplas universidades ao redor do mundo e testamos modelos de NER na
-tarefa de extrair o nome dos pesquisadores. 
-Descobrimos que uma arquitetura de redes neurais que combina uma LSTM bidirecional
-com uma camada de saída utilizando \textit{Conditional Random Fields}, representações
-de caracteres baseados em uma LSTM e o mecanismo rígido de atenção tem um desempenho
-superior aos demais métodos, alcançando um F1 de 0.902 na tarefa. Contudo,
-por meio da aplicação de algumas estratégias elementares como o auto-treinamento, 
-conseguimos obter um Hidden Markov Model que alcança um F1 de 0.879.
+introduzimos um \textit{dataset} novo que consiste em páginas 
+de departamentos de pesquisa extraídas dos sites de múltiplas universidades 
+ao redor do mundo e testamos os modelos de NER na
+tarefa de extrair os nomes dos pesquisadores destas páginas. 
+Uma arquitetura de redes neurais que combina uma Bi-LSTM-CRF com representações
+de caracteres baseadas em LSTMs e o mecanismo rígido de atenção tem um desempenho
+superior aos demais métodos, alcançando um F1 de 90,2 na tarefa. Contudo,
+por meio da aplicação de estratégias como o auto-treinamento, 
+conseguimos obter um modelo muito mais simples, o Hidden Markov Model de 
+segunda ordem, que alcança um F1 de 87,9 na mesma tarefa.
 
-\keywords{Reconhecimento de Entidades Nomeadas, Extração de Informação, Aprendizado de Máquina}
+\keywords{Reconhecimento de Entidades Nomeadas, Extração de Informação na Web, Extração de Nomes de Pesquisadores}
