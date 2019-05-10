@@ -1,5 +1,30 @@
-Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem. Ut enim ad minima veniam, quis nostrum exercitationem ullam corporis suscipit laboriosam, nisi ut aliquid ex ea commodi consequatur? Quis autem vel eum iure reprehenderit qui in ea voluptate velit esse quam nihil molestiae consequatur, vel illum qui dolorem eum fugiat quo voluptas nulla pariatur?
+Métodos tradicionais de extração de informação na web normalmente
+utilizam regras rígidas para identificar e extrair dados relevantes de
+páginas na internet. Estes métodos são adequados para resolver tarefas 
+de extração dentro de um mesmo website, mas eles são bem menos eficientes
+quando a tarefa de extração compreende um conjunto heterogêneo de websites.
+Por outro lado, modelos de rotulamento de sequências baseados em aprendizado
+de máquina apresentam alternativas mais flexíveis para resolver o problema.
+Na maior parte das vezes, páginas HTML tem um organização substancialmente
+diferente do texto em prosa, porque as frases são muito curtas, contribuindo
+negativamente para o desempenho de modelos de aprendizado para o Reconhecimento 
+de Entidades Nomeadas (NER). Em contrapartida, a estrutura do HTML contém informação 
+valiosa que pode ser incorporada nestes modelos para melhorar o seu desempenho
+na tarefa de extração de informação na web. Isso pode ser feito por meio
+de uma boa engenharia de \textit{features}, da estratégia de auto-treinamento 
+para \textit{Hidden Markov Models} e pelo uso de \textit{Word Embeddings},
+representações de caracteres e do mecanismo rígido de atenção na Bi-LSTM-CRF, 
+um tipo de rede neural.
+Nesta dissertação, nós avaliamos o desempenho de diversos métodos de NER
+na tarefa de extração de informação na web. Em particular,
+introduzimos um \textit{dataset} novo que consiste em páginas com listas de pesquisadores 
+extraídas dos sites de múltiplas universidades ao redor do mundo e testamos modelos de NER na
+tarefa de extrair o nome dos pesquisadores. 
+Descobrimos que uma arquitetura de redes neurais que combina uma LSTM bidirecional
+com uma camada de saída utilizando \textit{Conditional Random Fields}, representações
+de caracteres baseados em uma LSTM e o mecanismo rígido de atenção tem um desempenho
+superior aos demais métodos, alcançando um F1 de 0.902 na tarefa. Contudo,
+por meio da aplicação de algumas estratégias elementares como o auto-treinamento, 
+conseguimos obter um Hidden Markov Model que alcança um F1 de 0.879.
 
 \keywords{Reconhecimento de Entidades Nomeadas, Extração de Informação, Aprendizado de Máquina}
