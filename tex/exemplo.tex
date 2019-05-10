@@ -88,9 +88,9 @@
   % approval={pics/approvalsheet.eps},
   abstract=[brazil]{Resumo}{resumo},
   abstract={Abstract}{abstract},
-  dedication={dedicatoria},
+  % dedication={dedicatoria},
   ack={agradecimentos},
-  epigraphtext={$ x = 2 $.}{Unknown},
+  % epigraphtext={$ x = 2 $.}{Unknown},
   keywords={Reconhecimento de Entidades Nomeadas, Extração de Informação, Aprendizado de Máquina},
   beforetoc={\printglossary[type=\acronymtype]}
 }
@@ -491,15 +491,14 @@ task. That is, given a sequence of tokens, we want to attribute labels to each
 token, classifying them into one of a limited set of predefined classes. Figure~\ref{fig:ner_example}
 shows how to attribute Named Entity labels to a sentence according to the
 format defined in {CoNLL-2003}.
-
+%
 \begin{figure}[h]
-\centering{
+\centering
 \includegraphics[width=1.0\textwidth]{pics/ner_example}
 \caption{Named Entity Recognition as a sequence labeling task.}
 \label{fig:ner_example}
-}
 \end{figure}
-
+%
 Regular entities such as dates and prices can be extracted with almost perfect accuracy
 using regular expressions, which are search patterns that describe a regular language and 
 that can be easily implemented in most programming languages. Entities that belong to a 
@@ -508,7 +507,7 @@ simple dictionary matching. However, other types of entities, such as the ones i
 the {CoNLL-2003} challenge, require more sophisticated methods for sequence labeling.
 
 Some traditional statistical methods that can label
-complex entities with good accuracy are Hidden Markov Models~\citep{Leek1997}, 
+complex entities with good accuracy are Hidden Markov Models~\citep{Bikel1999}, 
 Maximum Entropy Markov Models~\citep{McCallum2000},
 and Conditional Random Fields~\citep{Lafferty2001}. These statistical 
 approaches have been frequently employed to sequence labeling tasks and still provide 
@@ -557,14 +556,14 @@ their profiles to public databases such as DBLP or Google Scholar~\footnote{
 even in fields for which the information is more easily available, such as Computer Science,
 only a small fraction of the records have reliable affiliation information, as we have verified
 in our preliminary studies. 
-
+%
 \begin{figure}
   \centering
-  \includegraphics[width=0.75\textwidth]{pics/jap_osaka_lab}
+  \includegraphics[width=0.65\textwidth]{pics/jap_osaka_lab}
   \caption{Example of a faculty webpage.}
   \label{fig:faculty_directory}
 \end{figure}
-
+%
 To acknowledge the complexity of this task, take for example a snippet extracted from
 the staff page for the intelligent robotics laboratory from Osaka University shown in 
 Figure~\ref{fig:faculty_directory}.
@@ -678,28 +677,23 @@ early approaches with a taxonomy based on their main technology, being them: lan
 wrapper development, HTML-aware tools, NLP-based tools, Wrapper Induction Tools,
 Modeling-based tools and Ontology-based tools. Some noteworthy examples from this era
 are: 
-
+%
 \begin{itemize}
 \item TSIMMIS~\citep{Hammer1997} and WebOQL~\citep{Arocena1999}, which are special purpose 
 languages for building wrappers.
-
 \item Road Runner~\citep{Crescenzi2001}, XWRAP~\citep{Liu2000} and W4F~\citep{Sahuguet1999}, 
 which are HTML-aware tools that infer meaningful patterns from the HTML structure.
-
 \item RAPIER~\citep{Califf1999}, SRV~\citep{Freitag1998}, WHISK~\citep{Soderland1999}, which 
 are NLP-based tools.
-
 \item WIEN~\citep{Kushmerick2000}, Soft Mealy~\citep{Hsu1998} and STALKER~\citep{Muslea1999} which 
 are wrapper induction methods.
-
 \item NoDoSE~\citep{Adelberg1998} and Debye~\citep{Laender2002a}, which are semi-supervised
 tools that require some interaction with the user by means of a graphical
 user interface.
 \end{itemize}
-
+%
 % Text Runner.
 % https://www.aaai.org/Papers/IJCAI/2007/IJCAI07-429.pdf
-
 \cite{Chang2006} complemented the previous surveys with semi-supervised 
 technologies such as Thresher~\citep{Hogue2005}, IEPAD~\citep{Chang2001} and 
 OLERA~\citep{Chang2004}. They differed from supervised 
@@ -786,7 +780,7 @@ Hidden Markov Models (HMMs). The first appearances of HMMs in the
 field of Natural Language Processing occurred in the mid-seventies and were
 primarily focused on the problem of Speech Recognition. 
 But in the late nineties, HMMs also found important applications in Information 
-Extraction and NER as in the works by~\cite{Leek1997}, \cite{Bikel1999}, 
+Extraction and NER as in the works by~\cite{Bikel1999}, 
 \cite{Freitag1999}, and \cite{Freitag2000}.
 
 The problem with HMMs was that they modeled the joint probability between 
@@ -828,7 +822,7 @@ modelling neural network.
 
 To our knowledge, the best NER system up to this date (considering the performance in the
 {CoNLL-2003} dataset) is the bidirectional transformer model proposed by~\cite{Baevski2019} that uses
-a stack of self attention modules and ELMo embeddings. Table~\ref{tab:ner_model_comparison}
+a stack of self-attention modules and ELMo embeddings. Table~\ref{tab:ner_model_comparison}
 shows a comparison of the history of reported F1 scores in the English test set of the {CoNLL-2003} dataset
 for the NER systems that were mentioned in this section. Each of the mentioned systems held the 
 record for the task at a given time, but some models that held the best F1-score at a given time
@@ -887,12 +881,12 @@ is a sequence of words and $ Y = \{y_1, y_2, ..., y_n\} $ is a sequence of label
 attributed to these words, and they are both generated by an unknown 
 probability distribution. Considering that the sequence of words $ X $ is observed
 but the sequence of labels $ Y $ is not, then the goal of a classifier is to find: 
-
+%
 \begin{equation}
 \label{eq:1}
 Y^* = \argmax_{Y} P(Y|X)
 \end{equation}
-
+%
 That is, the sequence of labels $ Y^* $ that maximizes the conditional probability of
 $ Y $ once we have observed the sequence of words $ X $. For example, in a \gls{ner} 
 setting, after observing the sentence \{ John, Smith, is, a, man \} we could conclude 
@@ -917,7 +911,7 @@ history at any position in the sequence, for example the two previous words, we 
 predictions about the current word's label. The related task of constructing language models consists of predicting the next 
 word in a sequence by looking at it's history. A language model that looks at the two previous words 
 word is called a bigram model and the model that looks at the three previous words is called a trigram model.
-
+%
 \begin{quote}
 For anyone from a linguistics background, the idea that we would choose to use a model of language structure
 which predicts the next word simply by examining the previous two words - with no reference to the 
@@ -926,7 +920,7 @@ basic syntactic relationships that appear in this very local context are a good 
 such systems work surprisingly well. Indeed, it is difficult to beat a trigram model on the purely linear task
 of predicting the next word~\citep{Manning1999}.
 \end{quote}
-
+%
 Considering this, we do not usually evaluate the quality of statistical natural language models by how reasonable
 their assumptions are, but by how instrumentally effective the models are for solving objective tasks. The 
 epistemological implications of this view are important, but in this work we will consider it to be valid.
@@ -951,11 +945,11 @@ model for describing sequences when the described sequences have the Markov Prop
 consider a sequence $ Y = \{y_1, y_2, \ldots, y_n\} $ in which each observed
 state $ y_i, \forall i \in [1, n] $ takes its value from a restricted set of possible states
 $ L = \{l_1, l_2, \ldots, l_m \} $. Sequence $ Y $ only satisfies the Markov Property if:
-
+%
 \begin{equation}
 P(y_i|y_{i-1}, y_{i-2}, \ldots, y_1) = P(y_i|y_{i-1}, y_{i-2}, \ldots, y_{i-k})
 \end{equation}
-
+%
 The probability of observing state $ y_i $ at time $ i $ depends only on the $ k $ previous observed states.
 When $ k = 1, k = 2, \ldots $ the Markov Chain is said to be of first order, second order, and so on.
 What the Markov Assumption implies is that, at any time, the entire history of observed states
@@ -972,11 +966,11 @@ nature of the studied phenomena.
 
 To see why the Markov Assumption may introduce a problem on text related tasks, consider the following
 labeled sentence: 
-
+%
 \begin{quote}
-"[Jon Snow]$_{PER}$ is [Ned]$_{PER}$ 's son. Snow is piling up on [Winterfell]$_{LOC}$, but [Snow]$_{PER}$ is not bothered"
+"[Jon Snow]$_{PER}$ is [Ned]$_{PER}$ 's son. Snow is piling up over [Winterfell]$_{LOC}$, but [Snow]$_{PER}$ is not bothered."
 \end{quote}
-
+%
 Snow is a very uncommon name, so a statistical model may have difficulty labeling the last mention of Snow correctly,
 but it would certainly be helpful if it could refer to the first mention in the beginning of the sentence,
 where the named entity label is more obvious. To do this we would need to keep track of distant relationships in 
@@ -999,20 +993,20 @@ states $ \{ AA, AB, BA, BB \} $.
 We have yet not made any restrictions on the form taken by the transition probabilities 
 $ P(y_i=l_b|y_{i-1}=l_a) $ besides the Markov Assumption. The Time Invariance Assumption 
 states that: 
-
+%
 \begin{equation}
 P(y_{i+1} = l_b |y_{i} = l_a) = P(y_i = l_b |y_{i-1} = l_a)
 \end{equation}
-
+%
 That is, given states $ l_a $ and $ l_b $, the probability of going from $ l_a $ 
 to $ l_b $ on timestep $ i $ is the same as in any other timestep. 
 With this, we can calculate the probability of observing sequence
 $ Y = \{ y_1, y_2, ..., y_n \} $ with:
-
+%
 \begin{equation}
 P(Y) = \prod_{t=1}^{n} P(y_t|y_{t-1}) \\
 \end{equation}
-
+%
 With the Time Invariance Assumption, all parameters in our model can be described 
 by a $ m \times m $ transition matrix $ \theta $ where each element $ \theta_{a, b} $ with
 row $ a $ and column $ b $ holds the probability of going from state $ l_a $ to $ l_b $.
@@ -1022,7 +1016,7 @@ consider the finite state-machine in Figure~\ref{fig:markov_graph} that describe
 a \textit{Time Invariant Markov Chain} with only two states (Name, Word), that models a sequence 
 of words that can be either names or common words. The edges in this graph represent the transition
 probabilities between states and the transition matrix for this Markov Chain takes the form:
-
+%
 \begin{equation*}
 \theta = 
 \begin{bmatrix}
@@ -1030,7 +1024,7 @@ probabilities between states and the transition matrix for this Markov Chain tak
     0.4 & 0.6 \\
 \end{bmatrix}
 \end{equation*}
-
+%
 \begin{figure}
 \centering
 \begin{tikzpicture}[->,shorten >=1pt,auto,node distance=2.8cm]
@@ -1047,15 +1041,15 @@ probabilities between states and the transition matrix for this Markov Chain tak
 \caption{Finite state machine for a Markov Chain.}
 \label{fig:markov_graph}
 \end{figure}
-
+%
 If we know the transition matrix $ \theta$ for a \textit{Markov Chain}, we can easily calculate 
 the probabilities of being in each state at time $ t $. If $ \rho_t $ is a vector of 
 size $ m $ with the probabilities for each state at time $ t $. Then:
-
+%
 \begin{equation}
 \rho_{t} = \rho_0 \cdot \theta^t
 \end{equation}
-
+%
 Where $ \rho_0 $ is the vector of starting probabilities for each state. We assume that we 
 have no knowledge about the initial conditions of our \textit{Markov Chain}, so we simply 
 attribute the same probability to every state at time $ t=0 $. Also, consider that $ P(y_1|y_0) $ 
@@ -1066,70 +1060,70 @@ Now we know how to calculate the state probabilities for a Markov Chain at any t
 we still need to solve the problem of obtaining the transition matrix $ \theta $. The usual
 choice is to obtain $ \theta $ such that it maximizes the probability of our labeled dataset 
 with Maximum Likelihood Estimation. The likelihood of our model is given by:
-
+%
 \begin{equation}
 \mathcal{L}(\theta; Y) = \prod_{t=1}^{n} \theta_{y_t, y_{t-1}}
 \end{equation}
-
+%
 By defining $ \eta_{a,b} $ to be the count of transitions from $ a $ to $ b $ in $ Y $. We can write the likelihood as:
-
+%
 \begin{equation}
 \mathcal{L}(\theta; Y) = \prod_{a, b} \theta_{a, b}^{\eta_{a, b}}
 \label{eq:hmm_likelihood}
 \end{equation}
-
-Where the product is calculated over all possible transitions from $ a $ to $ b $.
+%
+where the product is calculated over all possible transitions from $ a $ to $ b $.
 The logarithm function is monotone increasing, so we can maximize the log-likelihood instead
 of the likelihood for ease of calculation. With the log-likelihood, the product over transition 
 probabilities becomes a sum of logarithms. The log-likelihood is defined by:
-
+%
 \begin{equation}
 \mathcal{l}(\theta; Y) = \sum_{a, b} \eta_{a, b} \cdot log(\theta_{a, b})
 \end{equation}
-
+%
 Then, the maximum likelihood estimator becomes:
-
+%
 \begin{align}
 \hat\theta = \argmax_{\theta} \mathcal{l}(\theta; Y)
 \end{align}
-
+%
 However, if we try to optimize this function as it is, we will find that
 $ \hat\theta_{a, b} = \infty, \forall a, b \in [1, m] $. This happens because we did not
 take into account the degrees of freedom of our model. Every row in the transition matrix must sum up to one,
 so the parameters for the last row are defined by the preceding roles and the degrees of freedom 
 for the model are actually $ m(m-1) $ and not $ m^2 $ as we considered before. That is, we have a
 set of constraints:
-
+%
 \begin{equation}
 \sum_{b} \theta_{a, b} = 1, \forall a \in [1, m]
 \end{equation}
-
+%
 With the aid of Lagrange Multipliers, we can incorporate this set of constraints into our optimization 
 objective and optimize the Lagrangian:
-
+%
 \begin{equation}
 \Lambda(\theta, \lambda) = \mathcal{l}(\theta; Y) - \sum_{a} \lambda_{a} \cdot \left( \sum_{b} \theta_{a, b} - 1 \right)
 \end{equation}
-
+%
 Setting $ \frac{\partial \Lambda(\theta, \lambda)}{\partial \lambda_a} = 0 $ simply yields the initial set 
 of constraints, but by setting the partial derivatives $ \frac{\partial \Lambda(\theta, \lambda)}{\partial \theta_{a, b}} = 0 $,
 we get:
-
+%
 \begin{eqnarray}
 \frac{\partial \Lambda(\theta, \lambda)}{\partial \theta_{a, b}} & = & \frac{\eta_{a, b}}{\theta_{a, b}} - \lambda_a = 0 \\
 \theta_{a, b} & = & \frac{\eta_{a, b}}{\lambda_a}
 \end{eqnarray}
-
+%
 Finally, using the initial constraint equations, we find that:
-
+%
 \begin{align}
 \sum_b \frac{\eta_{a, b}}{\lambda_a}  =  1 \\
 \lambda_a                             =  \sum_b \eta_{a, b} \\
 \hat{\theta}_{a, b}                   =  \frac{\eta_{a, b}}{\sum_{b'} \eta_{a, b'}}
 \label{eq:theta_estimate}
 \end{align}
-
-Yielding a closed form expression for the maximum likelihood transition matrix. What is really convenient, 
+%
+yielding a closed form expression for the maximum likelihood transition matrix. What is really convenient, 
 since this is the average number of transitions from state $ a $ to state
 $ b $ in sequence $ Y $. A value that can be easily calculated with our labeled dataset.
 
@@ -1143,11 +1137,11 @@ With the \gls{hmm}, we want to predict a sequence of labels $ Y = \{y_1, y_2, ..
 (i.e. the words in a text, or a feature vectors with independent features). Contrastingly,
 when we were discussing Markov Chains alone, only the labels were being considered without 
 mention of the accompanying words. To incorporate words, we make another assumption:
-
+%
 \begin{equation}
 P(x_i|y_{i-1}x_{i-1}, ..., y_1x_1) = P(x_i|y_i)
 \end{equation}
-
+%
 That is, the probability of observing word $ x_i $ depends only on the current label
 $ y_i $, the hidden state (e.g. PER, LOC, ORG, etc.). By making this assumption, we are
 stating that if we know a token's assigned label, then we can reliably predict what are the 
@@ -1167,7 +1161,7 @@ finite state-machine in Figure~\ref{fig:hidden_markov_graph} that extends our pr
 example and defines a Hidden Markov model with two states (Name, Word), and a vocabulary of 
 two words (John, Hall). The edges between the hidden states and the words represent the emission probabilities,
 and the emission matrix for this HMM takes the form:
-
+%
 \begin{equation*}
 \mu = 
 \begin{bmatrix}
@@ -1175,8 +1169,7 @@ and the emission matrix for this HMM takes the form:
     0.8 & 0.2 \\
 \end{bmatrix}
 \end{equation*}
-
-
+%
 \begin{figure}
 \centering
 \begin{tikzpicture}[->,shorten >=1pt,auto,node distance=3.8cm]
@@ -1199,30 +1192,30 @@ and the emission matrix for this HMM takes the form:
 \caption{Finite state machine for a Hidden Markov Model.}
 \label{fig:hidden_markov_graph}
 \end{figure}
-
+%
 Now, the probability of observing a vector of labels $ Y $ given a sequence of 
 words $ X $ can be calculated with Bayes' theorem:
-
+%
 \begin{equation}
 P(Y|X) = \frac{P(X|Y) P(Y)}{P(X)}
 \end{equation}
-
+%
 Since $ P(X) $ is invariant for every sequence of labels $ Y $, we can simply 
 optimize in terms of the joint probability:
-
+%
 \begin{equation}
 P(Y|X) \propto P(X|Y) P(Y) = P(X, Y)
 \end{equation}
-
-And the log-likelihood takes the form:
-
+%
+and the log-likelihood takes the form:
+%
 \begin{equation}
 \mathcal{l}(Y|X; \theta) \propto 
 \sum_{a \in L, b \in L} {\eta_{a, b}} \cdot log(\theta_{a, b}) +
 \sum_{c \in L, d \in V} \eta'_{c, d} \cdot log(\mu_{c, d})
 \end{equation}
-
-Where $ \eta'_{c, d} $ is a function that counts the number of emissions from state $ c $
+%
+where $ \eta'_{c, d} $ is a function that counts the number of emissions from state $ c $
 to word $ d $. The matrices $ \theta $ and $ \mu $ are independent, so we can optimize for
 the transition and emission matrices separately, therefore the procedure to find $ \hat\theta $ 
 is exactly the same that we described in Equation~\ref{eq:theta_estimate}. Also, notice that
@@ -1230,12 +1223,12 @@ if we do the same procedure with Lagrangian Multipliers that we employed to find
 for Markov Chains, but this time we take the partial derivatives relative to 
 $ \mu_{c,d} $ and set the constraints such that each line in the emission matrix must sum up
 to one, we will find that:
-
+%
 \begin{equation}
 \hat{\mu}_{c, d} = \frac{\eta'_{c, d}}{\sum_{d'}\eta'_{c, d'}}
 \label{eq:mle_words}
 \end{equation}
-
+%
 This is the expected number of times that we observe word $ d $ when we were at the hidden state $ c $. 
 A closed form expression that is easy to calculate from the training data. With that, we conclude 
 the maximum likelihood parameter estimation for the \textit{Hidden Markov Model}. This procedure is
@@ -1253,13 +1246,13 @@ small dataset and even if it were much bigger we would still observe new words w
 for unseen data, this problem needs to be addressed. By taking the Maximum a Posteriori estimate with 
 uniform priors instead of the Maximum Likelihood estimate for $ \theta $ and $ \mu $, we get the Laplace
 smoothed estimates~\citep{Manning1999}:
-
+%
 \begin{align}
 \hat{\theta}_{a, b}    =  \frac{\eta_{a, b} + 1}{\sum_{b'} \eta_{a, b'} + |L|} \\
 \hat{\mu}_{c, d} = \frac{\eta'_{c, d} + 1}{\sum_{d'}\eta'_{c, d'} + |V|}
 \end{align}
-
-Where $ |L| $ is the number of labels and $ |V| $ is the size of the vocabulary.
+%
+where $ |L| $ is the number of labels and $ |V| $ is the size of the vocabulary.
 If we consider other prior distributions for the parameters, we get different smoothed probabilities, 
 but this already properly ensures that unobserved words will not receive a zero probability. The main
 shortcoming with Laplace Smoothing is that it gives too much probability mass to unseen words relative
@@ -1282,7 +1275,7 @@ a beam-search strategy can be used.
 \subsection{Conclusion}
 
 HMM based taggers have been successfully applied in many NLP and WDE tasks such as in the works by
-\cite{Rabiner1990}, \cite{Leek1997} and \cite{Freitag2000}. The closed-form parameter estimation
+\cite{Rabiner1990}, and \cite{Freitag2000}. The closed-form parameter estimation
 makes them incredibly fast to train, also their parameters are very interpretable (because the model is simple), 
 making them a good choice for a first approximation to NER. However, as we will discuss in the experiments section,
 these models are highly dependent on the right selection of features, what may outweigh the 
@@ -1312,11 +1305,11 @@ The concept of Information Entropy established by~\cite{Shannon1948}
 quantifies the amount of information expressed in a statistical distribution. 
 The entropy $ H $ of a random variable Z with a probability mass function 
 $ P $ is given by:
-
+%
 \begin{equation}
 H(Z) = \sum_{z \in Z} P(z) \cdot log \left( \frac{1}{P(z)} \right)
 \end{equation}
-
+%
 The logarithm in the entropy function can be taken in any base. The change 
 of base will only provide a linear scaling of the same entropy function. When using base two,
 $ H(Z) $ is essentially the expected number of bits necessary to encode the value of a
@@ -1348,25 +1341,25 @@ each label $ Y $ is predicted according to its context $ X $. The context is def
 a vector of observations that expresses features (useful pieces of evidence) such as: the last word 
 is an honorific, the current word is capitalized, the current word is "that", etc. And we
 define $ k $ binary feature functions $ f_i \; \forall i \in [1, k] $ such that:
-
+%
 \begin{equation}
   f_i(x, y) = \begin{cases} 
     1 \text{ if } y = L \text{ and the feature is present in } x \\ 
     0 \text{ otherwise}
   \end{cases}
 \end{equation}
-
+%
 So, at any position in the sequence, the truth statement of the feature functions can be
 determined in terms of the predicted label $ y $ and the context $ x $. But, different from
 HMMs, we do not assume that features are independent. Now, the Maximum Entropy framework 
 provides a compelling way for estimating the probability of a label given its linguistic context, 
 that is $ P(Y|X) $. In the sequence labeling problem, we actually want to maximize the conditional 
 entropy:
-
+%
 \begin{equation}
 H(Y|X) = - \sum_{x \in X, y \in Y} P(x, y) \cdot log \left( P(y|x) \right)
 \end{equation}
-
+%
 But, it is usual to approximate $ P(x, y) $ with $ P(y|x)\tilde{P}(x) $, because
 the model prior $ P(x) $ is hard to normalize since the probability space of observations is
 usually too big, while the empirical prior $ \tilde{P}(x) $ is easy to obtain.
@@ -1382,87 +1375,85 @@ for our model. By doing it, we can make sure that the model fits the data as tig
 (Maximum Likelihood), while making as few assumptions as it needs to (Maximum Entropy). 
 We can get this estimator by setting the constraints such that, given the $ k $ binary feature 
 functions that we determined earlier, there are also $ k $ constraints such that:
-
+%
 \begin{equation}
 E_{P}[f_i] = E_{\tilde{P}}[f_i] \;\;\; \forall \; i \in [1, k]
 \label{eq:maxent_constraints}
 \end{equation}
-
-Where $ E_{P}[f_i] $ is the model expectation of $ f_i $ and $ E_{\tilde{P}}[f_i] $ is the 
+%
+where $ E_{P}[f_i] $ is the model expectation of $ f_i $ and $ E_{\tilde{P}}[f_i] $ is the 
 empirical expectation of $ f_i $. Or more clearly:
-
+%
 \begin{align*}
 E_{P}[f_i]         = \sum_{x \in X, y \in Y} \tilde{P}(x)P(y|x) f_i(x, y) \\
 E_{\tilde{P}}[f_i] = \sum_{x \in X, y \in Y} \tilde{P}(x, y) f_i(x, y)
 \end{align*}
-
+%
 Additionally, we need to make sure that the probabilities sum up to one, so:
-
+%
 \begin{equation}
 \sum_{y} P(y|x) = 1 \;\;\; \forall \; x \in X
 \label{eq:maxent_constraints}
 \end{equation}
-
+%
 We can optimize the conditional entropy subject to these constraints with Lagrangian 
 Multipliers by defining the Lagrangian:
-
+%
 \begin{equation}
 \Lambda(P, \lambda, \beta) = H(Y|X) + \sum_{i=1}^k \lambda_i (E_{P}[f_i] - E_{\tilde{P}}[f_i]) 
 + \sum_{x \in X} \beta_x \left( \sum_{y \in Y} P(y|x) - 1 \right)
 \end{equation}
-
-And solving the unconstrained optimization problem to obtain the maximum entropy 
+%
+and solving the unconstrained optimization problem to obtain the maximum entropy 
 distribution:
-
+%
 \begin{equation}
 P^{*} = \argmax_P \Lambda(P, \lambda, \beta)
 \end{equation}
 
 The derivatives relative to $ \lambda_i $ and $ \beta_x $ yield the initial constraints, but
 setting the derivative of $ P(y|x) $ to zero, we get:
-
+%
 \begin{eqnarray}
 \frac{\partial \Lambda}{\partial P(y|x)} = -\tilde{P}(X) -\tilde{P}(X) \cdot log \; P(y|x) + \beta_x + \tilde{P}(X) \sum_{i=1}^k \lambda_i f_i(x, y) = 0 \\
 P(y|x) = exp \left( \frac{\beta_x}{\tilde{P}(x)} - 1 \right) \cdot exp \left( \sum_{i=1}^n \lambda_i f_i(x, y) \right)
 \label{eq:logistic_pre}
 \end{eqnarray}
-
+%
 By replacing $ P(y|x) $ in our initial probability constraints defined in Equation~\ref{eq:maxent_constraints},
 we get:
-
+%
 \begin{eqnarray}
 \sum_y exp \left( \frac{\beta_x}{\tilde{P}(x)} - 1 \right) \cdot exp \left( \sum_{i=1}^n \lambda_i f_i(x, y) \right) = 1 \\
 exp \left( \frac{\beta_x}{\tilde{P}(x)} - 1 \right) = \frac{1}{\sum_y exp \left( \sum_{i=1}^n \lambda_i f_i(x, y) \right)} 
 \end{eqnarray}
-
+%
 By replacing the expression found Equation~\ref{eq:logistic_pre} we finally get:
-
+%
 \begin{equation}
 P(y|x) = \frac{1}{Z(x)} \cdot exp \left( \sum_{i}^n \lambda_i f_i(x, y) \right)
 \label{eq:logistic_1}
 \end{equation}
-
-Where:
-
+%
 \begin{equation}
 Z(x) \equiv \sum_y exp \left( \sum_{i=1}^n \lambda_i f_i(x, y) \right)
 \end{equation}
-
+%
 This defines a family of exponential functions with parameters $ \lambda $. To obtain the parameters
 that maximize the entropy of our model subject to the initial set of constraints, we can replace this
 definition back in the Lagrangian and optimize in terms of $ \lambda $. This yields the following
 optimization problem:
-
+%
 \begin{equation}
 \Lambda(\lambda) = \sum_{i=1}^k \lambda_i E[f_i(x, y)] - \sum_{x} \tilde{P}(x) \cdot log \; Z(x) 
 \end{equation}
-
-Which is identical to the log-likelihood:
-
+%
+which is identical to the log-likelihood:
+%
 \begin{equation}
 \mathcal{l}(P) = \sum_{x, y} \tilde{P}(x, y) \cdot log \; P(y|x) 
 \end{equation}
-
+%
 With this, we conclude that a model with the parametric form defined in Equation~\ref{eq:logistic_1} 
 has identical maximum likelihood and maximum entropy estimators. Also, it can be proven that this 
 model is unique and its optimization function is concave~\citep{Brown1986}. The classifier based on this
@@ -1568,13 +1559,11 @@ the ones used in the previously discussed statistical models. However, word embe
 better input vectors for language tasks, as we will be discussing in Section~\ref{ssec:word_embeddings}.
 Finally, the \gls{rnn} produces an output vector $ y_t $ representing the label for that 
 timestep. A common definition for an \gls{rnn} cell is given by the equations:
-
 \begin{align*}
 h_t &= tanh(W_x x_t + W_h h_{t-1}) \\
 y_t &= softmax(W_y h_t)
 \end{align*}
-
-Where $ W_x $, $ W_h $ and $ W_y $ are weight matrices that can be trained with the 
+where $ W_x $, $ W_h $ and $ W_y $ are weight matrices that can be trained with the 
 Backpropagation Through Time (BPTT) algorithm. On a sequence labeling task, $ W_y $ 
 is a $ |H| \times |Y| $ weight matrix where $ H $ is the size of the hidden layer,
 defined experimentally according to the task, and $ Y $ is the number of classification labels
@@ -1612,7 +1601,6 @@ our LSTM cell is provided in Figure~\ref{fig:lstm_cell}.
 \end{figure}
 
 The equations for the LSTM cell are:
-
 \begin{align*}
 \Gamma_{i} &= \sigma(W_i \cdot [x_t,h_{t-1}] + b_i) \\
 \Gamma_{f} &= \sigma(W_f \cdot [x_t,h_{t-1}] + b_f) \\ 
@@ -1620,8 +1608,7 @@ The equations for the LSTM cell are:
 c_t        &= \Gamma_{f} \ast c_{t-1} + \Gamma_{i} \ast tanh(W_c \cdot [x_{t},h_{t-1}] + b_c) \\
 h_t        &= \Gamma_{o} \ast tanh(c_t)
 \end{align*}
-
-Where $ \sigma $ is the logistic sigmoid function. $ \Gamma_i $, $ \Gamma_f $, and $ \Gamma_o $ are the input,
+where $ \sigma $ is the logistic sigmoid function. $ \Gamma_i $, $ \Gamma_f $, and $ \Gamma_o $ are the input,
 forget and output gates, respectively, and $ W_i $, $ W_f $, $ W_o $ are the weight 
 matrices corresponding to each gate. $ c_{t} $ is the cell 
 state at time $ t $ and $ h_{t} $ is the hidden state at time $ t $. 
@@ -1813,11 +1800,14 @@ from the CNN method, because CNN filters are positional invariant.
 The accuracy of neural networks for sequence labeling is unparalleled when we consider
 the powerful combination consisting of the Bi-LSTM-CRF model, pre-trained word embeddings, and neural 
 character representations. However, it must be said that Neural Networks are costly to train in 
-terms of time and hardware in comparison to simpler models such as \gls{hmm}s and \gls{crf}s. 
+terms of time and hardware in comparison to simpler models such as \gls{hmm}s and \gls{crf}s. For example,
+in our experiments, Neural Network models could take up to a hundred times more time to train and run predictions
+than a simple \gls{hmm}, as we will be discussing in Chapter~\ref{cha:experiments}.
 And even though word embeddings and character representations can replace the feature engineering 
 that was required by earlier statistical approaches, there are still some technical concerns to be faced 
 experimentally. The loss function is not convex, thus the choice of the optimization 
-method and the choice of hyperparameters can alter the results. Also, neural networks are prone
+method and the choice of hyper parameters (e.g. learning rate, momentum, weight decay, etc.) 
+can alter the results. Also, neural networks are prone
 to overfitting, what can be partially avoided with the addition of dropout layers~\citep{Srivastava2014}
 and with the early stopping strategy over a validation dataset~\citep{Caruana2000}.
 
@@ -1839,28 +1829,30 @@ the number of parameters and the time required for convergence during training.
 \chapter{Sequence Labeling on the Web}
 
 In the last chapter, we discussed sequence models that can be generally employed in 
-a diverse range of natural language processing tasks. However, there are some specificities 
+a diverse range of \gls{nlp} tasks. However, there are some specificities 
 to the problem of sequence labeling on the web that can be explored to allow further improvement 
-of our models. In Section~\ref{sec:self_training}, we introduce the self-training strategy
-for Hidden Markov Models. In Section~\ref{sec:attention_models}, we introduce two attention models
-to incorporate HTML structural information in our neural sequence taggers. In
+of our models. In Section~\ref{sec:self_training}, we propose the self-training strategy
+for \gls{hmm}s to incorporate HTML features in the original formulation. 
+In Section~\ref{sec:attention_models}, we propose two attention models
+to incorporate HTML structural information in our neural sequence taggers. And in
 Section~\ref{sec:fscore_optimization}, we propose a new optimization objective for neural 
-networks trained for sequence labeling tasks.
+networks trained for sequence labeling tasks that can make prioritize Recall over Precision,
+what can be useful in a name extraction task in the web, because it is easier to filter
+out false positive from a huge corpus than to manually find the missed entries.
 
 
 \section{Self-Training for Hidden Markov Models} 
 \label{sec:self_training}
 
 As described in Section~\ref{sec:hmm}. The simplest conceivable Hidden Markov Model 
-for the sequence labeling on HTML task is a generative classifier that has the form:
-
+for the sequence labeling task is a generative classifier that has the form:
 \begin{equation}
 P(X,Y) \propto \prod_{i=1}^n P(x_i|y_i) P(y_i, y_{i-1})
 \end{equation}
-
-Where $ X $ is a sequence of words and $ Y $ is a sequence of labels, both with size $ n $,
-and the initial probabilities $ P(y_1|y_0) $ are uniform across all label assignments.
-To construct this model from the data, we need to estimate the probabilities:
+where $ X $ is a sequence of words and $ Y $ is a sequence of labels, both with size $ n $,
+and the initial probabilities $ P(y_1|y_0) $ follow a uniform distribution across all label 
+assignments.
+To construct this model from the data, we need to estimate the following probabilities:
 
 \begin{itemize}
   \item $ P(x_i|y_i) $: the emission probability of word $ x_i $ given label $ y_i $.
@@ -1869,7 +1861,6 @@ To construct this model from the data, we need to estimate the probabilities:
 
 We may consider $ x_i $ to be a binary feature vector $ x_i = \{ f_{i,1}, f_{i,2}, ..., f_{i,k} \} $
 as long as all the feature distributions are independent, conditioned on $ y_i $. That is:
-
 \begin{equation}
 P(x_i|y_i) = P(f_{i,1}, f_{i,2}, ..., f_{i,k}|y_i) = \prod_{j=1}^k P(f_{i,j}|y_i)
 \end{equation}
@@ -1877,7 +1868,6 @@ P(x_i|y_i) = P(f_{i,1}, f_{i,2}, ..., f_{i,k}|y_i) = \prod_{j=1}^k P(f_{i,j}|y_i
 With this assumption, we can obtain the maximum likelihood estimators for feature parameters
 from their relative frequencies, just as we did in Section~\ref{sec:hmm} for single words 
 (Equation~\ref{eq:mle_words}). Then, for binary features:
-
 \begin{equation}
 \hat{P}(f_{i,j}=1|y_i=L) = \frac{\text{Count}(f_{*,j}=1, y_*=L)}
 {\text{Count}(f_{*,j}=0, y_*=L) + \text{Count}(f_{*,j}=1, y_*=L)}
@@ -1892,37 +1882,36 @@ The problem is that there is not much statistical similarity between the HTML st
 For example, only because a named entity label occurs more often inside <div> tags
 in a page, that does not mean this is the case for most web pages. Consider for example a faculty web page 
 that shows researcher names in a table (<td> tags) in contrast to a web page that organizes researcher
-names in a list (<li> tags). If the first page is in our training set, and we use the HTML tag feature to 
-assign labels to the second page in our test set, we will probably get many wrong predictions.
+names in a list (<li> tags). If there are many cases like the former page in our training set, and we use the 
+HTML tag feature in a model that assigns labels to the latter page in our test set, we will probably get many 
+wrong predictions.
 Nonetheless, the HTML features are not useless. Inside a single web page, the HTML tag is a good predictor
-of the correct labels. Words with a similar HTML context tend to have similar labels. The question
-is how to obtain better parameter estimators for HTML features.
+of the correct labels. Words with a similar HTML context tend to have similar labels. For example, words
+that happen together in a list have very similar HTML contexts and are very likely to belong to
+the same category. The question is how to obtain better parameter estimators for HTML features.
 
-Consider a set of $ m $ textual features unrelated to the HTML structure:
-
+Consider a set $ F^T $ of $ m $ textual features unrelated to the HTML structure:
 \begin{equation*}
 F^T = \{ f^T_1, f^T_2, ..., f^T_m \}
 \end{equation*}
 
-And a set of $ k $ HTML features that are related to the HTML structure:
-
+And a set $ F^H $ of $ k $ HTML features that are related to the HTML structure:
 \begin{equation*}
 F^H = \{ f^H_1, f^H_2, ..., f^H_k \}
 \end{equation*}
 
-Given a Hidden Markov Model trained with only the first set of features $ F^T $,
+Given a \gls{hmm} trained with only the first set of features $ F^T $,
 we can use this model to predict the labels of an unlabeled document, and then we simply replace 
 the actual labels in Equation~\ref{eq:feature_mle} with the predicted labels $ \tilde{Y} $:
-
 \begin{equation}
 \hat{P}(f_{i,j}=1|y_i=L) = \frac{\text{Count}(f_{*,j}=1, \tilde{y}_*=L)}
 {\text{Count}(f_{*,j}=0, \tilde{y}_*=L) + \text{Count}(f_{*,j}=1, \tilde{y}_*=L)}
 \end{equation}
 
-Next, we incorporate the estimators for the HTML feature probabilities in $ H^T $ and predict
-the final labels with the whole set of features $ F^T \cup F^H $. This self-training
-strategy can be implemented like this:
-
+Next, we incorporate the estimators for the HTML feature probabilities in the original \gls{hmm} 
+and predict the final labels with the whole set of features $ F^T \cup F^H $. If we used the whole
+set of features from the start, the HTML features would probably capture wrong patterns as we argued
+before. This self-training strategy can be divided in the following steps:
 \begin{itemize}
 \item Train the HMM without any HTML features.
 \item Compute labels for a website with the trained HMM.
@@ -1930,14 +1919,34 @@ strategy can be implemented like this:
 website and estimate HTML feature frequencies for this website alone.
 \item Recompute the labels now using the HTML feature probabilities.
 \end{itemize}
+To understand why this strategy could help labeling named entities on the web, consider the 
+example shown in Figure~\ref{fig:self_training}. This example shows a snippet from a webpage 
+and how a naive \gls{hmm} would probably attribute 
+labels to each word. Despite being rather uncommon, North West is an actual person name,
+what becomes obvious in this case once we know the HTML context where it happens 
+(inside a list with other person names), but this is not so obvious if we consider the
+sentence in isolation. The naive \gls{hmm} could be improved if we calculated
+feature probabilities for the parent tags using proxies for the correct labels. We would find
+that four times in a total of six occurrences, the correct label for a word that happened inside
+a \textit{<li>} tag was \mbox{\textit{I-PER}}. By incorporating this knowledge in the model 
+using the self-training strategy, we would improve the probability that words North and West 
+were labeled correctly as a person name in this case.
 
-This strategy could possibly be incorporated in the Baum-Welch algorithm, but this heuristic
-approach already yields a consistent improvement to sequence labeling on the web. In theory, this 
+\begin{figure}
+  \centering
+  \includegraphics[width=0.5\textwidth]{pics/self_training_example}
+  \caption{Example of a webpage snippet with labels attributed by a \gls{hmm}.}
+  \label{fig:self_training}
+\end{figure}
+
+This strategy could possibly be incorporated in the Baum-Welch algorithm to provide a more 
+statistically solid argument for its effectiveness, but this heuristic
+already yields a consistent improvement to sequence labeling on the web. In theory, this 
 strategy could be used with any sequence tagger, however retraining a classifier with new features can 
-become prohibitively expensive in the case of CRFs or neural networks. In HMMs, retraining the features
-is really fast, because we assume feature independence and the maximum likelihood estimator can be obtained
-with a simple closed form expression.
-
+become prohibitively expensive in the case of CRFs or neural networks. 
+In HMMs, retraining the features
+is fast, because we assume feature independence and the maximum likelihood estimator can be 
+obtained with a simple closed form expression.
 
 \section{Attentions Models} 
 \label{sec:attention_models} 
@@ -1948,7 +1957,7 @@ networks. Ultimately, we want the model to consider the predictions that it made
 words in similar HTML contexts when constructing the neural representation for the 
 current word in a sequence. A natural way to incorporate this intuition into the neural 
 architectures described in Section~\ref{sec:neural_networks} is with the use of 
-self-attention mechanisms, created by~\cite{Vaswani2017}.
+attention mechanisms, similar to the one proposed by~\cite{Vaswani2017}.
 Originally, attention mechanisms were developed with the goal of solving sentence alignment 
 for neural machine translation~\citep{Bahdanau2014}, but since then it
 found other uses in NLP. An attention mechanism is a way to combine
@@ -1983,7 +1992,6 @@ attention values:
 \begin{equation}
 h'_i = \sum_{j} = \alpha_{i, j} h_j
 \end{equation}
-
 Also, consider a set of $ n $ context vectors $ c_i $ that contain representations for the
 html features at timestep $ i $. This representation can be a binary feature vector,
 a dense vector or even the hidden states $ h_i $. The attention matrix is then calculated as:
@@ -1991,8 +1999,7 @@ a dense vector or even the hidden states $ h_i $. The attention matrix is then c
 \begin{equation}
 \alpha_{i,j} = \frac{e^{A(c_i, c_j)}}{\sum_k e^{A(c_i, c_k)}}
 \end{equation}
-
-Where $ A(c_i, c_j) $ is an attention function that computes the similarity between
+where $ A(c_i, c_j) $ is an attention function that computes the similarity between
 HTML contexts at timesteps $ i $ and $ j $ and outputs a real number. The exponentials are
 a Softmax normalization function to ensure that $ 1 \geq \alpha_{i,j} \geq 0 $ and 
 $ \sum_{j} \alpha_{i, j} = 1 $. Next we propose two ways for defining the attention function
@@ -2006,17 +2013,17 @@ when the contexts $ c_i $ at timestep $ i $ are discrete feature vectors, becaus
 we would need a softer comparability criterion. So, if $ c_i = \{ f_{i,1}, f_{i,2}, ..., f_{i,m} \} $
 is a context vector where each feature $ f_{i,j} $ assumes a definite value from a discrete set
 $ \gamma_j $, we can define the attention function:
-
+%
 \begin{equation}
   A(c_i, c_j) = \begin{cases} 
     1, \text{ if } f_{i,k} = f_{j,k} \;\;\; \forall \; k \in [1,m] \\ 
     0, \text{ otherwise}
   \end{cases}
 \end{equation}
-
+%
 The combination of features must be sufficiently restrictive so that the mixture of hidden
 states does not introduce too much noise. We have determined experimentally that considering
-only three features: the enclosing HTML tag, its parent tag and the CSS class; is sufficient to 
+only three features --- the enclosing HTML tag, its parent tag and the CSS class --- is sufficient to 
 allow a consistent comparison between similar HTML contexts. Ideally, the choice of features
 could be performed automatically with the incorporation of a feed forward neural network in
 the comparison function and a softer similarity criterion. A possibility for doing this is 
@@ -2029,7 +2036,7 @@ Different from the Hard Attention Function, the Soft Attention Function outputs 
 that represents the degree of similarity between HTML contexts. Now, instead of considering
 discrete feature vectors we resort to dense vectorial representations for the HTML context.
 Similar to the way we extracted morphological features with characters representations in
-Section~\ref{ssec:experiment_char_representations}, we can extract HTML structural features with
+Section~\ref{ssec:experiment_char_representations}, we propose to extract HTML structural features with
 DOM path representations. To do this, consider a DOM tree (which is an acyclic directed graph),
 a word's HTML context can be represented by the path we take in this graph starting from the 
 root element. If we consider the path for each word in our sequence, we can create HTML dense 
@@ -2056,8 +2063,7 @@ function similar to the scaled dot product proposed by~\cite{Vaswani2017}. That 
 \begin{equation}
   A(c_i, c_j) = \frac{W c_i \cdot W c_j}{\sqrt{n}}
 \end{equation}
-
-Where $ W $ is a weight matrix to be learned and $ \sqrt{n} $ is a normalization factor
+where $ W $ is a weight matrix to be learned and $ \sqrt{n} $ is a normalization factor
 with $ n $ being the size of the context vectors $ c $. This function assumes a larger
 value when the contexts are similar and a smaller value when they are different. With the 
 soft attention mechanism, our model can learn HTML context representations from the training 
@@ -2083,11 +2089,15 @@ dropout rate before and after the attention mechanism.
 
 In the LSTM-CRF model, we estimate parameters by maximizing the log-likelihood. The likelihood is 
 intimately associated with the accuracy in a classification task, but in NER tasks, models are 
-usually evaluated according to their Precision, Recall, or their harmonic mean (i.e. the F-measure).
+usually evaluated according to their attained results in terms of Precision, Recall, or their harmonic 
+mean (i.e. the F-measure).
 By maximizing the likelihood, we are essentially increasing accuracy with the expectation that this 
-will lead to an improvement of the F-measure, what is most often true. However, there is a trade-off 
-between Precision and Recall, meaning that we can trade a little less Precision for an increase in
-Recall and vice-versa.
+will lead to an improvement of the F-measure, what is most often true. However, in extraction tasks 
+there is usually a trade-off between Precision and Recall, meaning that we can trade a little less 
+Precision for an increase in Recall and vice-versa. For example, if we want to achieve a better
+Precision, we can throw away entities that we are not so sure about. Contrarily, if we want a better
+Recall, we can lower the classification criteria and extract entities that otherwise would not be 
+extracted. 
 
 In NER on the web, we could argue that Recall is slightly more important than Precision, because when 
 we are parsing a huge amount of data, it is much easier to manually filter false positives than 
@@ -2108,7 +2118,8 @@ This makes the usage of the F-measure as an optimization objective impractical f
 batches. However, with a few simplifications, we can replace our loss function and instead 
 maximize the F-measure in terms of the expected utility. We take the method proposed by~\cite{Jansche2005}, that
 approximately maximizes the F-measure of a classifier based on a logistical regression model, and 
-apply it on our neural architectures. The F-measure function can be calculated in terms of a triple (A,B,C):
+apply it to our neural architectures. To our knowledge, this has not yet been tried in neural network
+models for sequence labeling. The F-measure function can be calculated in terms of a triple (A,B,C):
 
 \begin{equation}
 F_\alpha(A, B, C) = \frac{A}{A + \alpha B + (1-\alpha) C}
@@ -2138,13 +2149,6 @@ the actual labels.
   \caption{Relationship between positive and negative matches.}
   \label{tab:precision_recall}
 \end{table}
-
-Where:
-
-\begin{eqnarray*}
-n_{pos} = A + B \\
-m_{pos} = A + C
-\end{eqnarray*}
 
 That is, $ n_{pos} $ is the number of positive examples in the dataset (true positives plus missed positives) 
 and $ m_{pos} $ is the number of positive examples that were predicted (true positives plus false positives).
@@ -2190,10 +2194,14 @@ this formulation is sufficient for the researcher name extraction task.
 
 In this chapter we have discussed several methods for improving the performance of sequence
 labeling models in \gls{ner} on HTML. Section~\ref{sec:self_training} and Section~\ref{sec:attention_models} 
-discussed methods for incorporating HTML features in Hidden Markov Models and Neural Networks. 
+proposed methods for incorporating HTML features in Hidden Markov Models and Neural Networks, respectively. Both
+the self-training strategy for HMMs and the attention models for Neural Networks consider the HTML
+context when making label predictions, what can be very useful when we cannot extract so much
+information from the textual context, as is the case in many webpages (especially listings and tables).
 Section~\ref{sec:fscore_optimization} discussed the usage of a modified F-measure function as
 an optimization objective for neural networks to allow the choice of specific Precision or Recall 
-goals.
+goals. We argued that Recall is slightly more important than Precision in web extraction tasks, therefore
+it might be useful to control how much a neural model values Recall over Precision.
 
 
 \chapter{Researcher Name Extraction Dataset}
@@ -3784,7 +3792,7 @@ The Neural Network approach does not demand any feature engineering or self-trai
 strategy, contrasting with the HMM approach, which is highly reliant on
 the right selection of features and the self-training strategy. However, the absence of
 human engineering in Neural Network training is questionable to some degree since we need to
-define many hyper parameters (e.g. learning rate, momentum, weight decay, etc.) and
+define many hyper parameters and
 many details about the neural architecture, such as the number of \textit{LSTM} layers and
 hidden weights, where to add dropout layers, which word embeddings to use, etc. In summary, 
 there are many choices to be made, none of which have definitive theoretical justification, 
