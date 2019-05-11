@@ -63,7 +63,7 @@
 \newacronym{nlp}{NLP}{Natural Language Processing}
 \newacronym{wde}{WDE}{Web Data Extraction}
 \newacronym{ner}{NER}{Named Entity Recognition}
-\newacronym{hmm}{HMM}{Hidden Markov Model}
+\newacronym{hmm}{HMM}{Hidden Markov Models}
 \newacronym{crf}{CRF}{Conditional Random Fields}
 \newacronym{lstm}{LSTM}{Long Short-Term Memory Networks}
 \newacronym{ie}{IE}{Information Extraction}
@@ -155,12 +155,12 @@ flexible solution provided by statistical machine learning methods is the extrac
 researcher names from faculty directories. Automatically extracting researcher information 
 from university websites is important, for example, to construct researcher affiliation databases 
 and compare the academic impact of research groups using bibliographic indices~\citep{Ribas2015a, Hirsch2005}. 
-The problem of researcher name extraction can be solved with machine learning methods of 
+The problem of \gls{rne} can be solved with machine learning methods of 
 \gls{ner}, the task of finding entities such as
 people, organizations, and locations in a text.
 
 Many \gls{ie} tasks in the web share a common
-factor with the researcher name extraction task. That is, they need to extract similar
+factor with the \gls{rne} task. That is, they need to extract similar
 entities from different webpages or they need to extract entities from short snippets of text 
 instead of complete sentences. Some examples would be comment extraction from blog
 posts and \gls{ner} in tweets. Because of the lack of context in tweets, \gls{ner} methods trained 
@@ -168,8 +168,8 @@ in conventional plain text corpora tend to perform badly for more or less the sa
 they perform badly in other \gls{wde} tasks.
 
 In this dissertation, we compare different machine learning approaches to 
-\gls{ner} on the web by evaluating their performance in the researcher 
-name extraction task. With this purpose in mind, we introduce a novel \gls{ner} dataset 
+\gls{ner} on the web by evaluating their performance in the 
+\gls{rne} task. With this purpose in mind, we introduce a novel \gls{ner} dataset 
 with labeled entities, consisting of faculty directories from universities across the world. 
 We compare the models in terms of their Precision, Recall, F-scores and their 
 overall complexity. That is, even if a model has a slightly worse performance in terms of the
@@ -179,12 +179,12 @@ The tested models were the \gls{hmm} up to third
 order, \gls{crf}, and a range of Deep Learning 
 architectures based on Bidirectional \gls{lstm}. We also 
 introduce three strategies that can boost the performance of sequence labeling methods for
-HTML. The self-training strategy for HMMs, the Self-Attention layer with HTML features 
+HTML. The self-training strategy for \gls{hmm}, the Self-Attention layer with HTML features 
 for Neural Networks, and the direct F-score optimization, also 
 for Neural Networks.
 
-The usability of the evaluated models is not limited to the particular problem of researcher
-name extraction. By reliably detecting named entities on the web, we can boost the performance 
+The usability of the evaluated models is not limited to the particular problem of \gls{rne}. 
+By reliably detecting named entities on the web, we can boost the performance 
 of existing \gls{wde} approaches or even construct an end-to-end architecture that
 solves the problem of data extraction across different websites with improved robustness. Also, 
 the researcher affiliation database constructed with the application of these methods can be used 
@@ -213,13 +213,13 @@ There are not many \gls{wde} methods that can handle extraction
 tasks across different websites effectively. Also, \gls{ner} research 
 that could be useful to solve this problem is almost entirely focused in detecting 
 named entities in plain text. Both of these facts lead to the conclusion 
-that, to perform the researcher name extraction task, we need a \gls{wde} method that
+that, to perform the \gls{rne} task, we need a \gls{wde} method that
 can handle cross-website extraction and a new labeled dataset tailored for this extraction
 task. 
 
 Finally, \gls{ie} is a very broad field, so systems that perform
 well in a specific scenario are not likely to be as effective in other cases, as we concluded
-from our experiments concerning researcher name extraction.
+from our experiments concerning \gls{rne}.
 Therefore, when possible, it is desirable that the models be simple to tune for specific extraction 
 tasks. Taking this in consideration, we want to find 
 the best \gls{ner} methods for a specific task, but trying to derive general conclusions
@@ -228,7 +228,7 @@ about their expected performance in other similar tasks.
 \section{Objective}
 
 The main objective of this dissertation is to find the best \gls{ner} methods for the web
-in terms of their Precision, Recall, and F-scores in the researcher name extraction task,
+in terms of their Precision, Recall, and F-scores in the \gls{rne} task,
 considering their overall complexity and flexibility, taking into consideration that there is a 
 trade-off between model complexity and objective performance. Therefore, to accomplish 
 this goal we need to perform both a quantitative and qualitative assessment of different 
@@ -240,7 +240,7 @@ methods.
 The main contributions of this dissertation are:
 
 \begin{itemize}
-\item \textbf{Labeled Researcher Name Extraction dataset:} we introduce a labeled \gls{ner}
+\item \textbf{Labeled \gls{rne} dataset:} we introduce a labeled \gls{ner}
 dataset specific for the task of extracting researcher names from faculty directories in different 
 languages across 42 countries with the aim of comparing different extraction systems.
 
@@ -250,7 +250,7 @@ relative advantages and disadvantages in terms of quantitative measures such as 
 and qualitative aspects such as complexity and difficulty of training.
 
 \item \textbf{Self-training strategy for Hidden Markov Models:}
-we propose a self-training strategy to improve the performance of Hidden Markov Models 
+we propose a self-training strategy to improve the performance of \gls{hmm}s 
 on HTML \gls{ner}.
 
 \item \textbf{Attention mechanism for Neural Network sequence taggers:}
@@ -269,28 +269,28 @@ Neural Network values Recall over Precision.
 The organization of this dissertation takes the following structure:
 
 \begin{itemize}
-\item \textbf{Chapter 2: Problem Definition} defines the problem of researcher
-name extraction and discusses how it relates to the broader problems of 
-Web Data Extraction and Named Entity Recognition.
+\item \textbf{Chapter 2: Problem Definition} defines the problem of \gls{rne}
+and discusses how it relates to the broader problems of 
+\gls{ie} and \gls{ner}.
 
 \item \textbf{Chapter 3: Related Work} describes the literature concerning 
 \gls{wde} and \gls{ner} that is related to the models explored in this 
 dissertation.
 
 \item \textbf{Chapter 4: Techniques for Sequence Labeling} describes 
-Hidden Markov Models, Conditional Random Fields and 
-Deep Neural Networks for performing Named Entity Recognition.
+\gls{hmm}s, \gls{crf}s and 
+Deep Neural Networks for performing \gls{ner}.
 
 \item \textbf{Chapter 5: Sequence Labeling on HTML} describes variations and
-improvements to the models described in Chapter 4 to handle NER
+improvements to the models described in Chapter 4 to handle \gls{ner}
 on HTML documents.
 
-\item \textbf{Chapter 6: Researcher Name Dataset} presents the Researcher Name
-Dataset that concerns the NER on HTML task of extracting research names from
+\item \textbf{Chapter 6: Researcher Name Extraction Dataset} presents the \gls{rne}
+Dataset that concerns the \gls{ner} on HTML task of extracting research names from
 faculty directories.
 
 \item \textbf{Chapter 7: Experiments} presents the results of multiple experiments
-with the models from Chapter 4 and 5 in the Researcher Name Dataset introduced in 
+with the models from Chapter 4 and 5 in the \gls{rne} dataset introduced in 
 Chapter 6.
 
 \item \textbf{Chapter 8: Conclusion} discusses the conclusions to the research
@@ -323,7 +323,7 @@ machine translation~\citep{Bahdanau2014, Vaswani2017},
 and sequence labeling~\citep{Collobert2011,Lample2016,Ma2016} 
 (which concerns us more directly). 
 In fact, if we treat all sentences in a web page as sequences extracted from an 
-underlying presentation graph (i.e. the DOM tree), the problem of \gls{ie}
+underlying presentation graph (i.e. the DOM tree), the problem of \gls{wde}
 can be, in many cases, solved with the consecutive application of three NLP techniques: 
 sentence segmentation, named entity recognition, and relationship extraction. 
 First, we need to segment the relevant grouping structures (e.g. sentences, rows in a table, 
@@ -335,21 +335,21 @@ for plain text and web pages, but there are important differences chiefly relate
 to the structure of the data or rather the lack of structure.
 
 In this dissertation, we investigate the best methods for sequence labeling on HTML. 
-To evaluate these methods, we assess their performance on the task of researcher 
-name extraction from faculty directories of universities across the world.
+To evaluate these methods, we assess their performance on the task of 
+\gls{rne} from faculty directories of universities across the world.
 We will be mainly concerned with NER, but a brief
 discussion of the challenges involved in the task of sentence segmentation for HTML 
 will be provided in Chapter~\ref{cha:dataset}. The task of relationship extraction,
-however, is not relevant to the problem of researcher name extraction because we only
+however, is not relevant to the problem of \gls{rne} because we only
 consider one type of named entity (researchers) and we are only concerned with mapping 
 relations between researchers and universities (affiliations) that are obvious since
 we know which university website produced each faculty listing.
 
 The remainder of this chapter will describe in more depth the subject of this dissertation.
-Section~\ref{sec:information_extraction} discusses the problem of Information Extraction.
+Section~\ref{sec:information_extraction} discusses the problem of \gls{ie}.
 Section~\ref{sec:named_entity_recognition} discusses the importance of NER
 for WDE. Finally, Section~\ref{sec:researcher_name_extraction} describes the 
-specific problem of Researcher Name Extraction.
+specific problem of \gls{rne}.
 
 \section{Information Extraction}
 \label{sec:information_extraction}
@@ -358,7 +358,7 @@ specific problem of Researcher Name Extraction.
 data to a semantically well defined structure. It ``is the process of filling the fields and 
 records of a database from unstructured or loosely formatted text''~\citep{McCallum2005}. 
 Usually, the input consists of a corpus containing useful entities that
-are scattered in the text and the Information Extraction system is responsible
+are scattered in the text and the \gls{ie} system is responsible
 for finding these entities and organizing them according to a rigid hierarchy, such as
 the one defined by the schema of a relational database. It must be stated that it is somewhat
 misleading to refer to plain text as unstructured data, since prose has a loosely defined structure 
@@ -395,7 +395,7 @@ from news sources and determining their relation to outline the geographical are
 by an epidemy~\citep{Grishman2002}. 
 
 The field of bio-informatics has also found important applications for 
-Information Extraction. The first BioCreative challenge dealt with the ``extraction 
+\gls{ie}. The first BioCreative challenge dealt with the ``extraction 
 of gene or protein names from text, and their mapping into standardized gene identifiers 
 for three model organism databases''~\citep{Hirschman2005}.
 In the BioCreative/OHNLP Challenge 2018~\citep{Rastegar-Mojarad2018}, researchers 
@@ -422,7 +422,8 @@ academic impact and researcher productivity through the usage of quantitative
 indices of academic impact such as raw citation counts, the H-index~\citep{Hirsch2005} and 
 P-score~\citep{Ribas2015a}. 
 
-\gls{wde} is different from \gls{ie} in plain text because HTML documents frequently
+\gls{wde} is the task of \gls{ie} on webpages.
+It is different from \gls{ie} in plain text because HTML documents frequently
 have more structured content with less context than plain text. In HTML, relevant entities 
 may occur inside tables, lists, or other types of visual elements that provide 
 little to no contextual information that could give hints about an entity's category.
@@ -458,7 +459,7 @@ named entities (e.g. people, organizations, etc.) usually in plain text, but we 
 that the sequence models that work well in plain text can also be employed successfully 
 in WDE, sometimes with a few alterations.
 
-This section gave a brief introduction to Information Extraction, but
+This section gave a brief introduction to \gls{ie}, but
 there are many applications that were not discussed here. A more detailed view 
 of the field is given in the survey by~\cite{Sarawagi2008}.
 
@@ -468,7 +469,7 @@ of the field is given in the survey by~\cite{Sarawagi2008}.
 \gls{ner} is a task in Natural Language Processing that
 aims to identify Named Entities in a text. The \gls{ner} 
 problem definition first appeared as a subtask of 
-Information Extraction in the context of the Message Understanding 
+\gls{ie} in the context of the Message Understanding 
 Conference (MUC) promoted by the American Naval Ocean Systems Center. In 
 MUC-3~\citep{Sundheim1991}, the task involved extracting information on terrorist 
 incidents (incident type, date, location, perpetrator, target, instrument,
@@ -527,7 +528,7 @@ reduced dimensionality, and the next layer usually consists of a multi-layered
 recurrent neural network or a convolutional neural network. 
 
 Essentially all the best scoring models to date at the {CoNLL-2003} task employ some form of 
-deep learning, and most often Long Short-Term Memory Networks (LSTM). When combined with pre-trained
+deep learning, and most often \gls{lstm}s. When combined with pre-trained
 word embeddings, neural networks provide a powerful method of sequence labeling without
 any feature engineering or dictionary matching. However, these models have 
 become quite complex, contrasting with earlier approaches, that
@@ -538,7 +539,7 @@ in a billion token corpus~\citep{Mikolov2013}, the difference gets even more sub
 deep learning models usually require expensive hardware for training to become practical options. 
 
 In summary, the aforementioned sequence labeling models are exactly what we are looking for in the 
-researcher name extraction task. By labeling tokens in a webpage with machine learning
+\gls{rne} task. By labeling tokens in a webpage with machine learning
 models, we can extract researcher names with more flexibility than that provided by traditional 
 tools for \gls{wde}.
 
@@ -546,13 +547,13 @@ tools for \gls{wde}.
 \label{sec:researcher_name_extraction}
 
 The objective of this dissertation is to find the best sequence models for 
-\gls{ner} in the web by assessing their performance in the researcher name extraction task.
+\gls{ner} in the web by assessing their performance in the \gls{rne} task.
 This task consists of extracting researchers names from university 
 faculty listings across the world with the purpose of discovering their affiliations and linking 
 their profiles to public databases such as DBLP or Google Scholar~\footnote{
   This is useful, for instance, if one needs to compare the research output of 
   departments in a country, or study international publication patterns.
-}. Public researcher databases only have sparse information about author affiliation and 
+}. Public researcher databases only have sparse information about author affiliation and,
 even in fields for which the information is more easily available, such as Computer Science,
 only a small fraction of the records have reliable affiliation information, as we have verified
 in our preliminary studies. 
@@ -592,10 +593,10 @@ a key problem in the task of entity name extraction is accounting for every
 possible name combination. Since there is no database with all 
 possible named entity combinations, we need holistic statistical methods that can handle 
 unknown tokens with relative efficacy.
-In Chapter~\ref{cha:dataset}, we introduce the researcher name dataset to evaluate the 
-performance of different sequence models in the researcher name extraction task.
+In Chapter~\ref{cha:dataset}, we introduce the \gls{rne} dataset to evaluate the 
+performance of different sequence models in the \gls{rne} task.
 
-Lastly, another important related task in the context of researcher name extraction is performing named 
+Lastly, another important related task in the context of \gls{rne} is performing named 
 entity disambiguation, which consists of linking the extracted named entities to a unique profile in a 
 database. This task is called Named Entity Linking. In preliminary studies, we verified 
 that roughly half the records found in faculty webpages can be linked to the respective records in public databases 
@@ -614,24 +615,23 @@ of \gls{ner}, which is very useful to \gls{ie} both in plain text and
 web extraction tasks. Recent developments in \gls{ner} can help \gls{wde} systems become
 more flexible, handling extraction tasks across many website formats.
 Lastly, in Section~\ref{sec:researcher_name_extraction}, we discussed the
-problem of researcher name extraction, which is the main topic of this dissertation, 
+problem of \gls{rne}, which is the main topic of this dissertation, 
 showing how it can be challenging and why traditional solutions to \gls{wde} and \gls{ner}
 may have difficulty handling this specific setting. In fact, by combining the valuable 
-knowledge from both fields of study, we can get a more robust approach to researcher 
-name extraction.
+knowledge from both fields of study, we can get a more robust approach to \gls{rne}.
 
 
 \chapter{Related Work}
 
-The researcher name extraction task is a problem of Web Data Extraction that
-we solved with machine learning models for Named Entity Recognition.
-This chapter presents the related research in the fields of Web Data Extraction 
-in Section~\ref{sec:wde} and Named Entity Recognition in Section~\ref{sec:ner}.
+The \gls{rne} task is a problem of \gls{wde} that
+we solved with machine learning models for \gls{ner}.
+This chapter presents the related research in the fields of \gls{wde} 
+in Section~\ref{sec:wde} and \gls{ner} in Section~\ref{sec:ner}.
 
 \section{Web Data Extraction}
 \label{sec:wde}
 
-In the last 20 years, the astonishing growth of public information in the Web has 
+In the last 20 years, the astonishing growth of public information in the web has 
 led to the development of a number of different approaches to the problem of Web 
 Data Extraction. Traditionally, the task was solved by designing special purpose
 programs called wrappers to recognize relevant data and store records in a structured
@@ -658,7 +658,7 @@ require some sort of assistance from human experts to boost accuracy. One of the
 in the field lies in determining an adequate trade-off between the degree of automation and 
 the Precision and Recall of the data extraction tool.
 
-To automate the task of Web data extraction completely some approaches,
+To automate the task of Web Data Extraction completely some approaches,
 such as Road Runner~\citep{Crescenzi2001}, removed entirely the need for data examples.
 Road Runner parses documents belonging to a same class (e.g. books in Amazon) and 
 generates wrappers based on their similarities and differences, yielding comparable results 
@@ -739,7 +739,7 @@ approaches that are domain independent, such as RoadRunner and EXALG only work w
 for extracting data from pages generated from a same template. 
 
 A statistical approach to unsupervised domain 
-independent Web data extraction was described by~\cite{Zhu2005}. The 2D CRF 
+independent Web Data Extraction was described by~\cite{Zhu2005}. The 2D CRF 
 model takes a webpage segmented into data blocks and employs a two dimensional conditional 
 random field model to perform attribute labeling. The model was further improved 
 in~\cite{Zhu2006} to model record segmentation and attribute labeling as a joint task.
@@ -857,7 +857,7 @@ were omitted from this table.
 In this chapter, we discussed the related work in \gls{wde} and \gls{ner}. 
 The models discussed in this dissertation and employed in
 the experiments section are methods for \gls{ner} that were each deemed the best machine learning 
-techniques for solving the problem at a given time. However, the researcher name extraction 
+techniques for solving the problem at a given time. However, the \gls{rne}
 task is essentially a \gls{wde} task, so some ideas from this field are extremely useful, 
 such as using HTML structural features, as we did in the Self-Training strategy for 
 HMMs and the attention models for Neural Networks, that will be introduced in later chapters. Also, 
@@ -866,7 +866,7 @@ such as a specific setting of \gls{wde}. Because, \gls{ner} approaches may be mo
 depending on the objective extraction task. For example, we will see in the experiments section 
 that, despite the significant improvements brought by ELMo embeddings to NER in plain text
 (as attested by the results reported in the {CoNLL-2003} English dataset), their performance is far
-from great when we consider the researcher name extraction task, being surpassed by much simpler
+from great when we consider the \gls{rne} task, being surpassed by much simpler
 methods.
 
 
@@ -1935,7 +1935,7 @@ were labeled correctly as a person name in this case.
 \begin{figure}
   \centering
   \includegraphics[width=0.5\textwidth]{pics/self_training_example}
-  \caption{Example of a webpage snippet with labels attributed by a \gls{hmm}.}
+  \caption{Example of a webpage snippet with labels attributed by a HMM.}
   \label{fig:self_training}
 \end{figure}
 
@@ -2347,7 +2347,7 @@ never observed during training.
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Description of the data files in the \gls{rne} dataset.}
+  \caption{Description of the data files in the RNE dataset.}
   \label{tab:dataset}
 \end{table}
 
@@ -2452,7 +2452,7 @@ approaches is the fact that they can perform well even without the aid of a dict
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{DBLP dictionary coverage in each data file of the \gls{rne} dataset.}
+  \caption{DBLP dictionary coverage in each data file of the RNE dataset.}
   \label{tab:gazetteer}
 \end{table}
 
@@ -2518,7 +2518,7 @@ aforementioned experimental setting.
   \end{center}
   \caption{
     Performance of three classifiers trained with the {CoNLL-2003} training set and tested in
-    the CoNLL-2003 and \gls{rne} test sets.
+    the CoNLL-2003 and RNE test sets.
   }
   \label{tab:conll_to_ner_on_html}
 \end{table}
@@ -2589,7 +2589,7 @@ between different datasets.
       \bottomrule
     \end{tabular}
   \end{center}
-  \caption{Ten most frequent words for the {CoNLL-2003} dataset and the \gls{rne} dataset.}
+  \caption{Ten most frequent words for the {CoNLL-2003} dataset and the RNE dataset.}
   \label{tab:frequent_words}
 \end{table}
 
@@ -2619,7 +2619,7 @@ between different datasets.
       \end{axis}
     \end{tikzpicture}
     \caption{
-      Word frequencies plot for the {CoNLL-2003} dataset and the \gls{rne} dataset.
+      Word frequencies plot for the {CoNLL-2003} dataset and the RNE dataset.
     }
     \label{fig:word_frequency_plot}
   \end{center}
