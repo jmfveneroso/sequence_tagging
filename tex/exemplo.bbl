@@ -88,6 +88,17 @@
   {1}}):\ppgccpagedoformat {1}-\ppgccpagedoformat {}-\ppgccpagedoformat {127}.
 \newblock ISSN \ppgccissndoformat {1935-8237}.
 
+\bibitem[Bengio et~al.\@, 1994]{Bengio1994}
+\ppgccbibauthordoformat {Bengio, Y.\ppgccbibauthorsep {} Simard,
+  P.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Frasconi, P.}
+  (\ppgccyeardoformat {1994}).
+\newblock \ppgccbibtitledoformat {{Learning Long-term Dependencies with
+  Gradient Descent is Difficult}}.
+\newblock \ppgccbibjournaldoformat {Trans. Neur. Netw.}, \ppgccvolumedoformat
+  {5}({\ppgccnumberdoformat {2}}):\ppgccpagedoformat {157}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {166}.
+\newblock ISSN \ppgccissndoformat {1045-9227}.
+
 \bibitem[Bikel et~al.\@, 1999]{Bikel1999}
 \ppgccbibauthordoformat {Bikel, D.~M.\ppgccbibauthorsep {} Schwartz,
   R.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Weischedel, R.~M.}
