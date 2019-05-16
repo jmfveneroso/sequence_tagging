@@ -15,12 +15,12 @@ def load_raw_dataset(f):
     for i, s in enumerate(X):
       tkns, labels = [], []
       for j, t in enumerate(s):
-        # l = ['O', 'B-PER', 'I-PER'].index(t[1])
-        l = ['O', 'B-PER', 'I-PER'].index(t[3])
+        l = ['O', 'B-PER', 'I-PER'].index(t[1])
+        # l = ['O', 'B-PER', 'I-PER'].index(t[3])
         labels.append(l)
         tkns.append(t[0])
-        # X[i][j] = [X[i][j][0]] + X[i][j][2:]
-        X[i][j] = [X[i][j][0], str(X[i][j][0]).lower()]
+        X[i][j] = [X[i][j][0]] + X[i][j][2:]
+        # X[i][j] = [X[i][j][0], str(X[i][j][0]).lower()]
 
       Y.append(labels)
       T.append(tkns)
@@ -39,8 +39,8 @@ class HiddenMarkov:
     self.naive_bayes = naive_bayes
 
     self.num_labels   = 3
-    # self.num_features = 11
-    self.num_features = 1
+    self.num_features = 11
+    # self.num_features = 1
     self.num_secondary_features = 2
     self.num_all_features = self.num_features + self.num_secondary_features
     self.num_states = self.num_labels ** self.time_steps
@@ -135,11 +135,18 @@ class HiddenMarkov:
         states.pop(0) 
         states.append(y) 
   
-    self.transition_mat /= np.expand_dims(np.sum(self.transition_mat, axis=1), axis=1)
-    self.transition_mat = np.nan_to_num(self.transition_mat)
+    print(self.transition_mat)
+    # self.transition_mat /= np.expand_dims(np.sum(self.transition_mat, axis=1), axis=1)
+    # self.transition_mat = np.nan_to_num(self.transition_mat)
 
     if self.naive_bayes:
-      self.transition_mat = np.sum(self.transition_mat, axis=0) / 4
+      self.transition_mat = np.sum(self.transition_mat, axis=0)
+      self.transition_mat /= np.sum(self.transition_mat)
+      print(self.transition_mat)
+    else:
+      self.transition_mat /= np.expand_dims(np.sum(self.transition_mat, axis=1), axis=1)
+      self.transition_mat = np.nan_to_num(self.transition_mat)
+      print(self.transition_mat)
 
   def fit(self, X, Y):
     which_features = [0] * self.num_all_features 
@@ -147,12 +154,12 @@ class HiddenMarkov:
       which_features[i] = 1
 
     if self.use_features:
-      # for i in range(1,1+self.num_features):
-      #   which_features[i] = 1
-      #   # if i != 1 and i != 2:
-      #   #   which_features[i] = 0
-      # which_features[3] = 0
-      # which_features[4] = 0
+      for i in range(1,1+self.num_features):
+        which_features[i] = 1
+        # if i != 1 and i != 2:
+        #   which_features[i] = 0
+      which_features[3] = 0
+      which_features[4] = 0
       which_features[1] = 1
       which_features[2] = 1
       which_features[8] = 1
@@ -223,8 +230,12 @@ class HiddenMarkov:
             emission[y] *= self.feature_counts[k][y]['$UNK']
       # emission[emission == 1] = 0
 
+      print(X[i][0])
+      print(emission)
       p = self.transition_mat * emission
+      print(p)
       labels.append(p.argmax())
+      print(p.argmax())
     return labels
 
   def get_predictions(self, X):

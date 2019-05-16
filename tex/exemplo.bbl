@@ -32,15 +32,6 @@
   {}-\ppgccpagedoformat {1649}, Santa Fe, New Mexico, USA. Association for
   Computational Linguistics.
 
-\bibitem[Arasu et~al.\@, 2003]{Arasu2003}
-\ppgccbibauthordoformat {Arasu, A.\ppgccbibauthorsep {} Garcia-Molina,
-  H.\ppgccbibauthorsep {} Arasu, A.\ppgccbibauthorlastsep {} \ppgccbibauthorand
-  {} Garcia-Molina, H.} (\ppgccyeardoformat {2003}).
-\newblock \ppgccbibtitledoformat {{Extracting structured data from Web pages}}.
-\newblock \ppgccbibjournaldoformat {2003 ACM SIGMOD International Conference on
-  Management of Data}, \ppgccbibpagesstring {} \ppgccpagedoformat {337
-  }-\ppgccpagedoformat {}-\ppgccpagedoformat { 348}.
-
 \bibitem[Arocena \ppgccciteauthorand {} Mendelzon, 1998]{Arocena1999}
 \ppgccbibauthordoformat {Arocena, G.~O. \ppgccbibauthorand {} Mendelzon, A.~O.}
   (\ppgccyeardoformat {1998}).
@@ -844,25 +835,6 @@
   18th ACM/IEEE on Joint Conference on Digital Libraries}, JCDL '18,
   \ppgccbibpagesstring {} \ppgccpagedoformat {389}-\ppgccpagedoformat
   {}-\ppgccpagedoformat {390}, New York, NY, USA. ACM.
-
-\bibitem[Wang \ppgccciteauthorand {} Lochovsky, 2003]{Wang2003}
-\ppgccbibauthordoformat {Wang, J. \ppgccbibauthorand {} Lochovsky, F.~H.}
-  (\ppgccyeardoformat {2003}).
-\newblock \ppgccbibtitledoformat {{Data Extraction and Label Assignment for Web
-  Databases}}.
-\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of the
-  12th International Conference on World Wide Web}, WWW '03,
-  \ppgccbibpagesstring {} \ppgccpagedoformat {187}-\ppgccpagedoformat
-  {}-\ppgccpagedoformat {196}, New York, NY, USA. ACM.
-
-\bibitem[Zhai \ppgccciteauthorand {} Liu, 2005]{Zhai2005}
-\ppgccbibauthordoformat {Zhai, Y. \ppgccbibauthorand {} Liu, B.}
-  (\ppgccyeardoformat {2005}).
-\newblock \ppgccbibtitledoformat {{Web data extraction based on partial tree
-  alignment}}.
-\newblock \ppgccbibjournaldoformat {Proceedings of the 14th international
-  conference on World Wide Web - WWW '05}, \ppgccbibpagestring {}~76.
-\newblock ISSN \ppgccissndoformat {10414347}.
 
 \bibitem[Zhu et~al.\@, 2005]{Zhu2005}
 \ppgccbibauthordoformat {Zhu, J.\ppgccbibauthorsep {} Nie, Z.\ppgccbibauthorsep

@@ -6,4 +6,4 @@ run:
 .PHONY: clean
 
 clean:
-	rm -f *.aux *.lof *.log *.lot *.out *.toc *.pdf
+	rm -f *.aux *.lof *.log *.lot *.out *.toc *.pdf *.ist *.blg

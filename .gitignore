@@ -20,3 +20,9 @@ tex/*.log
 tex/*.lot
 tex/*.out
 tex/*.toc
+tex/*.bbl
+tex/*.blg
+tex/*.glg
+tex/*.glo
+tex/*.gls
+tex/*.ist

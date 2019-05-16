@@ -165,8 +165,8 @@ if sys.argv[1] == 'hmm':
     timesteps = 1
   
   print('Fitting...')
-  X, Y, _ = load_raw_dataset('data/conll2003_person/train')
-  # X, Y, _ = load_raw_dataset('data/ner_on_html/train')
+  # X, Y, _ = load_raw_dataset('data/conll2003_person/train')
+  X, Y, _ = load_raw_dataset('data/ner_on_html/train')
   hmm = HiddenMarkov(
     timesteps, 
     naive_bayes=naive_bayes,
@@ -178,8 +178,8 @@ if sys.argv[1] == 'hmm':
 
   for name in ['train', 'valid', 'test']:
     print('Predicting ' + name)
-    x, t, w = load_raw_dataset('data/conll2003_person/' + name)
-    # x, t, w = load_raw_dataset('data/ner_on_html/' + name)
+    # x, t, w = load_raw_dataset('data/conll2003_person/' + name)
+    x, t, w = load_raw_dataset('data/ner_on_html/' + name)
     p = hmm.predict(x)
 
     t = [[['O', 'B-PER', 'I-PER'][t__] for t__ in t_] for t_ in t]

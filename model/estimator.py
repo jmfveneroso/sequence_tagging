@@ -61,17 +61,17 @@ class Estimator:
     print("Model saved in path: %s" % save_path) 
 
   def get_dict(self, features, labels, train):
-    # ((words, nwords), (chars, nchars)), (f_vector, html, (css_chars, css_lengths)) = features
-    ((words, nwords), (chars, nchars)) = features
+    ((words, nwords), (chars, nchars)), (f_vector, html, (css_chars, css_lengths)) = features
+    # ((words, nwords), (chars, nchars)) = features
     return {
       'inputs/words:0': words,
       'inputs/nwords:0': nwords,
       'inputs/chars:0': chars,
       'inputs/nchars:0': nchars,
-      # 'inputs/features:0': f_vector,
-      # 'inputs/html:0': html,
-      # 'inputs/css_chars:0': css_chars,
-      # 'inputs/css_lengths:0': css_lengths,
+      'inputs/features:0': f_vector,
+      'inputs/html:0': html,
+      'inputs/css_chars:0': css_chars,
+      'inputs/css_lengths:0': css_lengths,
       'inputs/labels:0': labels,
       'inputs/training:0': train,
       'inputs/learning_rate:0': self.learning_rate,
@@ -88,8 +88,7 @@ class Estimator:
     for step in range(1, 1000000):
       try:
         features, labels = sess.run(next_el)
-        # ((words_, nwords_), (chars, nchars)), _ = features
-        ((words_, nwords_), (chars, nchars)) = features
+        ((words_, nwords_), (chars, nchars)), _ = features
   
         target = [
           'output/loss:0', 
@@ -150,9 +149,9 @@ class Estimator:
         SequenceModel(self.params).create()
         sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
         saver = tf.train.Saver()
-      # self.dataset = NerOnHtml(self.params)
+      self.dataset = NerOnHtml(self.params)
       # self.dataset = Conll2003(self.params)
-      self.dataset = Conll2003Person(self.params)
+      # self.dataset = Conll2003Person(self.params)
   
       for epoch in range(self.params['current_epoch'], self.params['epochs']):
         _, _ = self.run_epoch(sess, 'train', epoch_num=epoch, train=True)
@@ -168,9 +167,9 @@ class Estimator:
   def test(self):
     with tf.Session() as sess:
       _ = self.restore(sess)
-      # self.dataset = NerOnHtml(self.params)
+      self.dataset = NerOnHtml(self.params)
       # self.dataset = Conll2003(self.params)
-      self.dataset = Conll2003Person(self.params)
+      # self.dataset = Conll2003Person(self.params)
       
       for name in ['train', 'valid', 'test']:
         _, (p, t, w) = self.run_epoch(sess, name)

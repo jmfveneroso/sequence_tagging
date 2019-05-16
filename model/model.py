@@ -4,7 +4,7 @@ import tensorflow as tf
 from pathlib import Path
 from model.char_representations import get_char_representations, get_char_embeddings
 from model.attention import attention, exact_attention, pos_embeddings, normalize, multihead_attention
-from model.word_embeddings import glove, elmo, word2vec
+from model.word_embeddings import glove, elmo, word2vec, one_hot_embs
 from model.html_embeddings import get_html_representations, get_soft_html_representations
 
 class SequenceModel:
@@ -44,10 +44,10 @@ class SequenceModel:
       self.nwords        = tf.placeholder(tf.int32,   shape=(None,),            name='nwords'      )
       self.chars         = tf.placeholder(tf.string,  shape=(None, None, None), name='chars'       )
       self.nchars        = tf.placeholder(tf.int32,   shape=(None, None),       name='nchars'      )
-      # self.features      = tf.placeholder(tf.float32, shape=(None, None, 4),    name='features'    )
-      # self.html          = tf.placeholder(tf.string,  shape=(None, None, None), name='html'        )
-      # self.css_chars     = tf.placeholder(tf.string,  shape=(None, None, None), name='css_chars'   )
-      # self.css_lengths   = tf.placeholder(tf.int32,   shape=(None, None),       name='css_lengths' )
+      self.features      = tf.placeholder(tf.float32, shape=(None, None, 4),    name='features'    )
+      self.html          = tf.placeholder(tf.string,  shape=(None, None, None), name='html'        )
+      self.css_chars     = tf.placeholder(tf.string,  shape=(None, None, None), name='css_chars'   )
+      self.css_lengths   = tf.placeholder(tf.int32,   shape=(None, None),       name='css_lengths' )
       self.labels        = tf.placeholder(tf.string,  shape=(None, None),       name='labels'      )
       self.training      = tf.placeholder(tf.bool,    shape=(),                 name='training'    )
       self.learning_rate = tf.placeholder_with_default(
@@ -120,6 +120,17 @@ class SequenceModel:
       )
       pred_strings = reverse_vocab_tags.lookup(tf.to_int64(pred_ids))  
 
+  def maxent(self, use_features=False):
+    word_embs = one_hot_embs(self.words, self.params['words'])
+
+    # embs = [word_embs]
+
+    # if use_features: 
+    #   embs.append(self.features)
+    # embs = tf.concat(embs, axis=-1)
+
+    return tf.layers.dense(word_embs, 100)
+
   def crf(self, word_embs='glove', char_embs='cnn', use_features=False):
     if word_embs == 'elmo':
       word_embs = elmo(self.words, self.nwords)
@@ -128,12 +139,7 @@ class SequenceModel:
     elif word_embs == 'word2vec':
       word_embs = word2vec(self.words, self.params['words'], self.params['word2vec'])
     elif word_embs == 'one_hot':
-      vocab_size = 0
-      with Path(self.params['words']).open() as f:
-        indices = [idx for idx, tag in enumerate(f)]
-        vocab_size = len(indices) + 1
-
-      word_embs = tf.one_hot(self.words, vocab_size)
+      word_embs = one_hot_embs(self.words, self.params['words'])
     else:
       raise Exception('No word embeddings were selected.')
 
@@ -298,7 +304,9 @@ class SequenceModel:
     elif model == 'transformer':
       output = self.transformer()
     elif model == 'crf':
-      output = self.crf(char_embs=self.params['char_representation'], use_features=self.params['use_features'])
+      output = self.crf(word_embs=self.params['word_embeddings'], char_embs=self.params['char_representation'], use_features=self.params['use_features'])
+    elif model == 'maxent':
+      output = self.maxent(use_features=self.params['use_features'])
     else:
       raise Exception('Model does not exist.')
 
