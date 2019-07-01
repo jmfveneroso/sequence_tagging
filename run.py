@@ -3,6 +3,7 @@ matplotlib.use('Agg')
 from model.estimator import Estimator
 import numpy as np
 import matplotlib.pyplot as plt
+import time
 import sys
 import os
 import tensorflow as tf
@@ -159,6 +160,7 @@ elif sys.argv[1] == 'print_matrices':
   new_im.save('figures/all.png', 'PNG')
 
 if sys.argv[1] == 'hmm':
+  start_time = time.time()
   timesteps = int(sys.argv[2])
   naive_bayes = timesteps == 0
   if naive_bayes:
@@ -170,9 +172,9 @@ if sys.argv[1] == 'hmm':
   hmm = HiddenMarkov(
     timesteps, 
     naive_bayes=naive_bayes,
-    use_gazetteer=False,
-    use_features=False,
-    self_train=False
+    use_gazetteer=True,
+    use_features=True,
+    self_train=True
   )
   hmm.fit(X, Y)
 
@@ -190,6 +192,8 @@ if sys.argv[1] == 'hmm':
         f.write(b'\n')
         for word, pred, tag in zip(words, preds, tags):
           f.write(' '.join([word, tag, pred]).encode() + b'\n')
+
+  print('Elapsed time: %.4f' % (time.time() - start_time))
 
 # if sys.argv[1] == 'baum-welch':
 #   def load(f):

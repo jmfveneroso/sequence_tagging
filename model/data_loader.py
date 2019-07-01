@@ -333,7 +333,7 @@ class NerOnHtml:
     
     # Feature vector. 
     # features = [[float(f) for f in s[2][:2] + s[2][4:10]] for s in sentence]
-    features = [[float(f) for f in s[2][:2] + s[2][7:9]] for s in sentence]
+    features = [[float(f) for f in s[2][:2] + s[2][4:9]] for s in sentence]
 
     # HTML features.
     html_features = [[f.encode() for f in s[2][10:]] for s in sentence]

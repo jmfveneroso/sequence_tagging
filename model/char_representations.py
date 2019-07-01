@@ -2,28 +2,28 @@ import tensorflow as tf
 from pathlib import Path
 from six.moves import reduce
 
-def cnn_char_representations(t, masks, filters, kernel_size):
+def cnn_char_representations(t, weights, filters, kernel_size):
   shape = tf.shape(t)
   ndims = t.shape.ndims
   dim1 = reduce(lambda x, y: x*y, [shape[i] for i in range(ndims - 2)])
   dim2 = shape[-2]
   dim3 = t.shape[-1]
 
-  # Reshape masks
-  masks = tf.reshape(masks, shape=[dim1, dim2, 1])
-  masks = tf.to_float(masks)
+  # Reshape weights
+  weights = tf.reshape(weights, shape=[dim1, dim2, 1])
+  weights = tf.to_float(weights)
 
-  # Reshape input and apply masks
+  # Reshape input and apply weights
   flat_shape = [dim1, dim2, dim3]
   t = tf.reshape(t, shape=flat_shape)
-  t *= masks
+  t *= weights
 
   # Apply convolution
-  t_conv = tf.layers.conv1d(t, 15, kernel_size, padding='same')
-  t_conv *= masks
+  t_conv = tf.layers.conv1d(t, filters, kernel_size, padding='same')
+  t_conv *= weights
 
   # Reduce max -- set to zero if all padded
-  t_conv += (1. - masks) * tf.reduce_min(t_conv, axis=-2, keepdims=True)
+  t_conv += (1. - weights) * tf.reduce_min(t_conv, axis=-2, keepdims=True)
   t_max = tf.reduce_max(t_conv, axis=-2)
 
   # Reshape the output

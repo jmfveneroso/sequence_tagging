@@ -157,7 +157,7 @@ def filter_names(f_):
 
     lines = remove_honorifics(lines)
     lines = remove_numbers(lines)
-    lines = remove_fringe_punctuation(lines)
+    # lines = remove_fringe_punctuation(lines)
     lines = remove_single_names(lines)
     lines = remove_duplicates(lines)
 

@@ -44,7 +44,8 @@ class SequenceModel:
       self.nwords        = tf.placeholder(tf.int32,   shape=(None,),            name='nwords'      )
       self.chars         = tf.placeholder(tf.string,  shape=(None, None, None), name='chars'       )
       self.nchars        = tf.placeholder(tf.int32,   shape=(None, None),       name='nchars'      )
-      self.features      = tf.placeholder(tf.float32, shape=(None, None, 4),    name='features'    )
+      # self.features      = tf.placeholder(tf.float32, shape=(None, None, 4),    name='features'    )
+      self.features      = tf.placeholder(tf.float32, shape=(None, None, 7),    name='features'    )
       self.html          = tf.placeholder(tf.string,  shape=(None, None, None), name='html'        )
       self.css_chars     = tf.placeholder(tf.string,  shape=(None, None, None), name='css_chars'   )
       self.css_lengths   = tf.placeholder(tf.int32,   shape=(None, None),       name='css_lengths' )
@@ -166,9 +167,12 @@ class SequenceModel:
       word_embs = glove(self.words, self.params['words'], self.params['glove'])
     elif word_embs == 'word2vec':
       word_embs = word2vec(self.words, self.params['words'], self.params['word2vec'])
+    elif word_embs == 'one_hot':
+      word_embs = one_hot_embs(self.words, self.params['words'])
     else:
       raise Exception('No word embeddings were selected.')
 
+    word_embs = self.dropout(word_embs)
     embs = [word_embs]
     if char_embs in ['cnn', 'lstm']:
       char_embs = get_char_representations(
@@ -176,13 +180,13 @@ class SequenceModel:
         self.params['chars'], mode=char_embs,
         training=self.training
       )
+      char_embs = self.dropout(char_embs)
       embs.append(char_embs)
 
     if use_features: 
       embs.append(self.features)
 
     embs = tf.concat(embs, axis=-1)
-    embs = self.dropout(embs)
     return self.lstm(embs, self.params['lstm_size'])
 
   def self_attention(self, num_heads=1, residual='concat', queries_eq_keys=False):
