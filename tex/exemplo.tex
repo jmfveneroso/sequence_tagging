@@ -901,7 +901,7 @@ will become increasingly uncommon in the dataset, what makes probability estimat
 example, if the vocabulary size consists of 1,000 words and there are three possible labels for each 
 word, then there are already 27 billion combinations for sequences of only three words and labels.
 Also, sequences that were not seen during training will always have zero probability. That is problematic, 
-because proper names are often unique or very infrequent in a corpus (e.g. Veneroso, Schmidt, etc.),
+because proper names are often unique or very infrequent in a corpus,
 so many word sequences that we care about will belong to this category.
 
 Ultimately, the difference between statistical sequence labelling models lies in the assumptions 
@@ -956,7 +956,7 @@ P(Y_i=L_k|Y_{i-1}) = P(Y_i=L_k|Y_{i-1}, Y_{i-2}, \ldots, Y_1)
 \end{equation}
 %
 The probability of observing state $ Y_i=L_k $ depends only on the previous state.
-What the Markov Assumption implies is that, at any position in the sequenec, the entire history 
+What the Markov Assumption implies is that, at any position in the sequence, the entire history 
 of observed states is encoded in the previous state. So, by knowing the
 previous state, we can make as accurate predictions about the future as we would make by 
 knowing all the history. Conditioned on this previous state, the future and past states 
@@ -972,7 +972,7 @@ regarding higher order Markov Chains.
 
 A Markov Chain can represent a wide range of phenomena such as daily temperatures in a region, 
 closing prices of a stock in the financial market, yearly demographic growth, or words in a text. 
-However, in all these cases it is a simplification of reality that makes sequences mathematically 
+However, in all these cases, the model is a simplification of reality that makes sequences mathematically 
 treatable. The extent to which this simplification will hurt our predictions depends on the 
 nature of the studied phenomena. 
 
@@ -997,7 +997,7 @@ as well as the other models presented later in this chapter.
 However, HMMs up to third-order can work well if 
 we add independent features to make up for the lack of a longer context. 
 
-Further, besides the Markov Assumption, we make the Time Invariance Assumption:
+Furthermore, besides the Markov Assumption, we make the Time Invariance Assumption:
 %
 \begin{equation}
 P(Y_{i+1} = L_b |Y_{i} = L_a) = P(Y_i = L_b |Y_{i-1} = L_a)
@@ -1014,7 +1014,7 @@ timesteps in the text, we mean the position of a token or label in the sequence.
 % For the sake simplicity, assume that, unless clearly stated, the random
 % variables $ Y_i $ refer to $ Y_i=L_k $ 
 With this, we can calculate the probability of observing sequence
-$ Y = \{ Y_1, Y_2, ..., Y_n \} $ as:
+$ {{ Y = \{ Y_1, Y_2, ..., Y_n \} }} $ as:
 %
 \begin{equation}
 P(Y) = \prod_{i=1}^{n} P(Y_i|Y_{i-1}) \\
@@ -1066,14 +1066,16 @@ size $ m $ with the probabilities for each state at time $ t $. Then:
 %
 Where $ \rho_0 $ is the vector of starting probabilities for each state. We assume that we 
 have no knowledge about the initial probabilities of our Markov Chain, so we simply 
-attribute the same probability to every state at time $ t=0 $. For convenience, consider that $ P(Y_1|Y_0) $ 
+attribute the same probability to every state at time $ t=0 $. For the Markov Chain described
+in Figure~\ref{fig:markov_graph}, this assumption would make $ \rho_0 = ( 0.5, 0.5 ) $. 
+For convenience, consider that $ P(Y_1|Y_0) $ 
 is the probability of $ Y_1 $ given the initial vector of uniform state
 probabilities $ \rho_0 $. 
 
-Now we know how to calculate the state probabilities for a Markov Chain at any timestep
+Now we know how to calculate the state probabilities for a Markov Chain at any position in the sequence
 provided that we know the transition matrix. In the context of sequence labeling, we want
 to obtain the transition matrix $ \theta $ from our training data.
-The usual choice is to obtain $ \theta $ such that it maximizes the probability of reproducing 
+The most usual choice is to obtain $ \theta $ such that it maximizes the probability of reproducing 
 our labeled dataset with Maximum Likelihood Estimation. More formalliy, the likelihood of our model 
 is given by:
 %
@@ -1084,7 +1086,7 @@ is given by:
 Where $ y_i $ is the correct label at position $ i $.
 By defining $ \eta_{a,b} $ to be the count of transitions from state 
 $ a $ to $ b $ in the dataset, where $ a $ and $ b $ are states
-from a finite set of states $ L = \{ L_1, L_2, \ldots, L_k \} $. We can write the likelihood as:
+from a finite set of states $ L = \{ L_1, L_2, \ldots, L_k \} $. Instead, we can write the likelihood as:
 %
 \begin{equation}
 \mathcal{L}(\theta) = \prod_{a, b \; \in \; L} \theta_{a, b}^{\eta_{a, b}}
@@ -1107,7 +1109,7 @@ Then, the maximum likelihood estimator becomes:
 \end{align}
 %
 However, if we try to optimize this function as it is, we will find that
-$ \hat\theta_{a, b} = \infty, \; \forall \; a \in L, b \in L $. This happens because we did not
+$ \hat\theta_{a, b} = \infty $. This happens because we did not
 take into account the degrees of freedom of our model. Every row in the transition matrix must sum up to one,
 so the parameters for the last row are defined by the preceding rows. The degrees of freedom 
 for the model are actually $ |L|(|L|-1) $ and not $ |L|^2 $ as we were inadvertently considering before. 
@@ -1151,8 +1153,8 @@ are observed, while the named entity labels associated with these words are not.
 another layer of complexity. The \gls{hmm} differs from the Markov Chain in that it 
 does not observe the states $ Y $ directly, but rather a probabilistic function of these states.
 In Markov Chains, only the labels were being considered without 
-mention of the accompanying words. With the \gls{hmm}, we want to predict a sequence of 
-labels $ Y = \{Y_1, Y_2, ..., Y_n\} $ 
+mention of the accompanying words. With the \gls{hmm}, we want to estimate the probabilities of 
+a sequence of labels $ Y = \{Y_1, Y_2, ..., Y_n\} $ 
 (i.e. the Markov Chain) from a sequence of observed states $ X = \{X_1, X_2, ..., X_n\} $
 (i.e. the words in a text, or a feature vectors with independent features). 
 Now, to calculate the conditional probability for a sequence of labels we employ 
@@ -1185,7 +1187,7 @@ label, the current word is independent of the other words in the sequence.
 This assumption is problematic when we want to use observations from other positions in
 the sequence to predict labels at the current position, because these observations are
 likely to be correlated. For this reason, other models such as \gls{crf}s (explored in the next section) 
-try to overcome this issue by making different assumptions. 
+try to overcome this issue by taking different assumptions. 
 
 Now we can finally calculate the probability of a sequence $ Y $ given a sequence of 
 observations $ X $:
@@ -1247,7 +1249,7 @@ Now the log-likelihood for the \gls{hmm} is defined as:
 where $ \eta'_{c, d} $ is a function that counts the number of emissions from state $ c $
 to word $ d $. The matrices $ \theta $ and $ \mu $ are independent, so we can optimize for
 the transition and emission matrices separately, therefore the procedure to find $ \hat\theta $ 
-is exactly the same that we described in Equation~\ref{eq:theta_estimate}. Also, notice that
+is still the one described in Equation~\ref{eq:theta_estimate}. Also, notice that
 if we do the same procedure with Lagrangian Multipliers that we employed to find the MLE 
 for Markov Chains, but this time we take the partial derivatives relative to 
 $ \mu_{c,d} $ and set the constraints such that each line in the emission matrix must sum up
@@ -1274,7 +1276,7 @@ The problem with the Maximum Likelihood Estimate derived above is that the emiss
 words that were not observed in the training set will always be zero. Considering that we only have a 
 small dataset and even if it were much bigger we would still observe new words when running predictions
 for unseen data, this problem needs to be addressed. We use Laplace smoothing~\citep{Manning1999} to change 
-the estimates for $ \theta $ and $ \mu $ atributing some probability mass to unseen tokens:
+the estimates for $ \theta $ and $ \mu $ attributing some probability mass to unseen tokens:
 %
 \begin{align}
 \hat{\theta}_{a, b}    =  \frac{\eta_{a, b} + 1}{\sum_{b' \; \in \; L} \eta_{a, b'} + |L|} \\
@@ -1292,7 +1294,7 @@ much probability mass to unseen words relative to other smoothing methods.
 
 The last task that needs to be done is to calculate the most likely sequence of labels given a sequence of
 observations. With estimates for transition and emission matrices we can easily calculate the conditional
-probability $ P(Y|X) $ of each label sequence, given the observed sequence $ X $. But, instead of 
+probability $ P(Y=y|X=x) $ of each label sequence $ y $, given the observed sequence $ x $. But, instead of 
 computing probabilities for each possible label configuration and taking the one with maximum probability,
 we can obtain the label sequence with maximum probability with the Viterbi algorithm by~\cite{Forney1973}, which is a dynamic 
 programming algorithm that calculates the probabilities for sequences with the Markov Property exactly and efficiently.
@@ -1366,34 +1368,42 @@ the least number of assumptions is the best. Which is a good rule of thumb for s
 even though, ultimately, nothing guarantees that simpler models will be better.
 
 The task of labeling word sequences can be thought of as a multinomial classification task where 
-each label $ y $ is predicted according to its context $ x $. The context is defined as 
-a vector of observations that expresses features (useful pieces of evidence) such as: the last word 
-is an honorific, the current word is capitalized, the current word is "that", etc. And we
-define $ k $ binary feature functions $ f_i \; \forall i \in [1, k] $ such that:
+each label $ Y $ is predicted according to its context $ X $. The random variable $ Y $ takes
+values from a finite set of labels $ L = \{ L_1, L_2, \ldots, L_k \} $ and the random variable
+$ X $ takes a value from a finite set of possible contexts $ C $. These contexts are defined by 
+a vector of observations expressing features (useful pieces of evidence) such as: the last word 
+is an honorific, the current word is capitalized, the current word is "that", etc. Also, we
+define $ k $ binary feature functions $ f_j \; \forall j \; \in \; [1, k] $ such that:
 %
 \begin{equation}
-  f_i(x, y) = \begin{cases} 
-    1 \text{ if } y = L \text{ and the feature is present in } x \\ 
+  f_j(x, y) = \begin{cases} 
+    1 \text{ if } y = L_a \text{ and the feature is present in } x \\ 
     0 \text{ otherwise}
   \end{cases}
 \end{equation}
 %
+Where the feature function is only true when the observed label is $ L_a $ and the feature
+occurs in context $ x $.
 So, at any position in the sequence, the truth statement of the feature functions can be
-determined in terms of the predicted label $ y $ and the context $ x $. But, different from
-HMMs, we do not assume that features are independent. Now, the Maximum Entropy framework 
+determined in terms of the predicted label $ y $ and the context $ x $. At this moment,
+we treat the task of attributing labels to tokens at each position independently, so we 
+consider that the context $ x_i $ and label $ y_i $ for a token at
+position $ i $ can simply be represented generically by $ x $ and $ y $.
+
+Now, the Maximum Entropy framework 
 provides a compelling way for estimating the probability of a label given its linguistic context, 
 that is $ P(Y|X) $. In the sequence labeling problem, we actually want to maximize the conditional 
 entropy:
 %
 \begin{equation}
-H(Y|X) = - \sum_{i = 1}^{n} P(x, y) \cdot log \left( P(y|x) \right)
+H(Y|X) = - \sum_{x \; \in \; C, y \; \in \; L} P(X=x, Y=y) \cdot log \left( P(Y=y|X=x) \right)
 \end{equation}
 %
-It is usual to approximate $ P(x, y) $ with $ P(y|x) \tilde{P}(x) $~\citep{Ratnaparkhi1998}, because
-the model probability $ P(x) $ is hard to obtain since its probability space 
-is the entire range of feature configurations, which is usually very big.
-However, the observed probability $ \tilde{P}(x) $ is defined over a fixed training
-sample, so we only need to calculate probabilities for feature configurations that
+It is usual to approximate $ P(X=x, Y=y) $ with $ P(Y=y|X=x) \tilde{P}(X=x) $~\citep{Ratnaparkhi1998}, because
+the model probability $ P(X=x) $ is hard to obtain since its probability space 
+is the entire range of context configurations, which is usually very big.
+However, the observed probability $ \tilde{P}(X=x) $ is defined over a fixed training
+sample, so we only need to calculate probabilities for context configurations that
 actually occur in this sample.
 
 If we maximize $ H(Y|X)$ subject to no restrictions, we will find that the 
@@ -1418,14 +1428,16 @@ where $ E_{P}[f_i] $ is the model expectation of $ f_i $ and $ E_{\tilde{P}}[f_i
 empirical expectation of $ f_i $. Or more clearly:
 %
 \begin{align*}
-E_{P}[f_i]         = \sum_{x \in X, y \in Y} \tilde{P}(x)P(y|x) f_i(x, y) \\
-E_{\tilde{P}}[f_i] = \sum_{x \in X, y \in Y} \tilde{P}(x, y) f_i(x, y)
+E_{P}[f_i]         = \sum_{x \; \in \; C, y \; \in \; L} \tilde{P}(x)P(y|x) f_i(x, y) \\
+E_{\tilde{P}}[f_i] = \sum_{x \; \in \; C, y \; \in \; L} \tilde{P}(x, y) f_i(x, y)
 \end{align*}
 %
+From this point forward, assume that, when the random variable is omitted,
+$ P(x) \equiv P(X=x) $.
 Additionally, we need to make sure that the probabilities sum up to one, so:
 %
 \begin{equation}
-\sum_{y \in Y} P(y|x) = 1 \;\;\; \forall \; x \in X
+\sum_{y \; \in \; L} P(y|x) = 1 \;\;\; \forall \; x \in C
 \label{eq:maxent_constraints}
 \end{equation}
 %
@@ -1434,7 +1446,7 @@ Multipliers by defining the Lagrangian:
 %
 \begin{equation}
 \Lambda(P, \lambda, \beta) = H(Y|X) + \sum_{i=1}^k \lambda_i (E_{P}[f_i] - E_{\tilde{P}}[f_i]) 
-+ \sum_{x \in X} \beta_x \left( \sum_{y \in Y} P(y|x) - 1 \right)
++ \sum_{x \; \in \; C} \beta_x \left( \sum_{y \; \in \; L} P(y|x) - 1 \right)
 \end{equation}
 %
 and solving the unconstrained optimization problem to obtain the maximum entropy 
@@ -1515,16 +1527,16 @@ sequence of labels. That is, they normalize the probabilities over the entire
 sequence of labels and the feature functions also take the previous label in consideration. 
 The CRF equation is very similar to the generic maximum entropy equation derived earlier. The only difference being
 the assumptions about the feature functions and the joint decoding of label sequences. 
-For a sequence of contexts $ X $ and labels $ Y $ with size $ n $ and $ k $ feature functions, the 
-Linear Chain \gls{crf} is defined by:
+For a sequence of contexts $ x = \{ x_1, x_2, \ldots, x_n \} $ and labels $ y = \{ y_1, y_2, \ldots, y_n \} $ 
+with size $ n $, and $ k $ feature functions, the Linear Chain \gls{crf} is defined by:
 
 \begin{eqnarray}
-P(Y|X) = \frac{1}{Z(x)} \prod_{t=1}^{n} exp \left( \sum_{k=1}^{k} \theta_k f_k(y_{t-1}, y_t, X) \right) \\
-Z(x) = \sum_{Y'} \prod_{t=1}^{n} exp \left( \sum_{i=1}^{k} \theta_k f_k(y_{t-1}, y_t, X) \right)
+P(Y=y|X=x) = \frac{1}{Z(x)} \prod_{i=1}^{n} exp \left( \sum_{j=1}^{k} \theta_j f_j(y_{i-1}, y_i, x_i) \right) \\
+Z(x) = \sum_{y'} \prod_{i=1}^{n} exp \left( \sum_{j=1}^{k} \theta_j f_j(y_{i-1}, y_i, x_i) \right)
 \end{eqnarray}
 
-Where $ Y' $ is the set of all possible label combinations with size $ n $. This is a huge 
-combinatorial space with $ |Y|^n $ combinations, where $ |Y| $ is the number of possible labels.
+Where $ y' $ is the set of all possible label combinations with size $ n $. This is a huge 
+combinatorial space with $ |L|^n $ combinations, where $ |L| $ is the number of possible labels.
 But this quantity can be calculated efficiently with the sum-product algorithm, because of the assumptions 
 regarding the feature functions. The most likely label sequence can be calculated with the Viterbi 
 algorithm, as was the case for HMMs. 
@@ -1534,8 +1546,8 @@ analysis of Conditional Random Fields that is not restricted to Linear Chains, c
 
 \subsection{Conclusion}
 
-CRFs are more general than HMMs, because the transitions from $ y_{t-1} $ to $ y_{t} $ can depend 
-on the whole vector of observations $ X $ instead of being independent from $ X $. This flexibility of 
+CRFs are more general than HMMs, because the transitions from $ y_{i-1} $ to $ y_{i} $ can depend 
+on the context $ x_i $ and the feature functions may be correlated. This flexibility of 
 feature functions, and the fact that CRFs model the conditional probability instead of the joint
 probability allows for a wider range of possibilities. In general, CRFs have performed better than HMMs
 in sequence labeling problems, but recently, pure CRF models have been largely replaced by neural networks.
@@ -1890,11 +1902,12 @@ out false positive from a huge corpus than to manually find the missed entries.
 As described in Section~\ref{sec:hmm}. An \gls{hmm} for the sequence labeling task 
 has the form:
 \begin{equation}
-P(Y|X) \propto \prod_{i=1}^n P(x_i|y_i) P(y_i, y_{i-1})
+P(y|x) \propto \prod_{i=1}^n P(x_i|y_i) P(y_i, y_{i-1})
 \end{equation}
-where $ X $ is a sequence of words and $ Y $ is a sequence of labels, both with size $ n $,
+where $ x $ is a sequence of words and $ y $ is a sequence of labels, both with size $ n $,
 and the initial probabilities $ P(y_1|y_0) $ follow a uniform distribution across all label 
-assignments.
+assignments. Also, to simplify the notation, we omit the random variables, that is,
+$ {{ P(Y=y|X=x) \equiv P(y|x) }} $.
 To construct this model from the data, we need to estimate the following probabilities:
 %
 \begin{itemize}
@@ -1910,20 +1923,20 @@ P(x_i|y_i) = P(f_{i,1}, f_{i,2}, ..., f_{i,k}|y_i) = \prod_{j=1}^k P(f_{i,j}|y_i
 %
 Also, due to the time invariance assumption, the $ P(f_{i,j}|y_i) $ probabilities 
 are independent of the timestep $ i $. Therefore, for each binary feature $ f_j $ we
-need only estimate the parameters $ \hat{P}(f_{j}|y) $, relative to each possible
-assignment of $ y $.
+need only estimate the parameters $ \hat{P}(f_{j}|y_a) $, relative to each possible
+assignment of $ y_a $.
 The maximum likelihood estimators for these feature parameters can be obtained
 from their relative frequencies, just as we did in Section~\ref{sec:hmm} for single words 
 (Equation~\ref{eq:mle_words}). Then, for binary features:
 %
 \begin{equation}
-\hat{P}(f_{j}=1|y=l) = \frac{\text{Count}(f_{j}=1, y=l)}
-{\text{Count}(f_{j}=0, y=l) + \text{Count}(f_{j}=1, y=l)}
+\hat{P}(f_{j}=1|y_a) = \frac{\text{Count}(f_{j}=1, y_a)}
+{\text{Count}(f_{j}=0, y_a) + \text{Count}(f_{j}=1, y_a)}
 \label{eq:feature_mle}
 \end{equation}
 %
-Where $ \text{Count}(f_{j}=1, y=l) $ is the number of times in the training set that
-feature $ f_j $ was equal to one when the actual label was $ l $ (the other counts follow the same logic).
+Where $ \text{Count}(f_{j}=1, y_a) $ is the number of times in the training set that
+feature $ f_j $ was equal to one when the actual label was $ y_a $ (the other counts follow the same logic).
 This approach yields good experimental results for textual features such as the capitalization
 of a word, but if we try to use HTML structural features such as the HTML tags, we will find that
 they are not very useful, contradicting our intuition.
@@ -1956,15 +1969,11 @@ we can use this model to predict the labels for an unlabeled document, and then 
 the actual labels in Equation~\ref{eq:feature_mle} with the predicted labels, we get:
 %
 \begin{equation}
-\hat{P}(f_{j}=1|y=l) = \frac{\text{Count}(f_{j}=1, \tilde{y}=l)}
-{\text{Count}(f_{j}=0, \tilde{y}=l) + \text{Count}(f_{j}=1, \tilde{y}=l)}
+\hat{P}(f_{j}=1|y_a) = \frac{\text{Count}(f_{j}=1, \tilde{y}_a)}
+{\text{Count}(f_{j}=0, \tilde{y}_a) + \text{Count}(f_{j}=1, \tilde{y}_a)}
 \end{equation}
 %
-\begin{equation}
-\hat{P}(\text{Tag}=\text{<li>}|y=\text{I-PER}) = \frac{4}{4 + 0} = 1
-\end{equation}
-%
-Where $ \tilde{y} $ is the label predicted by the \gls{hmm} trained with only the textual features.
+Where $ \tilde{y}_a $ is the label predicted by the \gls{hmm} trained with only textual features.
 We use this formulation to calculate feature probabilities for the HTML features only.
 And next, we incorporate the estimators for the HTML feature probabilities in the original \gls{hmm} 
 and predict the final labels with the whole set of features $ F^T \cup F^H $. 
