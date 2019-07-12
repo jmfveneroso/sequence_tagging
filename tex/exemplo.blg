@@ -7,45 +7,46 @@ Warning--can't use both author and editor fields in Li2018
 Warning--can't use both author and editor fields in Rabiner1990
 Warning--can't use both author and editor fields in Ramshaw1999
 Warning--empty school in Ratnaparkhi1998
-You've used 85 entries,
+Warning--can't use both volume and number fields in Werbos1990
+You've used 86 entries,
             2043 wiz_defined-function locations,
-            1184 strings with 22912 characters,
-and the built_in function-call counts, 41217 in all, are:
-= -- 4259
-> -- 1465
-< -- 80
-+ -- 505
-- -- 492
-* -- 3725
-:= -- 6603
-add.period$ -- 319
-call.type$ -- 85
-change.case$ -- 664
-chr.to.int$ -- 84
-cite$ -- 89
-duplicate$ -- 1621
-empty$ -- 2910
-format.name$ -- 619
-if$ -- 8523
+            1191 strings with 23035 characters,
+and the built_in function-call counts, 41755 in all, are:
+= -- 4317
+> -- 1472
+< -- 83
++ -- 507
+- -- 494
+* -- 3768
+:= -- 6676
+add.period$ -- 322
+call.type$ -- 86
+change.case$ -- 670
+chr.to.int$ -- 85
+cite$ -- 91
+duplicate$ -- 1648
+empty$ -- 2954
+format.name$ -- 622
+if$ -- 8644
 int.to.chr$ -- 2
 int.to.str$ -- 0
-missing$ -- 172
-newline$ -- 463
-num.names$ -- 255
-pop$ -- 607
+missing$ -- 174
+newline$ -- 468
+num.names$ -- 258
+pop$ -- 614
 preamble$ -- 1
-purify$ -- 671
+purify$ -- 677
 quote$ -- 0
-skip$ -- 1392
+skip$ -- 1419
 stack$ -- 0
-substring$ -- 3115
-swap$ -- 358
-text.length$ -- 39
+substring$ -- 3167
+swap$ -- 370
+text.length$ -- 41
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 496
-warning$ -- 4
-while$ -- 348
+type$ -- 502
+warning$ -- 5
+while$ -- 353
 width$ -- 0
-write$ -- 1251
-(There were 4 warnings)
+write$ -- 1265
+(There were 5 warnings)

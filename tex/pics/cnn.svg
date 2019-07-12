@@ -14,7 +14,7 @@
    viewBox="0 0 210 297"
    version="1.1"
    id="svg3988"
-   inkscape:version="0.92.2 5c3e80d, 2017-08-06"
+   inkscape:version="0.92.3 (unknown)"
    sodipodi:docname="cnn.svg"
    inkscape:export-filename="/Code/sequence_tagging/tex/pics/cnn.png"
    inkscape:export-xdpi="71.654526"
@@ -360,14 +360,14 @@
      inkscape:pageshadow="2"
      inkscape:zoom="0.70555556"
      inkscape:cx="396.85039"
-     inkscape:cy="561.25984"
+     inkscape:cy="674.64567"
      inkscape:document-units="mm"
-     inkscape:current-layer="g19816"
+     inkscape:current-layer="g4734-4"
      showgrid="false"
-     inkscape:window-width="1680"
-     inkscape:window-height="1005"
-     inkscape:window-x="0"
-     inkscape:window-y="1"
+     inkscape:window-width="1375"
+     inkscape:window-height="876"
+     inkscape:window-x="65"
+     inkscape:window-y="24"
      inkscape:window-maximized="1"
      inkscape:snap-global="false" />
   <metadata
@@ -616,14 +616,14 @@
              transform="scale(0.99994141,1.0000586)"
              id="text4710-8"
              y="162.03174"
-             x="33.184612"
+             x="37.091442"
              style="font-style:normal;font-weight:normal;font-size:15.73106098px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
              xml:space="preserve"><tspan
                style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.73106098px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332px"
                y="162.03174"
-               x="33.184612"
+               x="37.091442"
                id="tspan4708-57"
-               sodipodi:role="line">w</tspan></text>
+               sodipodi:role="line">j</tspan></text>
           <text
              transform="scale(0.99994141,1.0000586)"
              id="text4710-8-7"
@@ -635,7 +635,7 @@
                y="162.12613"
                x="63.797733"
                id="tspan4708-57-7"
-               sodipodi:role="line">o</tspan></text>
+               sodipodi:role="line">a</tspan></text>
           <text
              transform="scale(0.99994141,1.0000586)"
              id="text4710-8-7-2"
@@ -647,7 +647,7 @@
                y="162.2205"
                x="94.219833"
                id="tspan4708-57-7-0"
-               sodipodi:role="line">r</tspan></text>
+               sodipodi:role="line">g</tspan></text>
           <text
              transform="scale(0.99994141,1.0000586)"
              id="text4710-8-7-4"
@@ -659,19 +659,31 @@
                y="162.0632"
                x="121.9002"
                id="tspan4708-57-7-9"
-               sodipodi:role="line">d</tspan></text>
+               sodipodi:role="line">u</tspan></text>
           <text
-             transform="scale(0.99994141,1.0000586)"
-             id="text4710-8-7-4-8"
-             y="161.44075"
-             x="150.92107"
-             style="font-style:normal;font-weight:normal;font-size:10.47471142px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.17617591px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+             transform="scale(0.9999414,1.0000586)"
+             id="text4710-8-7-4-3"
+             y="161.90002"
+             x="151.38808"
+             style="font-style:normal;font-weight:normal;font-size:15.73106098px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
              xml:space="preserve"><tspan
-               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:10.47471142px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.17617591px"
-               y="161.44075"
-               x="150.92107"
-               id="tspan4708-57-7-9-1"
-               sodipodi:role="line">Padding</tspan></text>
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.73106098px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332px"
+               y="161.90002"
+               x="151.38808"
+               id="tspan4708-57-7-9-6"
+               sodipodi:role="line">a</tspan></text>
+          <text
+             transform="scale(0.9999414,1.0000586)"
+             id="text4710-8-7-4-7"
+             y="161.71034"
+             x="180.91997"
+             style="font-style:normal;font-weight:normal;font-size:15.73106098px;line-height:125%;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+             xml:space="preserve"><tspan
+               style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:15.73106098px;font-family:'CMU Serif';-inkscape-font-specification:'CMU Serif';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332px"
+               y="161.71034"
+               x="180.91997"
+               id="tspan4708-57-7-9-5"
+               sodipodi:role="line">r</tspan></text>
         </g>
         <g
            style="stroke-width:1.26143742"

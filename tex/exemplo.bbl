@@ -836,6 +836,14 @@
   \ppgccbibpagesstring {} \ppgccpagedoformat {389}-\ppgccpagedoformat
   {}-\ppgccpagedoformat {390}, New York, NY, USA. ACM.
 
+\bibitem[Werbos, 1990]{Werbos1990}
+\ppgccbibauthordoformat {Werbos, P.} (\ppgccyeardoformat {1990}).
+\newblock \ppgccbibtitledoformat {Backpropagation through time: what does it do
+  and how to do it}.
+\newblock \ppgccbibinstring {} \ppgccbibbooktitledoformat {Proceedings of
+  IEEE}, volume~\ppgccvolumedoformat {78}, \ppgccbibpagesstring {}
+  \ppgccpagedoformat {1550}-\ppgccpagedoformat {}-\ppgccpagedoformat {1560}.
+
 \bibitem[Zhu et~al.\@, 2005]{Zhu2005}
 \ppgccbibauthordoformat {Zhu, J.\ppgccbibauthorsep {} Nie, Z.\ppgccbibauthorsep
   {} Wen, J.-R.\ppgccbibauthorsep {} Zhang, B.\ppgccbibauthorlastsep {}
