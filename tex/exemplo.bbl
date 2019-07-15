@@ -79,6 +79,16 @@
   {1}}):\ppgccpagedoformat {1}-\ppgccpagedoformat {}-\ppgccpagedoformat {127}.
 \newblock ISSN \ppgccissndoformat {1935-8237}.
 
+\bibitem[Bengio et~al.\@, 2003]{Bengio2003}
+\ppgccbibauthordoformat {Bengio, Y.\ppgccbibauthorsep {} Ducharme,
+  R.\ppgccbibauthorsep {} Vincent, P.\ppgccbibauthorlastsep {}
+  \ppgccbibauthorand {} Janvin, C.} (\ppgccyeardoformat {2003}).
+\newblock \ppgccbibtitledoformat {A neural probabilistic language model}.
+\newblock \ppgccbibjournaldoformat {J. Mach. Learn. Res.}, \ppgccvolumedoformat
+  {3}:\ppgccpagedoformat {1137}-\ppgccpagedoformat {}-\ppgccpagedoformat
+  {1155}.
+\newblock ISSN \ppgccissndoformat {1532-4435}.
+
 \bibitem[Bengio et~al.\@, 1994]{Bengio1994}
 \ppgccbibauthordoformat {Bengio, Y.\ppgccbibauthorsep {} Simard,
   P.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Frasconi, P.}
@@ -510,13 +520,18 @@
   {32}({\ppgccnumberdoformat {6}}):\ppgccpagedoformat {67}--\ppgccpagedoformat
   {71}.
 
-\bibitem[Li \ppgccciteauthorand {} Yang, 2018]{Li2018}
-\ppgccbibauthordoformat {Li, Y. \ppgccbibauthorand {} Yang, T.}
-  (\ppgccyeardoformat {2018}).
-\newblock \ppgccbibbtitledoformat {Word Embedding for Understanding Natural
-  Language: A Survey}, \ppgccbibpagesstring {} \ppgccpagedoformat
-  {83}-\ppgccpagedoformat {}-\ppgccpagedoformat {104}.
-\newblock Springer International Publishing, Cham.
+\bibitem[LeCun et~al.\@, 1989]{Lecun1989}
+\ppgccbibauthordoformat {LeCun, Y.\ppgccbibauthorsep {} Boser,
+  B.\ppgccbibauthorsep {} Denker, J.~S.\ppgccbibauthorsep {} Henderson,
+  D.\ppgccbibauthorsep {} Howard, R.~E.\ppgccbibauthorsep {} Hubbard,
+  W.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Jackel, L.~D.}
+  (\ppgccyeardoformat {1989}).
+\newblock \ppgccbibtitledoformat {Backpropagation applied to handwritten zip
+  code recognition}.
+\newblock \ppgccbibjournaldoformat {Neural Comput.}, \ppgccvolumedoformat
+  {1}({\ppgccnumberdoformat {4}}):\ppgccpagedoformat {541}-\ppgccpagedoformat
+  {}-\ppgccpagedoformat {551}.
+\newblock ISSN \ppgccissndoformat {0899-7667}.
 
 \bibitem[Liu et~al.\@, 2000]{Liu2000}
 \ppgccbibauthordoformat {Liu, L.\ppgccbibauthorsep {} Pu,
@@ -749,17 +764,6 @@
   {34}({\ppgccnumberdoformat {1}}):\ppgccpagedoformat {233}-\ppgccpagedoformat
   {}-\ppgccpagedoformat {272}.
 \newblock ISSN \ppgccissndoformat {0885-6125}.
-
-\bibitem[Srivastava et~al.\@, 2014]{Srivastava2014}
-\ppgccbibauthordoformat {Srivastava, N.\ppgccbibauthorsep {} Hinton,
-  G.\ppgccbibauthorsep {} Krizhevsky, A.\ppgccbibauthorsep {} Sutskever,
-  I.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Salakhutdinov, R.}
-  (\ppgccyeardoformat {2014}).
-\newblock \ppgccbibtitledoformat {Dropout: A simple way to prevent neural
-  networks from overfitting}.
-\newblock \ppgccbibjournaldoformat {Journal of Machine Learning Research},
-  \ppgccvolumedoformat {15}:\ppgccpagedoformat {1929}--\ppgccpagedoformat
-  {1958}.
 
 \bibitem[Sundheim, 1991]{Sundheim1991}
 \ppgccbibauthordoformat {Sundheim, B.~M.} (\ppgccyeardoformat {1991}).

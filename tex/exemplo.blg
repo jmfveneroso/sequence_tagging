@@ -3,50 +3,49 @@ Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
 The top-level auxiliary file: exemplo.aux
 The style file: ppgccufmg.bst
 Database file #1: bibfile.bib
-Warning--can't use both author and editor fields in Li2018
 Warning--can't use both author and editor fields in Rabiner1990
 Warning--can't use both author and editor fields in Ramshaw1999
 Warning--empty school in Ratnaparkhi1998
 Warning--can't use both volume and number fields in Werbos1990
 You've used 86 entries,
             2043 wiz_defined-function locations,
-            1191 strings with 23035 characters,
-and the built_in function-call counts, 41755 in all, are:
-= -- 4317
-> -- 1472
-< -- 83
-+ -- 507
-- -- 494
-* -- 3768
-:= -- 6676
-add.period$ -- 322
+            1188 strings with 23014 characters,
+and the built_in function-call counts, 41852 in all, are:
+= -- 4325
+> -- 1492
+< -- 81
++ -- 517
+- -- 502
+* -- 3793
+:= -- 6702
+add.period$ -- 324
 call.type$ -- 86
-change.case$ -- 670
+change.case$ -- 675
 chr.to.int$ -- 85
-cite$ -- 91
-duplicate$ -- 1648
-empty$ -- 2954
-format.name$ -- 622
-if$ -- 8644
+cite$ -- 90
+duplicate$ -- 1642
+empty$ -- 2951
+format.name$ -- 628
+if$ -- 8647
 int.to.chr$ -- 2
 int.to.str$ -- 0
 missing$ -- 174
-newline$ -- 468
+newline$ -- 470
 num.names$ -- 258
 pop$ -- 614
 preamble$ -- 1
-purify$ -- 677
+purify$ -- 681
 quote$ -- 0
-skip$ -- 1419
+skip$ -- 1410
 stack$ -- 0
-substring$ -- 3167
-swap$ -- 370
-text.length$ -- 41
+substring$ -- 3171
+swap$ -- 362
+text.length$ -- 40
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 502
-warning$ -- 5
+type$ -- 504
+warning$ -- 4
 while$ -- 353
 width$ -- 0
-write$ -- 1265
-(There were 5 warnings)
+write$ -- 1268
+(There were 4 warnings)

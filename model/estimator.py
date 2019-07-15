@@ -100,6 +100,12 @@ class Estimator:
           # 'output/a_tilde_prev:0',
           # 'output/masked_a:0',
           # 'output/mask:0',
+          "Shape:0",
+          "Shape_1:0",
+          "Shape_2:0",
+          "Shape_3:0",
+          "Shape_4:0",
+
         ]
         if train:
           target.append('output/Adam')
@@ -116,6 +122,12 @@ class Estimator:
         # print('masked_a:', r[7])
         # print('mask:', r[8])
         # print(words_)
+
+        print('initial:', r[3])
+        print('before_conv:', r[4])
+        print('before_max_pool:', r[5])
+        print('after_max_pool', r[6])
+        print('output:', r[7])
  
         # for w, m, p in zip(words_[0], r[8][0], r[2][0]):
         #   print(w, m, p)
