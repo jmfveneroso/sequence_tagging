@@ -3,7 +3,7 @@ import re
 
 num_labels = 3
 
-def load_raw_dataset(f):
+def load_dataset(f):
   with open(f, 'r') as f:
     data = f.read().strip()
 
@@ -31,9 +31,8 @@ def is_punctuation(text):
   return re.match("^[\,\;\:\-\"\(\)“”；]$", text)
 
 class HiddenMarkov:
-  def __init__(self, timesteps, naive_bayes=False, use_gazetteer=True, use_features=True, self_train=False):
+  def __init__(self, timesteps, naive_bayes=False, use_features=True, self_train=False):
     self.time_steps   = timesteps
-    self.use_gazetteer = use_gazetteer
     self.use_features = use_features
     self.do_self_train = self_train
     self.naive_bayes = naive_bayes

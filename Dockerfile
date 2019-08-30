@@ -1,5 +1,5 @@
-# FROM tensorflow/tensorflow:latest-py3
-FROM lspvic/tensorboard-notebook
+FROM tensorflow/tensorflow:latest-py3
+# FROM lspvic/tensorboard-notebook
 
 USER root
 
