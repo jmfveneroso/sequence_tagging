@@ -21,7 +21,6 @@ def masked_conv1d_and_max(t, weights, filters, kernel_size):
   """
   # Get shape and parameters
   shape = tf.shape(t)
-  print("Input tensor:", shape)
 
   ndims = t.shape.ndims
   dim1 = reduce(lambda x, y: x*y, [shape[i] for i in range(ndims - 2)])
@@ -37,24 +36,16 @@ def masked_conv1d_and_max(t, weights, filters, kernel_size):
   t = tf.reshape(t, shape=flat_shape)
   t *= weights
 
-  print("Before conv1d:", t)
-
   # Apply convolution
   t_conv = tf.layers.conv1d(t, filters, kernel_size, padding='same')
   t_conv *= weights
-
-  print("After conv1d:", t_conv)
 
   # Reduce max -- set to zero if all padded
   t_conv += (1. - weights) * tf.reduce_min(t_conv, axis=-2, keepdims=True)
   t_max = tf.reduce_max(t_conv, axis=-2)
 
-  print("After Max Pooling:", t_max)
-
   # Reshape the output
   final_shape = [shape[i] for i in range(ndims-2)] + [filters]
   t_max = tf.reshape(t_max, shape=final_shape)
-
-  print("Final shape:", t_max)
 
   return t_max

@@ -134,18 +134,18 @@ class HiddenMarkov:
         states.pop(0) 
         states.append(y) 
   
-    print(self.transition_mat)
+    # print(self.transition_mat)
     # self.transition_mat /= np.expand_dims(np.sum(self.transition_mat, axis=1), axis=1)
     # self.transition_mat = np.nan_to_num(self.transition_mat)
 
     if self.naive_bayes:
       self.transition_mat = np.sum(self.transition_mat, axis=0)
       self.transition_mat /= np.sum(self.transition_mat)
-      print(self.transition_mat)
+      # print(self.transition_mat)
     else:
       self.transition_mat /= np.expand_dims(np.sum(self.transition_mat, axis=1), axis=1)
       self.transition_mat = np.nan_to_num(self.transition_mat)
-      print(self.transition_mat)
+      # print(self.transition_mat)
 
   def fit(self, X, Y):
     which_features = [0] * self.num_all_features 
@@ -229,12 +229,12 @@ class HiddenMarkov:
             emission[y] *= self.feature_counts[k][y]['$UNK']
       # emission[emission == 1] = 0
 
-      print(X[i][0])
-      print(emission)
+      # print(X[i][0])
+      # print(emission)
       p = self.transition_mat * emission
-      print(p)
+      # print(p)
       labels.append(p.argmax())
-      print(p.argmax())
+      # print(p.argmax())
     return labels
 
   def get_predictions(self, X):

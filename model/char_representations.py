@@ -9,8 +9,6 @@ def cnn_char_representations(t, weights, filters, kernel_size):
   dim2 = shape[-2]
   dim3 = t.shape[-1]
 
-  print("Input tensor:", shape)
-
   # Reshape weights
   weights = tf.reshape(weights, shape=[dim1, dim2, 1])
   weights = tf.to_float(weights)
@@ -20,11 +18,8 @@ def cnn_char_representations(t, weights, filters, kernel_size):
   t = tf.reshape(t, shape=flat_shape)
   t *= weights
 
-  print("Before conv1d:", tf.shape(t))
-
   # Apply convolution
   t_conv = tf.layers.conv1d(t, filters, kernel_size, padding='same')
-  print("Before max pooling:", tf.shape(t_conv))
 
   t_conv *= weights
 
@@ -33,13 +28,10 @@ def cnn_char_representations(t, weights, filters, kernel_size):
   t_conv += (1. - weights) * tf.reduce_min(t_conv, axis=-2, keepdims=True)
   t_max = tf.reduce_max(t_conv, axis=-2)
 
-  print("After max pooling:", tf.shape(t_max))
-
   # Reshape the output
   final_shape = [shape[i] for i in range(ndims-2)] + [filters]
   t_max = tf.reshape(t_max, shape=final_shape)
 
-  print("Output shape:", tf.shape(t_max))
   return t_max
 
 def lstm_char_representations(char_embeddings, nchars, lstm_size, char_embedding_size, scope='lstm_chars'):

@@ -8,7 +8,7 @@ from model.cnn import masked_conv1d_and_max
 import numpy as np
 from IPython.display import clear_output, display
 import time
-from model.data_loader import DL, NerOnHtml, Conll2003, Conll2003Person
+from model.data_loader import DL, NerOnHtml, Conll2003, Conll2003Person, get_sentences, prepare_dataset
 from model.metrics import evaluate
 from model.model import SequenceModel
 
@@ -62,7 +62,6 @@ class Estimator:
 
   def get_dict(self, features, labels, train):
     ((words, nwords), (chars, nchars)), (f_vector, html, (css_chars, css_lengths)) = features
-    # ((words, nwords), (chars, nchars)) = features
     return {
       'inputs/words:0': words,
       'inputs/nwords:0': nwords,
@@ -93,19 +92,7 @@ class Estimator:
         target = [
           'output/loss:0', 
           'output/accuracy:0', 
-          'output/index_to_string_Lookup:0',
-          # 'output/m_pos_tilde:0',
-          # 'output/n_pos:0',
-          # 'output/a_tilde:0',
-          # 'output/a_tilde_prev:0',
-          # 'output/masked_a:0',
-          # 'output/mask:0',
-          "Shape:0",
-          "Shape_1:0",
-          "Shape_2:0",
-          "Shape_3:0",
-          "Shape_4:0",
-
+          'output/index_to_string_Lookup:0'
         ]
         if train:
           target.append('output/Adam')
@@ -113,24 +100,6 @@ class Estimator:
 
         feed_dict = self.get_dict(features, labels, train)
         r = sess.run(target, feed_dict=feed_dict)
-        # print('=============')
-        # print('loss:', r[0])
-        # print('mpos_tilde:', r[3])
-        # print('n_pos:', r[4])
-        # print('a_tilde:', r[5])
-        # print('a_tilde_prev:', r[6])
-        # print('masked_a:', r[7])
-        # print('mask:', r[8])
-        # print(words_)
-
-        print('initial:', r[3])
-        print('before_conv:', r[4])
-        print('before_max_pool:', r[5])
-        print('after_max_pool', r[6])
-        print('output:', r[7])
- 
-        # for w, m, p in zip(words_[0], r[8][0], r[2][0]):
-        #   print(w, m, p)
   
         seqlens = nwords_.tolist()
         words += [w[:seqlens[i]] for i, w in enumerate(words_.tolist())]
@@ -150,6 +119,101 @@ class Estimator:
       self.params['current_epoch'] = epoch_num
 
     return m, (preds, tags, words)
+
+  def run_epoch_cv(self, sess, sentences, train=False, filename='', epoch_num=0):
+    start_time = time.time()
+    iterator = self.dataset.input_cv_fn(sentences, training=train).make_initializable_iterator()
+    next_el = iterator.get_next()
+    sess.run(iterator.initializer)
+   
+    words, tags, preds = [], [], []
+    for step in range(1, 1000000):
+      try:
+        features, labels = sess.run(next_el)
+        ((words_, nwords_), (chars, nchars)), _ = features
+  
+        target = [
+          'output/loss:0', 
+          'output/accuracy:0', 
+          # 'output/index_to_string_Lookup:0'
+          'output/hash_table_Lookup_1/LookupTableFindV2:0'
+        ]
+        if train:
+          target.append('output/Adam')
+
+        feed_dict = self.get_dict(features, labels, train)
+        r = sess.run(target, feed_dict=feed_dict)
+  
+        seqlens = nwords_.tolist()
+        words += [w[:seqlens[i]] for i, w in enumerate(words_.tolist())]
+        tags  += [l[:seqlens[i]] for i, l in enumerate(labels.tolist())]
+        preds += [p[:seqlens[i]] for i, p in enumerate(r[2].tolist())]
+
+        if step % 1000 == 0:
+          print('Loss: %.4f, Acc: %.4f, Time: %.4f, Step: %d' % (r[0], r[1], time.time() - start_time, step))
+      except tf.errors.OutOfRangeError:
+        print('Loss: %.4f, Acc: %.4f, Time: %.4f, Step: %d' % (r[0], r[1], time.time() - start_time, step))
+        break
+  
+    m = evaluate(preds, tags, words)
+    print('%s - Epoch %d, Precision: %.4f, Recall: %.4f, F1: %.4f' % (filename, epoch_num, m['precision'], m['recall'], m['f1']))
+    return m, (preds, tags, words)
+
+  def train_cv(self, restore=False):
+    sentences = get_sentences(Path(self.params['datadir'], 'train'))
+    sentences = sentences + get_sentences(Path(self.params['datadir'], 'valid'))
+    sentences = sentences + get_sentences(Path(self.params['datadir'], 'test'))
+
+    # Split HTML tag feature.
+    for i, s in enumerate(sentences):
+      for j, t in enumerate(s):
+        if t[0] != '-DOCSTART-':
+          sentences[i][j] = t[:13] + t[13].split('.') + t[14:]
+
+    training_set = prepare_dataset(
+      sentences, mode=self.params['dataset_mode'], 
+      label_col=1, feature_cols=range(3, 15), 
+      training=True
+    )
+
+    fold_size = len(training_set) // 5
+
+    folds = []
+    for i in range(5):
+      start = i * fold_size
+      end = start + fold_size if (i < 4) else len(training_set)
+      folds.append(training_set[start:end])
+
+    for i in range(5):
+      tf.reset_default_graph()
+      with tf.Session() as sess:  
+        SequenceModel(self.params).create()
+        sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
+
+        train = []
+        for j in range(5):
+          if i != j:
+            train = train + folds[j]
+        test = folds[i]
+
+        self.dataset = NerOnHtml(self.params)
+        last_p, last_t, last_w = [], [], []
+        for epoch in range(self.params['epochs']):
+          name = 'fold_' + str(i)
+          _, _ = self.run_epoch_cv(sess, train, train=True, filename=name, epoch_num=epoch)
+          _, (p, t, w) = self.run_epoch_cv(sess, test, filename=name, epoch_num=epoch)
+          last_p = p, last_t = t, last_w = w
+  
+        print('Writing', name)
+        Path('../results/score').mkdir(parents=True, exist_ok=True)
+        with Path('../results/score/{}.preds.txt'.format(name)).open('wb') as f:
+          for words, preds, tags in zip(last_w, last_p, last_t):
+            f.write(b'\n\n')
+            for word, pred, tag in zip(words, preds, tags):
+              if not word.decode("utf-8") == 'EOS':
+                f.write(b' '.join([word, tag, pred]) + b'\n')
+              else:
+                f.write(b'\n')
 
   def train(self, restore=False):
     with tf.Session() as sess:  
@@ -189,35 +253,9 @@ class Estimator:
         Path('results/score').mkdir(parents=True, exist_ok=True)
         with Path('results/score/{}.preds.txt'.format(name)).open('wb') as f:
           for words, preds, tags in zip(w, p, t):
-            # f.write(b'-DOCSTART- O O\n\n')
             f.write(b'\n\n')
             for word, pred, tag in zip(words, preds, tags):
               if not word.decode("utf-8") == 'EOS':
                 f.write(b' '.join([word, tag, pred]) + b'\n')
               else:
                 f.write(b'\n')
-  
-  def get_alphas(self, filename, doc):
-    pass
-    # with tf.Session() as sess:
-    #   _ = self.restore(sess)
-  
-    #   features, labels = DL().get_doc(filename, doc)
-    #   (words, nwords), (chars, nchars), html, (css_chars, css_lengths) = features
-  
-    #   target = ['output/index_to_string_Lookup:0']
-    #   try:
-    #     tf.get_default_graph().get_tensor_by_name('transformer/alphas:0')
-    #     target.append('transformer/alphas:0')
-    #   except:
-    #     pass
-    #  
-    #   feed_dict = self.get_dict(features, labels, False)
-    #   r = sess.run(target, feed_dict=feed_dict)
- 
-    #   words = words[0] 
-    #   preds  = r[0][0]
-    #   labels = labels[0]
-    #   alphas = np.mean(r[1], axis=0) if len(r) > 1 else []
-    #   
-    #   return words, alphas, preds, labels

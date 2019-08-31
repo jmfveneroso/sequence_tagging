@@ -124,8 +124,6 @@ class SequenceModel:
   def maxent(self, use_features=False):
     word_embs = one_hot_embs(self.words, self.params['words'])
 
-    # embs = [word_embs]
-
     # if use_features: 
     #   embs.append(self.features)
     # embs = tf.concat(embs, axis=-1)

@@ -332,7 +332,6 @@ class NerOnHtml:
     chars = [pad_array(c, b'<pad>', max(lengths)) for c in chars]
     
     # Feature vector. 
-    # features = [[float(f) for f in s[2][:2] + s[2][4:10]] for s in sentence]
     features = [[float(f) for f in s[2][:2] + s[2][4:9]] for s in sentence]
 
     # HTML features.
@@ -368,6 +367,10 @@ class NerOnHtml:
       training=training
     )
 
+    for s in sentences:
+      yield self.parse_sentence(s)
+
+  def generator_cv_fn(self, sentences, training=False):
     for s in sentences:
       yield self.parse_sentence(s)
         
@@ -416,12 +419,68 @@ class NerOnHtml:
       ), 
       'O'
     )
-  
+
     dataset = tf.data.Dataset.from_generator(
       functools.partial(self.generator_fn, filename, training=training),
       output_types=types, output_shapes=shapes
     )
   
+    if training:
+      dataset = dataset.shuffle(15000)
+ 
+    return dataset.padded_batch(self.params['batch_size'], shapes, defaults)
+
+  def input_cv_fn(self, sentences, training=False):
+    shapes = (
+      (
+        (
+          ([None], ()), # (words, nwords)
+          ([None, None], [None]), # (chars, nchars)  
+        ),
+        (
+          [None, None], # features
+          [None, None], # html_features
+          ([None, None], [None]), # (css_chars, css_lengths)  
+        )
+      ),
+      [None] # tags
+    )
+  
+    types = (
+      (
+        (
+          (tf.string, tf.int32),
+          (tf.string, tf.int32),  
+        ),
+        (
+          tf.float32,
+          tf.string,
+          (tf.string, tf.int32)
+        )
+      ),  
+      tf.string
+    )
+  
+    defaults = (
+      (
+        (
+          ('<pad>', 0),
+          ('<pad>', 0), 
+        ),
+        (
+          0.0,
+          '<pad>',
+          ('<pad>', 0)
+        )
+      ), 
+      'O'
+    )
+
+    dataset = tf.data.Dataset.from_generator(
+      functools.partial(self.generator_cv_fn, sentences, training=training),
+      output_types=types, output_shapes=shapes
+    )
+
     if training:
       dataset = dataset.shuffle(15000)
  
