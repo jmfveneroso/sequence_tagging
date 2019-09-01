@@ -41,7 +41,7 @@ def prepare_dataset(sentences, mode='sentences', label_col=3, feature_cols=[], t
   ] 
 
   if mode == 'sentences':
-    sentences = [s for s in sentences if s[0][0] != '-DOCSTART-']
+    # sentences = [s for s in sentences if s[0][0] != '-DOCSTART-']
     return sentences
 
   else:

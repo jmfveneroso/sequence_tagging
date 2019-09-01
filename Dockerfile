@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:latest-py3
+FROM tensorflow/tensorflow:latest-gpu-py3
 # FROM lspvic/tensorboard-notebook
 
 RUN apt-get update     && \

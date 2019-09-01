@@ -1,6 +1,7 @@
 import numpy as np
 import re
 import json 
+import random
 import functools
 from pathlib import Path
 import tensorflow as tf
@@ -176,13 +177,32 @@ class Estimator:
       training=True
     )
 
-    fold_size = len(training_set) // 5
+    # documents = []
+    # for p in training_set:     
+    #     if p[0][0] == '-DOCSTART-':
+    #         documents.append([])
+    #     else:
+    #         documents[len(documents)-1].append(p)
+    
+    # random.shuffle(documents)
+    # fold_size = len(documents) // 5
+    # 
+    # folds = []
+    # for i in range(5):
+    #     start = i * fold_size
+    #     end = start + fold_size if (i < 4) else len(documents)
+    #     folds.append(documents[start:end])
+    # print('Fold size:', fold_size)
 
+    random.shuffle(training_set)
+    fold_size = len(training_set) // 5
+    
     folds = []
     for i in range(5):
-      start = i * fold_size
-      end = start + fold_size if (i < 4) else len(training_set)
-      folds.append(training_set[start:end])
+        start = i * fold_size
+        end = start + fold_size if (i < 4) else len(training_set)
+        folds.append(training_set[start:end])
+    print('Fold size:', fold_size)
 
     for i in range(5):
       tf.reset_default_graph()
@@ -190,11 +210,21 @@ class Estimator:
         SequenceModel(self.params).create()
         sess.run([tf.initializers.global_variables(), tf.tables_initializer()])
 
-        train = []
-        for j in range(5):
-          if i != j:
-            train = train + folds[j]
+        train = []        
+        for j in range(5):        
+            if i != j:
+                train = train + folds[j]
         test = folds[i]
+            
+        # aux = []    
+        # for d in train:
+        #     aux = aux + d
+        # train = aux    
+        #     
+        # aux = []    
+        # for d in test:
+        #     aux = aux + d    
+        # test = aux
 
         self.dataset = NerOnHtml(self.params)
         last_p, last_t, last_w = [], [], []
@@ -202,7 +232,10 @@ class Estimator:
           name = 'fold_' + str(i)
           _, _ = self.run_epoch_cv(sess, train, train=True, filename=name, epoch_num=epoch)
           _, (p, t, w) = self.run_epoch_cv(sess, test, filename=name, epoch_num=epoch)
-          last_p = p, last_t = t, last_w = w
+          
+          last_p = p
+          last_t = t
+          last_w = w
   
         print('Writing', name)
         Path('../results/score').mkdir(parents=True, exist_ok=True)

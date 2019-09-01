@@ -23,11 +23,11 @@ def get_html_embeddings(html, html_vocab_file):
   return html_embeddings
 
 def get_css_embeddings(html, css_chars, css_lengths, char_vocab_file, training=False):
-  with Path('data/ner_on_html/vocab.css.txt').open() as f:
+  with Path('../data/ner_on_html/vocab.css.txt').open() as f:
     num_css_classes = sum(1 for _ in f) + 1
   
   vocab_css = tf.contrib.lookup.index_table_from_file(
-    'data/ner_on_html/vocab.css.txt', num_oov_buckets=1
+    '../data/ner_on_html/vocab.css.txt', num_oov_buckets=1
   )
 
   css_class = tf.slice(html, [0, 0, 2], [-1, -1, 1])
