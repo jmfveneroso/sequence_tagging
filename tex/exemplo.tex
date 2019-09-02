@@ -3449,7 +3449,8 @@ performance of Bi-LSTM-CRF models with LSTM-based character representations usin
       \midrule
       GloVe    & 0.928 & 0.950 & 0.939 & \textbf{0.920} & \textbf{0.886} & \textbf{0.902} \\
       Word2Vec & 0.925 & 0.926 & 0.926 & 0.899 & 0.831 & 0.864 \\
-      ELMo     & 0.783 & 0.844 & 0.812 & 0.720 & 0.885 & 0.794 \\
+      ELMo     & 0.917 & 0.953 & 0.937 & 0.876 & 0.810 & 0.842 \\
+      % ELMo     & 0.783 & 0.844 & 0.812 & 0.720 & 0.885 & 0.794 \\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -3554,6 +3555,206 @@ with a high quality. This points to the necessity of searching for good unsuperv
 sequence labeling. This way, we would have models with better flexibility and good accuracy in
 many extraction tasks. Unfortunately, unsupervised and semi supervised approaches to this problem 
 are still far from serviceable.
+
+\section{Cross Validation}
+\label{sec:cross_validation}
+
+\textcolor{red}{
+Considering the reduced size of the \gls{rne} dataset, we must acknowledge the
+limitations concerning generalizations about the relative performance of 
+the models studied in this dissertation. The naive division of the labeled data 
+into three static data files (training, validation and test) may harm the validity 
+of our analysis if the data files were randomly selected in a way that favors 
+a model in place of others due to the natural volatility in the process of parameter 
+estimation.
+}
+
+\textcolor{red}{
+When training a machine learning model for a particular prediction task, the model is 
+expected to fit the training data as closely as
+possible as the training progresses. If the training is kept going indefinitely, the model will probably
+learn spurious patterns in the training data (i.e. overfitting the training data),
+what will lead to poor generalizations. That is why the expected performance of a 
+predictive model over unseen data must be checked with the aid of an independent sample
+drawn from the same population as the training data, which we call the test set.
+In addition to the test set, we also separated a validation data file.
+The validation data file is never observed directly by the models.
+Rather, its purpose is to prevent overfitting by monitoring the model performance in
+the validation dataset and stop its training when a given statistic, in this case the
+F1-score, decreases over several epochs. This is called the early stopping strategy~\citep{Caruana2000}. 
+}
+
+\textcolor{red}{
+The problem with splitting the dataset in three files is that the independent sample
+used to test the models may not be a faithful representation of the complete population.
+This problem is less likely to lead to wrong conclusions if the dataset is sizable, but
+in the case of the \gls{rne} dataset, the risk of tarnished results increases due to the
+diminished size of the dataset. We can mitigate this problem by employing the strategy
+of K-fold cross-validation. K-fold cross-validation consists in splitting the complete dataset
+into K folds, where $ (K-1) $ folds are used to train the model and one fold is used to
+test it. The test fold is rotated $ K $ times until we have trained $ K $ variants
+of the same model and tested it in each fold separately. The averaged statistics obtained 
+in this process will be more trustworthy than the results obtained with the static split
+since each model variation will have been tested against all data points.
+}
+
+\textcolor{red}{
+In this section, we discuss the results for the models presented in the preceding
+sections by performing five fold cross validation in a combination of the training, 
+validation and test data files of the RNE dataset. The results for HMMs are presented
+in Subsection~\ref{ssec:hmm_cv}, the results for CRFs are presented in 
+Subsection~\ref{ssec:crf_cv} and the results for Neural Networks are presented in 
+Subsection~\ref{ssec:nn_cv}.
+}
+
+\subsection{Hidden Markov Models}
+\label{ssec:hmm_cv}
+
+\textcolor{red}{
+Table~\ref{tab:hmm_cv} presents the results for all HMM variations discussed earlier
+when performing five fold cross validation in the RNE dataset. The F1 obtained only 
+in the test set is also presented for ease of comparison. The F1 (test set) is the
+same one presented in earlier sections.
+Each cell shows the precision, recall and F1 statistics averaged over five folds 
+and their standard deviations.
+}
+
+\textcolor{red}{
+The results for the models that employed only the current word as a feature did not
+change dramatically, except for the HMM-3, which had a much better average result
+in the cross validation runs. An important aspect revealed by cross validation
+is that most tested HMMs showed a significant F1 standard deviation.
+For example, the HMM-2 with the self-training strategy showed a 0.099 standard 
+deviation in the F1 across five folds. This important information poses some doubt
+over some earlier conclusions. In fact, models that employed Group B features (all features)
+performed better than models with only Group A features (less correlated features), 
+contrasting with the results for the models tested using only the test datafile.
+Because of the high standard deviation, it is difficult to ascertain the relative 
+superiority of different feature selections and different types of HMMs. But,
+the self-training strategy was still useful in improving all models. Overall,
+the best HMMs can achieve an F1 around $ 0.8 $ in the RNE dataset, privileging recall
+over precision.
+}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      Model & P & R & F1 (CV) & F1 (test set) \\
+      \midrule
+      NB                   & 0.082 (0.006) & 0.072 (0.004) & 0.077 (0.005) & 0.086 \\
+      HMM-1                & 0.631 (0.066) & 0.516 (0.097) & 0.566 (0.083) & 0.533 \\
+      HMM-2                & 0.606 (0.141) & 0.552 (0.114) & 0.577 (0.126) & 0.583 \\
+      HMM-3                & 0.599 (0.111) & 0.609 (0.114) & 0.603 (0.105) & 0.506 \\
+      HMM-1 (Group A)      & 0.773 (0.094) & 0.729 (0.055) & 0.750 (0.073) & 0.805 \\
+      HMM-2 (Group A)      & 0.762 (0.085) & 0.749 (0.057) & 0.754 (0.062) & 0.812 \\
+      HMM-3 (Group A)      & 0.777 (0.073) & 0.763 (0.061) & 0.769 (0.065) & 0.798 \\
+      HMM-1 (Group B)      & 0.811 (0.048) & 0.793 (0.030) & 0.801 (0.032) & 0.748 \\
+      HMM-2 (Group B)      & 0.779 (0.042) & 0.781 (0.082) & 0.779 (0.055) & 0.769 \\
+      HMM-3 (Group B)      & 0.771 (0.075) & 0.787 (0.042) & 0.778 (0.055) & 0.724 \\
+      HMM-1 (Group A) + ST & 0.745 (0.060) & 0.787 (0.093) & 0.764 (0.069) & 0.865 \\
+      HMM-2 (Group A) + ST & 0.771 (0.123) & 0.816 (0.082) & 0.791 (0.099) & 0.879 \\
+      HMM-3 (Group A) + ST & 0.772 (0.098) & 0.802 (0.072) & 0.786 (0.085) & 0.762 \\
+      HMM-1 (Group B) + ST & 0.812 (0.041) & 0.828 (0.028) & 0.819 (0.018) & 0.866 \\
+      HMM-2 (Group B) + ST & 0.783 (0.081) & 0.836 (0.033) & 0.807 (0.052) & 0.877 \\
+      HMM-3 (Group B) + ST & 0.774 (0.073) & 0.821 (0.044) & 0.796 (0.053) & 0.814 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Precision (P), Recall (R) and F1 for Hidden Markov Models and Naive Bayes in the RNE 
+    task using five fold cross validation (CV).}
+  \label{tab:hmm_cv}
+\end{table}
+
+
+\subsection{Conditional Random Fields}
+\label{ssec:crf_cv}
+
+\textcolor{red}{
+Table~\ref{tab:crf_cv} presents the results for all CRF variations discussed earlier
+when performing five fold cross validation in the RNE dataset. 
+Each cell shows the precision, recall and F1 statistics averaged over five folds 
+and their standard deviations.
+}
+
+\textcolor{red}{
+All CRF variations performed worse when considering the average results across five
+folds in comparison to the models tested using only the test set, but the variant 
+using Group B features still achieves top performance between the three variants. As was
+the case for the HMMs, CRFs present a significant standard deviation, what renders
+affirmations about the relative performances of different model variations inconclusive.
+}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      Model & P & R & F1 (CV) & F1 (test set) \\
+      \midrule
+      Logistic Classifier & 0.095 (0.027) & 0.122 (0.027) & 0.104 (0.018) & 0.133 \\
+      CRF                 & 0.685 (0.086) & 0.680 (0.071) & 0.677 (0.031) & 0.750 \\
+      CRF (Group A)       & 0.794 (0.074) & 0.742 (0.081) & 0.767 (0.075) & 0.808 \\
+      CRF (Group B)       & 0.802 (0.068) & 0.753 (0.074) & 0.776 (0.067) & 0.826 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Precision (P), Recall (R) and F1 for CRFs and Logistic Classifier in the RNE 
+    task using five fold cross validation (CV).}
+  \label{tab:hmm_cv}
+\end{table}
+
+
+\subsection{Neural Networks}
+\label{ssec:nn_cv}
+
+\textcolor{red}{
+Table~\ref{tab:nn_cv} presents the results for all Neural Network variations 
+discussed earlier when performing five fold cross validation in the RNE dataset. 
+Each cell shows the precision, recall and F1 statistics averaged over five folds 
+and their standard deviations. All neural networks were trained over ten epochs in
+each fold. No early stopping strategy was used in these experiments.
+}
+
+\textcolor{red}{
+Almost all neural network variations showed about the same performance using either 
+only the test set or cross validation. However, it is noteworthy to mention that the 
+choice of the test set hindered the performance of ELMo embeddings quite significantly.
+Overall, ELMo embeddings showed better performance than Word2Vec embeddings but 
+despite adding a lot of complexity to the models, they still performed suboptimally when 
+compared to static GloVe embeddings.
+}
+
+\textcolor{red}{
+When compared to simpler statistical models, neural networks show a lower standard deviation.
+Still, when considering these ranges of variation, the introduction of Neural 
+Networks in the RNE task does not provide a massive gain in performance. However, this gain
+is more significant than previously stated when we compared only the performances in the test set.
+It could be argued that the main benefits of employing Bi-LSTM-CRFs in this task, are the
+improved predictability provided by a smaller standard deviation and a better overall performance.
+}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      Model & P & R & F1 (CV) & F1 (test set) \\
+      \midrule
+      Bi-LSTM-CRF                    & 0.866 (0.036) & 0.844 (0.043) & 0.855 (0.036) & 0.886 \\
+      Bi-LSTM-CRF + CNNc             & 0.885 (0.050) & 0.925 (0.023) & 0.904 (0.034) & 0.901 \\
+      Bi-LSTM-CRF + LSTMc            & 0.889 (0.051) & 0.924 (0.029) & 0.906 (0.036) & 0.902 \\
+      Bi-LSTM-CRF + LSTMc + Word2Vec & 0.870 (0.056) & 0.898 (0.047) & 0.883 (0.044) & 0.864 \\
+      Bi-LSTM-CRF + LSTMc + Elmo     & 0.911 (0.044) & 0.891 (0.036) & 0.901 (0.038) & 0.841 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Precision(P), Recall (R) and F1 for Bi-LSTM-CRF variations in the RNE 
+    task using five fold cross validation (CV). All the models used GloVe-300 embeddings 
+    except if stated otherwise.}
+  \label{tab:hmm_cv}
+\end{table}
 
 
 \chapter{Improvements to Neural Networks}
@@ -4084,6 +4285,95 @@ gains in terms of objective measures are not very substantial.
   \end{center}
   \caption{Overview of the subjective complexity and training times of the best models for the RNE task.}
   \label{tab:complexity}
+\end{table}
+
+\section{Cross Validation}
+\label{sec:cross_validation_improvements_to_nn}
+
+In this section we present results for the Hard Attention Model, 
+the Soft Attention Model and the F1 Optimization Objective when 
+performing five fold cross-validation in the combined training, 
+validation and test sets as we did for the other models in 
+Section~\ref{sec:cross_validation}. 
+
+\textcolor{red}{
+Table~\ref{tab:nn_improvements_cv} presents the five fold cross validation results for 
+the Hard Attention Model and the Soft Attention Model.
+The F1 obtained only in the test set is also presented for ease of comparison. 
+The F1 (test set) is the same one presented in earlier sections.
+Each cell shows the precision, recall and F1 statistics averaged over five folds 
+and their standard deviations. All models were trained over ten epochs and they
+used GloVE-300 embeddings. We did not employ the early stopping strategy.
+}
+
+\textcolor{red}{
+With cross-validation, the results did not change significantly. The hard attention
+layer still improves the plain Bi-LSTM-CRF with LSTM character representation by a 
+small margin with the added benefit of reducing the standard deviation significantly.
+The soft attention layer is still detrimental to the performance of the Bi-LSTM-CRF 
+model.
+}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      Model & P & R & F1 (CV) & F1 (test set) \\
+      \midrule
+      Bi-LSTM-CRF + LSTMc & 0.889 (0.051) & 0.924 (0.029) & 0.906 (0.036) & 0.902 \\
+        +Hard Attention   & 0.905 (0.032) & 0.912 (0.032) & 0.908 (0.019) & 0.907 \\
+        +Soft Attention   & 0.875 (0.051) & 0.924 (0.039) & 0.899 (0.044) & 0.865 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Precision(P), Recall (R) and F1 for Bi-LSTM-CRF variations using the Hard Attention
+    Layer and the Soft Attention Layer in the RNE 
+    task using five fold cross validation (CV).}
+  \label{tab:hmm_cv}
+\end{table}
+
+\textcolor{red}{
+In Table~\ref{tab:f_score_optimization_cv}, we present the cross-validation results for 
+the Bi-LSTM-CRF with an F-$\alpha$ optimization objective, where $\alpha$ ranges from 
+$ 0.1 $ to $ 0.9 $. The previous F-$\alpha$ scores obtained using only the test set are 
+also presented.
+}
+
+\textcolor{red}{
+The cross validation results for the Bi-LSTM-CRFs that optimized the F-$\alpha$ objective 
+did not change very much when compared to the results in the test set only. All variants
+privileged recall over precision and the change in the value of $\alpha$ did not impact
+the end result significantly. It is noteworthy to mention that, different from the results 
+obtained using only the test set, most Neural Network variants showed a preference for Recall over
+Precision in the cross validation results even when optimizing the regular cross
+entropy function, what lessens the case for a custom optimization objective such as 
+the F-score utility function.
+}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      $\alpha$ & P & R & F-$\alpha$ (CV) & F-$\alpha$ (test set) \\
+      \midrule
+      0.1 & 0.000 (0.000) & 0.000 (0.000) & 0.000 (0.000) & 0.832 \\
+      0.2 & 0.837 (0.047) & 0.901 (0.052) & 0.887 (0.048) & 0.863 \\
+      0.3 & 0.842 (0.049) & 0.911 (0.053) & 0.888 (0.039) & 0.873 \\
+      0.4 & 0.836 (0.068) & 0.929 (0.037) & 0.887 (0.023) & 0.881 \\
+      0.5 & 0.807 (0.033) & 0.904 (0.036) & 0.853 (0.031) & 0.881 \\
+      0.6 & 0.000 (0.000) & 0.000 (0.000) & 0.000 (0.000) & 0.855 \\
+      0.7 & 0.000 (0.000) & 0.000 (0.000) & 0.000 (0.000) & 0.877 \\
+      0.8 & 0.000 (0.000) & 0.000 (0.000) & 0.000 (0.000) & 0.850 \\
+      0.9 & 0.000 (0.000) & 0.000 (0.000) & 0.000 (0.000) & 0.734 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Precision(P), Recall (R) and F1 for Bi-LSTM-CRF variations optimizing the
+    F-$\alpha$ objective in the RNE 
+    task using five fold cross validation (CV).}
+  \label{tab:hmm_cv}
 \end{table}
 
 
