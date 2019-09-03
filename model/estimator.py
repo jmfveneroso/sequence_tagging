@@ -171,38 +171,39 @@ class Estimator:
         if t[0] != '-DOCSTART-':
           sentences[i][j] = t[:13] + t[13].split('.') + t[14:]
 
+    feature_cols = range(3, 15) 
     training_set = prepare_dataset(
       sentences, mode=self.params['dataset_mode'], 
-      label_col=1, feature_cols=range(3, 15), 
+      label_col=1, feature_cols=feature_cols, 
       training=True
     )
 
-    # documents = []
-    # for p in training_set:     
-    #     if p[0][0] == '-DOCSTART-':
-    #         documents.append([])
-    #     else:
-    #         documents[len(documents)-1].append(p)
+    documents = []
+    for p in training_set:     
+        if p[0][0] == '-DOCSTART-':
+            documents.append([])
+        else:
+            documents[len(documents)-1].append(p)
     
-    # random.shuffle(documents)
-    # fold_size = len(documents) // 5
-    # 
-    # folds = []
-    # for i in range(5):
-    #     start = i * fold_size
-    #     end = start + fold_size if (i < 4) else len(documents)
-    #     folds.append(documents[start:end])
-    # print('Fold size:', fold_size)
-
-    random.shuffle(training_set)
-    fold_size = len(training_set) // 5
+    random.shuffle(documents)
+    fold_size = len(documents) // 5
     
     folds = []
     for i in range(5):
         start = i * fold_size
-        end = start + fold_size if (i < 4) else len(training_set)
-        folds.append(training_set[start:end])
+        end = start + fold_size if (i < 4) else len(documents)
+        folds.append(documents[start:end])
     print('Fold size:', fold_size)
+
+    # random.shuffle(training_set)
+    # fold_size = len(training_set) // 5
+    # 
+    # folds = []
+    # for i in range(5):
+    #     start = i * fold_size
+    #     end = start + fold_size if (i < 4) else len(training_set)
+    #     folds.append(training_set[start:end])
+    # print('Fold size:', fold_size)
 
     for i in range(5):
       tf.reset_default_graph()
@@ -216,15 +217,15 @@ class Estimator:
                 train = train + folds[j]
         test = folds[i]
             
-        # aux = []    
-        # for d in train:
-        #     aux = aux + d
-        # train = aux    
-        #     
-        # aux = []    
-        # for d in test:
-        #     aux = aux + d    
-        # test = aux
+        aux = []    
+        for d in train:
+            aux = aux + d
+        train = aux    
+            
+        aux = []    
+        for d in test:
+            aux = aux + d    
+        test = aux
 
         self.dataset = NerOnHtml(self.params)
         last_p, last_t, last_w = [], [], []
@@ -232,7 +233,7 @@ class Estimator:
           name = 'fold_' + str(i)
           _, _ = self.run_epoch_cv(sess, train, train=True, filename=name, epoch_num=epoch)
           _, (p, t, w) = self.run_epoch_cv(sess, test, filename=name, epoch_num=epoch)
-          
+
           last_p = p
           last_t = t
           last_w = w

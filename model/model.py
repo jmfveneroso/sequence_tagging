@@ -44,8 +44,10 @@ class SequenceModel:
       self.nwords        = tf.placeholder(tf.int32,   shape=(None,),            name='nwords'      )
       self.chars         = tf.placeholder(tf.string,  shape=(None, None, None), name='chars'       )
       self.nchars        = tf.placeholder(tf.int32,   shape=(None, None),       name='nchars'      )
-      # self.features      = tf.placeholder(tf.float32, shape=(None, None, 4),    name='features'    )
-      self.features      = tf.placeholder(tf.float32, shape=(None, None, 7),    name='features'    )
+      # Group A.
+      self.features      = tf.placeholder(tf.float32, shape=(None, None, 4),    name='features'    )
+      # Group B.
+      # self.features      = tf.placeholder(tf.float32, shape=(None, None, 7),    name='features'    )
       self.html          = tf.placeholder(tf.string,  shape=(None, None, None), name='html'        )
       self.css_chars     = tf.placeholder(tf.string,  shape=(None, None, None), name='css_chars'   )
       self.css_lengths   = tf.placeholder(tf.int32,   shape=(None, None),       name='css_lengths' )
@@ -155,7 +157,7 @@ class SequenceModel:
       embs.append(self.features)
 
     embs = tf.concat(embs, axis=-1)
-    # embs = self.dropout(embs)
+    embs = self.dropout(embs)
     return embs
 
   def lstm_crf(self, word_embs='glove', char_embs='cnn', use_features=False):

@@ -8,19 +8,21 @@ def load_dataset(f):
     data = f.read().strip()
 
     sentences = data.split('\n\n')
-    sentences = [s for s in sentences if not s.startswith('-DOCSTART-')]
+    # sentences = [s for s in sentences if not s.startswith('-DOCSTART-')]
     X = [[t.split(' ') for t in s.split('\n') if len(s) > 0] for s in sentences]
     Y = []
     T = []
     for i, s in enumerate(X):
       tkns, labels = [], []
       for j, t in enumerate(s):
-        l = ['O', 'B-PER', 'I-PER'].index(t[1])
-        # l = ['O', 'B-PER', 'I-PER'].index(t[3])
+        if t[0] == '-DOCSTART-':
+          l = 0
+        else:
+          l = ['O', 'B-PER', 'I-PER'].index(t[1])
+
         labels.append(l)
         tkns.append(t[0])
         X[i][j] = [X[i][j][0]] + X[i][j][2:]
-        # X[i][j] = [X[i][j][0], str(X[i][j][0]).lower()]
 
       Y.append(labels)
       T.append(tkns)
@@ -155,10 +157,10 @@ class HiddenMarkov:
     if self.use_features:
       for i in range(1,1+self.num_features):
         which_features[i] = 1
-        # if i != 1 and i != 2:
-        #   which_features[i] = 0
-      which_features[3] = 0
-      which_features[4] = 0
+      # if i != 1 and i != 2:
+      #   which_features[i] = 0
+      # which_features[3] = 1
+      # which_features[4] = 1
       which_features[1] = 1
       which_features[2] = 1
       which_features[8] = 1
@@ -257,7 +259,7 @@ class HiddenMarkov:
     Y = self.get_predictions(X)
     which_features = [0] * self.num_features 
     which_features += [1] * self.num_secondary_features
-    # which_features[-2] = 0
+    which_features[-2] = 0
     self.train_features(X, Y, which_features)
 
   def predict(self, X):
