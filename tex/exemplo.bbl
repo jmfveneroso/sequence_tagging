@@ -208,12 +208,6 @@
   {242}.
 \newblock ISSN \ppgccissndoformat {00359246}.
 
-\bibitem[Cramer, 1946]{Cramer1946}
-\ppgccbibauthordoformat {Cramer, H.} (\ppgccyeardoformat {1946}).
-\newblock \ppgccbibbtitledoformat {Mathematical Methods of Statistics}.
-\newblock Princeton University Press, Princeton, NJ, USA.
-\newblock ISBN \ppgccissndoformat {0-691-00547-8}.
-
 \bibitem[Crescenzi et~al.\@, 2001]{Crescenzi2001}
 \ppgccbibauthordoformat {Crescenzi, V.\ppgccbibauthorsep {} Mecca,
   G.\ppgccbibauthorlastsep {} \ppgccbibauthorand {} Merialdo, P.}

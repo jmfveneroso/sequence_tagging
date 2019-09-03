@@ -198,37 +198,54 @@ later on bibliometric studies.
 %%% @ Review 1
 %%% Rewrite the motivation stating the problem more clearly.
 
-The practical motivation for this dissertation stems from the need to acquire reliable 
-affiliation information of researchers from many fields across the world to conduct a
-bibliographic analysis of their scientific impact. Acquiring this data manually is 
+\textcolor{red}{
+The task of Web Information Extraction emerges in the context of many Web projects.
+It consists of extracting structured information from unstructured web pages to
+build a knowledge base. Wrapper-based methods are effective for extracting regular data
+from similar webpages, for example in price comparison websites. However,
+when a particular extraction task requires more flexibility, such as in the case where
+the website layout varies significantly between sources and the extracted entities cannot
+be easily recognized, the extraction systems based on 
+machine learning usually fare better. \gls{ner} is an essential subtask that needs to
+be solved by these machine learning systems, however most of the research concerning 
+\gls{ner} only handles extraction tasks in plain text. We argue that \gls{ner} on the
+Web presents a different kind of challenge because HTML pages may contain plain text,
+but also have important differences, such as the smaller average sentence size and 
+a considerable amount of boilerplate that may hurt the performance of regular \gls{ner} models. 
+}
+
+\textcolor{red}{
+A good example of a Web information extraction task that requires the type of flexible approach 
+discussed above is the task of building a researcher affiliation database to
+complement other sources of affiliation information. One way to build this 
+database is to crawl university websites, find faculty directories for each department, 
+extract researcher names and link these names to their public profiles (when they exist).
+Acquiring this data manually is 
 impractical because of the sheer number of universities and researchers in the 
 world~\footnote{The field of Computer Science alone has more than 2,200,000 researchers 
-listed on DBLP: https://dblp.uni-trier.de/.}, so we must resort to automatic methods. A form
-of building a reliable affiliation database is to crawl university websites, find the 
-faculty directories for each department, extract researcher names and link these names 
-to their public profiles (when they exist). 
+listed on DBLP: https://dblp.uni-trier.de/.}, so we must resort to automatic methods. 
+}
 
+\textcolor{red}{
 The crawling stage is relatively simple once we have a somewhat reliable way of 
 detecting faculty webpages, but the researcher name extraction stage is trickier. Faculty listings
 vary widely between different universities, and they are not always available in English,
 so we need an extraction system that can handle the possible variations without needing
 to be trained again for each website.
+}
 
-There are not many \gls{wde} methods that can handle extraction
-tasks across different websites effectively. Also, \gls{ner} research 
-that could be useful to solve this problem is almost entirely focused in detecting 
-named entities in plain text. Both of these facts lead to the conclusion 
-that, to perform the \gls{rne} task, we need a \gls{wde} method that
-can handle cross-website extraction and a new labeled dataset tailored for this extraction
-task. 
-
-Finally, \gls{ie} is a very broad field, so systems that perform
+\textcolor{red}{
+The problem of \gls{rne} presents a good case of study to attest the performance of different \gls{ner} 
+systems on the Web, because the named entities concerning this problem can
+be rather complex and the faculty directories are usually very different from plain text.
+Finally, \gls{ner} on the Web can vary significantly depending on the end goal, so systems that perform
 well in a specific scenario are not likely to be as effective in other cases, as we concluded
 from our experiments concerning \gls{rne}.
 Therefore, whenever possible, it is desirable that the models be simple to tune for specific extraction 
 tasks. Taking this into consideration, we want to find 
 the best \gls{ner} methods for a specific task, while trying to derive general conclusions
 about their expected performance in other similar tasks.
+}
 
 \section{Objective}
 
@@ -1419,7 +1436,16 @@ feature probabilities for the parent tags using proxies for the correct labels. 
 that four times in a total of six occurrences, the correct label for a word that happened inside
 a \textit{<li>} tag was \mbox{\textit{I-PER}}. By incorporating this knowledge in the model 
 using the self-training strategy, we would improve the probability that words North and West 
-were labeled correctly as a person name in this case.
+were labeled correctly as a person name in this case. 
+
+\textcolor{red}{
+This step needs to be done individually
+for each webpage because we cannot assume that only because tokens inside \textit{<li>} in 
+this webpage were more likely to be names this will also be the case in another webpage. In fact, 
+since the layout varies significantly between different websites, another page may be 
+formatted in such a way that no tokens inside a list are names, and if we calculated HTML 
+feature probabilities over all documents, we would introduce too much noise.
+}
 
 \begin{figure}
   \centering
@@ -2468,6 +2494,55 @@ between different datasets.
   \end{center}
 \end{figure}
 
+\section{Dataset Size}
+\label{sec:dataset_size}
+
+\textcolor{red}{
+The reduced size of the dataset (only 145 webpages) may prevent us from demonstrating
+conclusive evidence about the expected performance of different \gls{ner} models
+in the \gls{rne} task and other web \gls{ner} tasks. The matter of sample size is 
+difficult to refute since there is no counterfactual to disprove the claim that this
+dataset is in fact representative. The number of tokens in the RNE
+dataset is roughly half the number present in the CoNLL-2003 dataset, which is often
+used to attest the performance of NER models in plain text. However, the size of the
+CoNLL-2003 dataset is also very limited if we want to draw general conclusions about 
+the relative performance of different \gls{ner} methods.
+}
+
+\textcolor{red}{
+Some facts may contribute to ascertain the validity of the \gls{rne} dataset as a representative
+sample of faculty directories across the world. It contains pages from 145 universities 
+(roughly 1.5\% of the universities listed in https://univ.cc/world.php) from the top 42 countries 
+with most universities. Each country contributes to the dataset roughly in proportion to the number 
+of universities in that country relative to the total number of universities. Table~\ref{tab:countries}
+presents the geographical distribution of the universities with most entries in the RNE dataset.
+}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      Country & Universities & \% & In dataset & \% \\
+      \midrule
+
+      USA       & 2051 & 21.31\% & 35 & 24.14\% \\
+      Japan     & 568  & 5.90\%  & 11 & 7.59\%  \\
+      Germany   & 281  & 2.92\%  & 11 & 7.59\%  \\
+      China     & 392  & 4.07\%  & 10 & 6.90\%  \\
+      UK        & 165  & 1.71\%  & 8  & 5.52\%  \\
+      Canada    & 145  & 1.51\%  & 7  & 4.83\%  \\
+      Australia & 50   & 0.52\%  & 6  & 4.14\%  \\
+      France    & 265  & 2.75\%  & 5  & 3.45\%  \\
+      Italy     & 92   & 0.96\%  & 5  & 3.45\%  \\
+      Russia    & 320  & 3.33\%  & 4  & 2.76\%  \\
+      Other     & 5294 & 55.01\% & 43 & 29.66\% \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Ten most frequent countries in the RNE datasets.}
+  \label{tab:countries}
+\end{table}
 
 \chapter{Experiments}
 \label{cha:experiments}
@@ -2773,46 +2848,52 @@ attention architectures for Bi-LSTM-CRFs. In other models, we use features 1 to 
 %%% Review 3 
 %%% Remove Partial Match from Group A
 
-We know that correlated features may hurt the performance of \gls{hmm}s, because
-we assumed feature independence to calculate the model parameters. So,
-in Table~\ref{tab:feature_correlation} we present the feature correlation matrix based on 
-the Cramér's V measure, which is a correlation measure between two nominal variables. A value closer
-to 0 means no correlation, a value close to 1 means complete correlation, and a value
-close to -1 means inverse correlation, see~\cite{Cramer1946}. 
-% The stronger correlations are shown in bold numbers.
-% Dpython implementation
-% https://en.wikipedia.org/wiki/Cram%C3%A9r%27s_V
-% https://github.com/shakedzy/dython/blob/master/dython/nominal.py
+% We know that correlated features may hurt the performance of \gls{hmm}s, because
+% we assumed feature independence to calculate the model parameters. So,
+% in Table~\ref{tab:feature_correlation} we present the feature correlation matrix based on 
+% the Cramér's V measure, which is a correlation measure between two nominal variables. A value closer
+% to 0 means no correlation, a value close to 1 means complete correlation, and a value
+% close to -1 means inverse correlation, see~\cite{Cramer1946}. 
+% % The stronger correlations are shown in bold numbers.
+% % Dpython implementation
+% % https://en.wikipedia.org/wiki/Cram%C3%A9r%27s_V
+% % https://github.com/shakedzy/dython/blob/master/dython/nominal.py
+% 
+% \begin{table}[h]
+%   \tiny
+%   \begin{center}
+%     \begin{tabular}{ lccccccccccc }
+%       \toprule
+%            & \rot{Word} & \rot{Exact Match} & \rot{Partial Match} & \rot{Email} & \rot{Number} & \rot{Honorific} 
+% 	   & \rot{URL} & \rot{Capitalized} & \rot{Punctuation} & \rot{HTML Tag} & \rot{CSS Class} \\
+%       \midrule
+%       Word          & 1.00 & \textbf{0.60} & \textbf{0.94} & \textbf{1.00} & \textbf{1.00}  & \textbf{1.00} & 0.00 & \textbf{0.84} & \textbf{1.00}  & 0.25 & 0.00 \\
+%       Exact Match   & -    & 1.00  & 0.19  & -0.02 & -0.07 & -0.04 & 0.00 & 0.15  & -0.05 & 0.07 & 0.22 \\
+%       Partial Match & -    & -     & 1.00  & -0.11 & -0.35 & -0.09 & 0.00 & -0.01 & 0.45  & 0.04 & 0.17 \\
+%       Email         & -    & -     & -     & 1.00  & -0.02 & -0.02 & 0.00 & -0.12 & -0.05 & 0.03 & 0.27 \\
+%       Number        & -    & -     & -     & -     & 1.00  & -0.07 & 0.00 & -0.36 & -0.16 & 0.09 & 0.34 \\
+%       Honorific     & -    & -     & -     & -     & -     & 1.00  & 0.00 & 0.15  & -0.08 & 0.02 & 0.11 \\
+%       URL           & -    & -     & -     & -     & -     & -     & 1.00 & 0.00  & 0.00  & 0.00 & 0.00 \\
+%       Capitalized   & -    & -     & -     & -     & -     & -     & -    & 1.00  & -0.48 & 0.07 & 0.28 \\
+%       Punctuation   & -    & -     & -     & -     & -     & -     & -    & -     & 1.00  & 0.04 & 0.11 \\
+%       HTML Tag      & -    & -     & -     & -     & -     & -     & -    & -     & -     & 1.00 & \textbf{0.64} \\
+%       CSS Class     & -    & -     & -     & -     & -     & -     & -    & -     & -     & -    & 1.00 \\
+%       \bottomrule
+%     \end{tabular}
+%   \end{center}
+%   \caption{Feature correlation matrix}
+%   \label{tab:feature_correlation}
+% \end{table}
 
-\begin{table}[h]
-  \tiny
-  \begin{center}
-    \begin{tabular}{ lccccccccccc }
-      \toprule
-           & \rot{Word} & \rot{Exact Match} & \rot{Partial Match} & \rot{Email} & \rot{Number} & \rot{Honorific} 
-	   & \rot{URL} & \rot{Capitalized} & \rot{Punctuation} & \rot{HTML Tag} & \rot{CSS Class} \\
-      \midrule
-      Word          & 1.00 & \textbf{0.60} & \textbf{0.94} & \textbf{1.00} & \textbf{1.00}  & \textbf{1.00} & 0.00 & \textbf{0.84} & \textbf{1.00}  & 0.25 & 0.00 \\
-      Exact Match   & -    & 1.00  & 0.19  & -0.02 & -0.07 & -0.04 & 0.00 & 0.15  & -0.05 & 0.07 & 0.22 \\
-      Partial Match & -    & -     & 1.00  & -0.11 & -0.35 & -0.09 & 0.00 & -0.01 & 0.45  & 0.04 & 0.17 \\
-      Email         & -    & -     & -     & 1.00  & -0.02 & -0.02 & 0.00 & -0.12 & -0.05 & 0.03 & 0.27 \\
-      Number        & -    & -     & -     & -     & 1.00  & -0.07 & 0.00 & -0.36 & -0.16 & 0.09 & 0.34 \\
-      Honorific     & -    & -     & -     & -     & -     & 1.00  & 0.00 & 0.15  & -0.08 & 0.02 & 0.11 \\
-      URL           & -    & -     & -     & -     & -     & -     & 1.00 & 0.00  & 0.00  & 0.00 & 0.00 \\
-      Capitalized   & -    & -     & -     & -     & -     & -     & -    & 1.00  & -0.48 & 0.07 & 0.28 \\
-      Punctuation   & -    & -     & -     & -     & -     & -     & -    & -     & 1.00  & 0.04 & 0.11 \\
-      HTML Tag      & -    & -     & -     & -     & -     & -     & -    & -     & -     & 1.00 & \textbf{0.64} \\
-      CSS Class     & -    & -     & -     & -     & -     & -     & -    & -     & -     & -    & 1.00 \\
-      \bottomrule
-    \end{tabular}
-  \end{center}
-  \caption{Feature correlation matrix}
-  \label{tab:feature_correlation}
-\end{table}
-
-The current word is strongly correlated with most features besides the URL feature and the ones related to 
-the HTML structure. To understand how this can help or hurt the Hidden Markov Model performance we test the 
+% The current word is strongly correlated with most features besides the URL feature and the ones related to 
+% the HTML structure. 
+\textcolor{red}{
+A \gls{hmm} can benefit from a good feature selection, but we need to be careful
+when selecting too many features, because we assumed feature independence to calculate the 
+model parameters and correlated features may introduce a source of noise. 
+To understand how a feature selection can help or hurt the Hidden Markov Model performance we tested the 
 model using three groups of features:
+}
 %
 \begin{itemize}
   \item Group A: Current word, Exact Match, Partial Match, URL, Capitalized
@@ -2820,7 +2901,7 @@ model using three groups of features:
   \item Group C: The HTML Tag and the CSS Class
 \end{itemize}
 %
-Group A is composed of features with a smaller correlation while Group B is composed of all the
+Group A is composed of a small selection of indicative features while Group B is composed of all the
 textual features. Group C will only be used in the Self-Training strategy.
 
 Figure~\ref{fig:hmm_features} compares the performance of HMMs using the 
@@ -2944,11 +3025,12 @@ numerical results for the same models.
   \label{tab:hmm_features}
 \end{table}
 
-The Group A models were better overall showing that too many correlated 
+The Group A models were better overall showing that too many
 features can hurt the performance of \gls{hmm}s.
 However, when these features are carefully selected, they can improve the 
 performance of the \gls{hmm} significantly (0.812 F1 for the HMM-2)
-relative to the performance of the featureless \gls{hmm} (0.583 F1 for the HMM-2).
+relative to the performance of the \gls{hmm}s that used only the current word as 
+a feature (0.583 F1 for the HMM-2).
 
 
 \subsection{Self-training strategy}
@@ -3093,26 +3175,26 @@ second-order \textit{HMM} using \textit{Group A} features and the self-training 
 %%% @ Review 9
 %%% Retrain CRFs with cross validation.
 
-When we compared a featureless Logistic Classifier with a featureless Naive Bayes model,
+When we compared a Logistic Classifier with a Naive Bayes model,
 we found that the Logistic Classifier performed a little better. In this section we
-want to check if featureless CRFs are also better than featuress HMMs. Also, CRFs provide a much more 
-flexible way to incorporate 
+want to check if CRFs are also better than HMMs when using only the current words as features. 
+Also, CRFs provide a much more flexible way to incorporate 
 features in comparison to HMMs. When considering the application
 of this class of models to the Researcher Name Extraction task, we want to understand how the feature
 selection impacts the performance of CRFs.
 
-\subsection{No Features}
+\subsection{Only the Current Word Feature}
 
 Figure~\ref{fig:crf_no_features} shows a comparison between the Logistic Classifier
-(that assumes label independence), the best HMM without features (HMM-2)
-and a CRF without features in the \gls{rne} task. Table~\ref{fig:crf_no_features} shows
+(that assumes label independence), the best HMM with no features besides the current word (HMM-2)
+and a CRF with no features besides the current word in the \gls{rne} task. Table~\ref{fig:crf_no_features} shows
 the numerical results for the same models.
 
 \begin{figure}[h!]
   \begin{center}
     \begin{tikzpicture}
       \begin{axis}[
-        title={CRF without Features},
+        title={CRF using only the current word as a feature},
         xmin=0.5, xmax=3.5,
         ymin=0, ymax=1,
         xticklabels={Logistic,HMM-2,CRF},
@@ -3152,7 +3234,7 @@ the numerical results for the same models.
     \end{tikzpicture}
     \caption{
       Performance of the Logistic Classifier, second-order HMM and 
-      CRF without features on the test set of the RNE dataset.
+      CRF with no features besides the current word on the test set of the RNE dataset.
     }
     \label{fig:crf_no_features}
   \end{center}
@@ -3168,14 +3250,14 @@ the numerical results for the same models.
                              & \multicolumn{1}{c}{P} & \multicolumn{1}{c}{R} & \multicolumn{1}{c}{F1} \\
       \midrule
       Logistic Classifier    & 0.952 & 0.171 & 0.122 & 0.116 & 0.156 & 0.133 \\
-      HMM-2 (featureless)    & 0.703 & 0.630 & 0.665 & 0.653 & 0.527 & 0.583 \\
-      CRF (featureless)      & 0.806 & 0.805 & 0.806 & \textbf{0.795} & \textbf{0.710} & \textbf{0.750} \\
+      HMM-2i                 & 0.703 & 0.630 & 0.665 & 0.653 & 0.527 & 0.583 \\
+      CRF i                  & 0.806 & 0.805 & 0.806 & \textbf{0.795} & \textbf{0.710} & \textbf{0.750} \\
       \bottomrule
     \end{tabular}
   \end{center}
   \caption{
       Performance of the Logistic Classifier, second-order HMM and 
-      CRF without features on the validation and test sets of the RNE dataset.
+      CRF with no features besides the current word on the validation and test sets of the RNE dataset.
   }
   \label{tab:crf_no_features}
 \end{table}
@@ -3279,7 +3361,7 @@ self-trained HMM-2, it still shows a better overall performance with an F1 score
 
 A neural network architecture that has had remarkable success at solving sequence labeling 
 tasks is the Bi-LSTM-CRF described in Section~\ref{ssec:lstm_crf}. 
-In Section~\ref{ssec:experiments_nn_1}, we investigate how featureless Bi-LSTM-CRFs compare to featureless HMMs and 
+In Section~\ref{ssec:experiments_nn_1}, we investigate how Bi-LSTM-CRFs compare to HMMs and 
 CRFs in the \gls{rne} task. In Section~\ref{ssec:experiments_nn_2}, we check if CNN-based or LSTM-based character 
 representations can boost the performance of Bi-LSTM-CRFs in the same task. Lastly, in Section~\ref{ssec:experiments_nn_4}, we check if
 the choice of pre-trained word embeddings alters the results significantly. 
@@ -3449,7 +3531,8 @@ performance of Bi-LSTM-CRF models with LSTM-based character representations usin
       \midrule
       GloVe    & 0.928 & 0.950 & 0.939 & \textbf{0.920} & \textbf{0.886} & \textbf{0.902} \\
       Word2Vec & 0.925 & 0.926 & 0.926 & 0.899 & 0.831 & 0.864 \\
-      ELMo     & 0.783 & 0.844 & 0.812 & 0.720 & 0.885 & 0.794 \\
+      ELMo     & 0.917 & 0.953 & 0.937 & 0.876 & 0.810 & 0.842 \\
+      % ELMo     & 0.783 & 0.844 & 0.812 & 0.720 & 0.885 & 0.794 \\
       \bottomrule
     \end{tabular}
   \end{center}
@@ -4170,5 +4253,312 @@ affiliation information from university websites. The second article discusses t
 proposed in this dissertation.
 
 \ppgccbibliography{bibfile}
+
+\begin{appendices}
+\label{app:cross_validation}
+
+\chapter{Cross Validation}
+
+\section{Cross Validation}
+\label{sec:cross_validation}
+
+\textcolor{red}{
+Considering the reduced size of the \gls{rne} dataset, we must acknowledge the
+limitations concerning generalizations about the relative performance of 
+the models studied in this dissertation. The naive division of the labeled data 
+into three static data files (training, validation and test) may harm the validity 
+of our analysis if the data files were randomly selected in a way that favors 
+a model in place of others due to the natural volatility in the process of parameter 
+estimation.
+}
+
+\textcolor{red}{
+When training a machine learning model for a particular prediction task, the model is 
+expected to fit the training data as closely as
+possible as the training progresses. If the training is kept going indefinitely, the model will probably
+learn spurious patterns in the training data (i.e. overfitting the training data),
+what will lead to poor generalizations. That is why the expected performance of a 
+predictive model over unseen data must be checked with the aid of an independent sample
+drawn from the same population as the training data, which we call the test set.
+In addition to the test set, we also separated a validation data file.
+The validation data file is never observed directly by the models.
+Rather, its purpose is to prevent overfitting by monitoring the model performance in
+the validation dataset and stop its training when a given statistic, in this case the
+F1-score, decreases over several epochs. This is called the early stopping strategy~\citep{Caruana2000}. 
+}
+
+\textcolor{red}{
+The problem with splitting the dataset in three files is that the independent sample
+used to test the models may not be a faithful representation of the complete population.
+This problem is less likely to lead to wrong conclusions if the dataset is sizable, but
+in the case of the \gls{rne} dataset, the risk of tarnished results increases due to the
+diminished size of the dataset. We can mitigate this problem by employing the strategy
+of K-fold cross-validation. K-fold cross-validation consists in splitting the complete dataset
+into K folds, where $ (K-1) $ folds are used to train the model and one fold is used to
+test it. The test fold is rotated $ K $ times until we have trained $ K $ variants
+of the same model and tested it in each fold separately. The averaged statistics obtained 
+in this process will be more trustworthy than the results obtained with the static split
+since each model variation will have been tested against all data points.
+}
+
+\textcolor{red}{
+In this section, we discuss the results for the models presented in the preceding
+sections by performing five fold cross validation in a combination of the training, 
+validation and test data files of the RNE dataset. The results for HMMs are presented
+in Subsection~\ref{ssec:hmm_cv}, the results for CRFs are presented in 
+Subsection~\ref{ssec:crf_cv} and the results for Neural Networks are presented in 
+Subsection~\ref{ssec:nn_cv}.
+}
+
+\subsection{Hidden Markov Models}
+\label{ssec:hmm_cv}
+
+\textcolor{red}{
+Table~\ref{tab:hmm_cv} presents the results for all HMM variations discussed earlier
+when performing five fold cross validation in the RNE dataset. The F1 obtained only 
+in the test set is also presented for ease of comparison. The F1 (test set) is the
+same one presented in earlier sections.
+Each cell shows the precision, recall and F1 statistics averaged over five folds 
+and their standard deviations.
+}
+
+\textcolor{red}{
+The results for the models that employed only the current word as a feature did not
+change dramatically, except for the HMM-3, which had a much better average result
+in the cross validation runs. An important aspect revealed by cross validation
+is that most tested HMMs showed a significant F1 standard deviation.
+For example, the HMM-2 with the self-training strategy showed a 0.099 standard 
+deviation in the F1 across five folds. This important information poses some doubt
+over some earlier conclusions. In fact, models that employed Group B features (all features)
+performed better than models with only Group A features (less correlated features), 
+contrasting with the results for the models tested using only the test datafile.
+Because of the high standard deviation, it is difficult to ascertain the relative 
+superiority of different feature selections and different types of HMMs. But,
+the self-training strategy was still useful in improving all models. Overall,
+the best HMMs can achieve an F1 around $ 0.8 $ in the RNE dataset, privileging recall
+over precision.
+}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      Model & P & R & F1 (CV) & F1 (test set) \\
+      \midrule
+      NB                   & 0.082 (0.006) & 0.072 (0.004) & 0.077 (0.005) & 0.086 \\
+      HMM-1                & 0.631 (0.066) & 0.516 (0.097) & 0.566 (0.083) & 0.533 \\
+      HMM-2                & 0.606 (0.141) & 0.552 (0.114) & 0.577 (0.126) & 0.583 \\
+      HMM-3                & 0.599 (0.111) & 0.609 (0.114) & 0.603 (0.105) & 0.506 \\
+      HMM-1 (Group A)      & 0.773 (0.094) & 0.729 (0.055) & 0.750 (0.073) & 0.805 \\
+      HMM-2 (Group A)      & 0.762 (0.085) & 0.749 (0.057) & 0.754 (0.062) & 0.812 \\
+      HMM-3 (Group A)      & 0.777 (0.073) & 0.763 (0.061) & 0.769 (0.065) & 0.798 \\
+      HMM-1 (Group B)      & 0.811 (0.048) & 0.793 (0.030) & 0.801 (0.032) & 0.748 \\
+      HMM-2 (Group B)      & 0.779 (0.042) & 0.781 (0.082) & 0.779 (0.055) & 0.769 \\
+      HMM-3 (Group B)      & 0.771 (0.075) & 0.787 (0.042) & 0.778 (0.055) & 0.724 \\
+      HMM-1 (Group A) + ST & 0.745 (0.060) & 0.787 (0.093) & 0.764 (0.069) & 0.865 \\
+      HMM-2 (Group A) + ST & 0.771 (0.123) & 0.816 (0.082) & 0.791 (0.099) & 0.879 \\
+      HMM-3 (Group A) + ST & 0.772 (0.098) & 0.802 (0.072) & 0.786 (0.085) & 0.762 \\
+      HMM-1 (Group B) + ST & 0.812 (0.041) & 0.828 (0.028) & 0.819 (0.018) & 0.866 \\
+      HMM-2 (Group B) + ST & 0.783 (0.081) & 0.836 (0.033) & 0.807 (0.052) & 0.877 \\
+      HMM-3 (Group B) + ST & 0.774 (0.073) & 0.821 (0.044) & 0.796 (0.053) & 0.814 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Precision (P), Recall (R) and F1 for Hidden Markov Models and Naive Bayes in the RNE 
+    task using five fold cross validation (CV).}
+  \label{tab:hmm_cv}
+\end{table}
+
+
+\subsection{Conditional Random Fields}
+\label{ssec:crf_cv}
+
+\textcolor{red}{
+Table~\ref{tab:crf_cv} presents the results for all CRF variations discussed earlier
+when performing five fold cross validation in the RNE dataset. 
+Each cell shows the precision, recall and F1 statistics averaged over five folds 
+and their standard deviations.
+}
+
+\textcolor{red}{
+All CRF variations performed worse when considering the average results across five
+folds in comparison to the models tested using only the test set, but the variant 
+using Group B features still achieves top performance between the three variants. As was
+the case for the HMMs, CRFs present a significant standard deviation, what renders
+affirmations about the relative performances of different model variations inconclusive.
+}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      Model & P & R & F1 (CV) & F1 (test set) \\
+      \midrule
+      Logistic Classifier & 0.095 (0.027) & 0.122 (0.027) & 0.104 (0.018) & 0.133 \\
+      CRF                 & 0.685 (0.086) & 0.680 (0.071) & 0.677 (0.031) & 0.750 \\
+      CRF (Group A)       & 0.794 (0.074) & 0.742 (0.081) & 0.767 (0.075) & 0.808 \\
+      CRF (Group B)       & 0.802 (0.068) & 0.753 (0.074) & 0.776 (0.067) & 0.826 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Precision (P), Recall (R) and F1 for CRFs and Logistic Classifier in the RNE 
+    task using five fold cross validation (CV).}
+  \label{tab:hmm_cv}
+\end{table}
+
+
+\subsection{Neural Networks}
+\label{ssec:nn_cv}
+
+\textcolor{red}{
+Table~\ref{tab:nn_cv} presents the results for all Neural Network variations 
+discussed earlier when performing five fold cross validation in the RNE dataset. 
+Each cell shows the precision, recall and F1 statistics averaged over five folds 
+and their standard deviations. All neural networks were trained over ten epochs in
+each fold. No early stopping strategy was used in these experiments.
+}
+
+\textcolor{red}{
+Almost all neural network variations showed about the same performance using either 
+only the test set or cross validation. However, it is noteworthy to mention that the 
+choice of the test set hindered the performance of ELMo embeddings quite significantly.
+Overall, ELMo embeddings showed better performance than Word2Vec embeddings but 
+despite adding a lot of complexity to the models, they still performed suboptimally when 
+compared to static GloVe embeddings.
+}
+
+\textcolor{red}{
+When compared to simpler statistical models, neural networks show a lower standard deviation.
+Still, when considering these ranges of variation, the introduction of Neural 
+Networks in the RNE task does not provide a massive gain in performance. However, this gain
+is more significant than previously stated when we compared only the performances in the test set.
+It could be argued that the main benefits of employing Bi-LSTM-CRFs in this task, are the
+improved predictability provided by a smaller standard deviation and a better overall performance.
+}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      Model & P & R & F1 (CV) & F1 (test set) \\
+      \midrule
+      Bi-LSTM-CRF                    & 0.866 (0.036) & 0.844 (0.043) & 0.855 (0.036) & 0.886 \\
+      Bi-LSTM-CRF + CNNc             & 0.885 (0.050) & 0.925 (0.023) & 0.904 (0.034) & 0.901 \\
+      Bi-LSTM-CRF + LSTMc            & 0.889 (0.051) & 0.924 (0.029) & 0.906 (0.036) & 0.902 \\
+      Bi-LSTM-CRF + LSTMc + Word2Vec & 0.870 (0.056) & 0.898 (0.047) & 0.883 (0.044) & 0.864 \\
+      Bi-LSTM-CRF + LSTMc + Elmo     & 0.911 (0.044) & 0.891 (0.036) & 0.901 (0.038) & 0.841 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Precision(P), Recall (R) and F1 for Bi-LSTM-CRF variations in the RNE 
+    task using five fold cross validation (CV). All the models used GloVe-300 embeddings 
+    except if stated otherwise.}
+  \label{tab:hmm_cv}
+\end{table}
+
+\section{Improvements}
+\label{sec:cross_validation_improvements_to_nn}
+
+In this section we present results for the Hard Attention Model, 
+the Soft Attention Model and the F1 Optimization Objective when 
+performing five fold cross-validation in the combined training, 
+validation and test sets as we did for the other models in 
+Section~\ref{sec:cross_validation}. 
+
+\textcolor{red}{
+Table~\ref{tab:nn_improvements_cv} presents the five fold cross validation results for 
+the Hard Attention Model and the Soft Attention Model.
+The F1 obtained only in the test set is also presented for ease of comparison. 
+The F1 (test set) is the same one presented in earlier sections.
+Each cell shows the precision, recall and F1 statistics averaged over five folds 
+and their standard deviations. All models were trained over ten epochs and they
+used GloVE-300 embeddings. We did not employ the early stopping strategy.
+}
+
+\textcolor{red}{
+With cross-validation, the results did not change significantly. The hard attention
+layer still improves the plain Bi-LSTM-CRF with LSTM character representation by a 
+small margin with the added benefit of reducing the standard deviation significantly.
+The soft attention layer is still detrimental to the performance of the Bi-LSTM-CRF 
+model.
+}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      Model & P & R & F1 (CV) & F1 (test set) \\
+      \midrule
+      Bi-LSTM-CRF + LSTMc & 0.889 (0.051) & 0.924 (0.029) & 0.906 (0.036) & 0.902 \\
+        +Hard Attention   & 0.905 (0.032) & 0.912 (0.032) & 0.908 (0.019) & 0.907 \\
+        +Soft Attention   & 0.875 (0.051) & 0.924 (0.039) & 0.899 (0.044) & 0.865 \\
+      \bottomrule
+    \end{tabular}
+  \end{center}
+  \caption{Precision(P), Recall (R) and F1 for Bi-LSTM-CRF variations using the Hard Attention
+    Layer and the Soft Attention Layer in the RNE 
+    task using five fold cross validation (CV).}
+  \label{tab:hmm_cv}
+\end{table}
+
+\textcolor{red}{
+In Table~\ref{tab:f_score_optimization_cv}, we present the cross-validation results for 
+the Bi-LSTM-CRF with an F-$\alpha$ optimization objective, where $\alpha$ ranges from 
+$ 0.1 $ to $ 0.9 $. The previous F-$\alpha$ scores obtained using only the test set are 
+also presented.
+}
+
+\textcolor{red}{
+The cross validation results for the Bi-LSTM-CRFs that optimized the F-$\alpha$ objective 
+did not change very much when compared to the results in the test set only. All variants
+privileged recall over precision and the change in the value of $\alpha$ did not impact
+the end result significantly. It is noteworthy to mention that, different from the results 
+obtained using only the test set, most Neural Network variants showed a preference for Recall over
+Precision in the cross validation results even when optimizing the regular cross
+entropy function, what lessens the case for a custom optimization objective such as 
+the F-score utility function.
+}
+
+\begin{table}[h]
+  \small
+  \begin{center}
+    \begin{tabular}{ lllll }
+      \toprule
+      $\alpha$ & P & R & F-$\alpha$ (CV) & F-$\alpha$ (test set) \\
+      \midrule
+      0.1 & 0.832 (0.055) & 0.871 (0.048) & 0.867 (0.048) & 0.832 \\
+      0.2 & 0.837 (0.047) & 0.901 (0.052) & 0.887 (0.048) & 0.863 \\
+      0.3 & 0.842 (0.049) & 0.911 (0.053) & 0.888 (0.039) & 0.873 \\
+      0.4 & 0.836 (0.068) & 0.929 (0.037) & 0.887 (0.023) & 0.881 \\
+      0.5 & 0.807 (0.033) & 0.904 (0.036) & 0.853 (0.031) & 0.881 \\
+      0.6 & 0.818 (0.050) & 0.926 (0.065) & 0.857 (0.053) & 0.855 \\
+      0.7 & 0.798 (0.090) & 0.900 (0.037) & 0.825 (0.077) & 0.877 \\
+      0.8 & 0.821 (0.044) & 0.926 (0.029) & 0.840 (0.041) & 0.850 \\
+      0.9 & 0.000 (0.000) & 0.000 (0.000) & 0.000 (0.000) & 0.734 \\
+      \bottomrule
+      		
+    \end{tabular}
+  \end{center}
+  \caption{Precision(P), Recall (R) and F1 for Bi-LSTM-CRF variations optimizing the
+    F-$\alpha$ objective in the RNE task using five fold cross validation (CV).}
+  \label{tab:hmm_cv}
+\end{table}
+
+\section{Conclusion}
+
+Cross validation analysis revealed important aspects of our models such as the volatily
+of HMMs and CRFs and the comparative stability of neural networks. The performance of most tested
+models did not change significantly when we compare results reported in the test set of the
+RNE dataset and results obtained with five fold cross validation over the complete dataset.
+However, in some cases, cross validation analysis was useful in casting doubt over some of our
+previous conclusions. Namely, the comparative analysis of different variations of HMMs and CRFs 
+regarding feature selection and other model parameters was inconclusive, because of the high 
+volatility of statistical models in the RNE task. 
+
+\end{appendices}
 
 \end{document}

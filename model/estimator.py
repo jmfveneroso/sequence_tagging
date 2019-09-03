@@ -171,12 +171,7 @@ class Estimator:
         if t[0] != '-DOCSTART-':
           sentences[i][j] = t[:13] + t[13].split('.') + t[14:]
 
-    feature_cols = range(3, 15) 
-    training_set = prepare_dataset(
-      sentences, mode=self.params['dataset_mode'], 
-      label_col=1, feature_cols=feature_cols, 
-      training=True
-    )
+    training_set = sentences
 
     documents = []
     for p in training_set:     
@@ -194,6 +189,27 @@ class Estimator:
         end = start + fold_size if (i < 4) else len(documents)
         folds.append(documents[start:end])
     print('Fold size:', fold_size)
+
+    # random.shuffle(training_set)
+    # fold_size = len(training_set) // 5
+    # 
+    # folds = []
+    # for i in range(5):
+    #     start = i * fold_size
+    #     end = start + fold_size if (i < 4) else len(training_set)
+    #     folds.append(training_set[start:end])
+    # print('Fold size:', fold_size)
+
+    for i, _ in enumerate(folds):
+      aux = []    
+      for d in folds[i]:
+        aux = aux + d
+    
+      folds[i] = prepare_dataset(
+        aux, mode=self.params['dataset_mode'], 
+        label_col=1, feature_cols=range(3, 15), 
+        training=True
+      )
 
     # random.shuffle(training_set)
     # fold_size = len(training_set) // 5

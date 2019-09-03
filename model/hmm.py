@@ -19,10 +19,10 @@ def load_dataset(f):
           l = 0
         else:
           l = ['O', 'B-PER', 'I-PER'].index(t[1])
-
+        X[i][j] = [X[i][j][0]] + X[i][j][2:]
         labels.append(l)
         tkns.append(t[0])
-        X[i][j] = [X[i][j][0]] + X[i][j][2:]
+        # X[i][j] = [X[i][j][0], str(X[i][j][0]).lower()]
 
       Y.append(labels)
       T.append(tkns)
@@ -40,7 +40,7 @@ class HiddenMarkov:
     self.naive_bayes = naive_bayes
 
     self.num_labels   = 3
-    self.num_features = 11
+    self.num_features = 12
     # self.num_features = 1
     self.num_secondary_features = 2
     self.num_all_features = self.num_features + self.num_secondary_features
@@ -79,14 +79,16 @@ class HiddenMarkov:
   def train_features(self, X, Y, which_features=[]):
     if len(which_features) != self.num_all_features:
       which_features = [0] * self.num_all_features
-
+  
     label_count = np.ones((self.num_labels))
     for i in range(len(Y)):
       for j in range(len(Y[i])):
         label_count += Y[i][j]
         y = Y[i][j]
   
-        f = X[i][j][1:1+self.num_all_features]
+        # f = X[i][j][1:1+self.num_all_features]
+        f = X[i][j][:self.num_all_features]
+
         for k in range(self.num_all_features):
           if which_features[k] == 0:
             continue
@@ -149,22 +151,22 @@ class HiddenMarkov:
       self.transition_mat = np.nan_to_num(self.transition_mat)
       # print(self.transition_mat)
 
-  def fit(self, X, Y):
-    which_features = [0] * self.num_all_features 
-    for i in range(0,1):
-      which_features[i] = 1
+  def fit(self, X, Y, which_features):
+    # which_features = [0] * self.num_all_features 
+    # for i in range(0,1):
+    #   which_features[i] = 1
 
-    if self.use_features:
-      for i in range(1,1+self.num_features):
-        which_features[i] = 1
-      # if i != 1 and i != 2:
-      #   which_features[i] = 0
-      # which_features[3] = 1
-      # which_features[4] = 1
-      which_features[1] = 1
-      which_features[2] = 1
-      which_features[8] = 1
-      which_features[9] = 1
+    # if self.use_features:
+    #   for i in range(1,1+self.num_features):
+    #     which_features[i] = 1
+    #     # if i != 1 and i != 2:
+    #     #   which_features[i] = 0
+    #   which_features[3] = 0
+    #   which_features[4] = 0
+    #   which_features[1] = 1
+    #   which_features[2] = 1
+    #   which_features[8] = 1
+    #   which_features[9] = 1
 
     self.train_features(X, Y, which_features)
     self.train_transitions(X, Y)
@@ -176,8 +178,9 @@ class HiddenMarkov:
     for i in range(len(X)):
       emission = np.ones(self.num_labels)
   
-      f = X[i][1:1+self.num_features+self.num_secondary_features]
-      for k in range(self.num_features+self.num_secondary_features):
+      # f = X[i][1:1+self.num_features+self.num_secondary_features]
+      f = X[i][:self.num_all_features]
+      for k in range(self.num_all_features):
         for y in range(self.num_labels):
           key = ''
           if k < len(f):
@@ -218,7 +221,8 @@ class HiddenMarkov:
     for i in range(len(X)):
       emission = np.ones(self.num_labels)
   
-      f = X[i][1:1+self.num_features+self.num_secondary_features]
+      # f = X[i][1:1+self.num_features+self.num_secondary_features]
+      f = X[i][:self.num_all_features]
       for k in range(self.num_features+self.num_secondary_features):
         for y in range(self.num_labels):
           key = ''
