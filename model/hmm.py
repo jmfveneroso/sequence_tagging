@@ -263,7 +263,7 @@ class HiddenMarkov:
     Y = self.get_predictions(X)
     which_features = [0] * self.num_features 
     which_features += [1] * self.num_secondary_features
-    # which_features[-2] = 0
+    which_features[-2] = 0
     self.train_features(X, Y, which_features)
 
   def predict(self, X):

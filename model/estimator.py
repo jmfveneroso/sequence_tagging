@@ -211,6 +211,15 @@ class Estimator:
         training=True
       )
 
+    # random.shuffle(training_set)
+    # fold_size = len(training_set) // 5
+    # 
+    # folds = []
+    # for i in range(5):
+    #     start = i * fold_size
+    #     end = start + fold_size if (i < 4) else len(training_set)
+    #     folds.append(training_set[start:end])
+    # print('Fold size:', fold_size)
 
     for i in range(5):
       tf.reset_default_graph()
@@ -224,15 +233,15 @@ class Estimator:
                 train = train + folds[j]
         test = folds[i]
             
-        # aux = []    
-        # for d in train:
-        #     aux = aux + d
-        # train = aux    
-        #     
-        # aux = []    
-        # for d in test:
-        #     aux = aux + d    
-        # test = aux
+        aux = []    
+        for d in train:
+            aux = aux + d
+        train = aux    
+            
+        aux = []    
+        for d in test:
+            aux = aux + d    
+        test = aux
 
         self.dataset = NerOnHtml(self.params)
         last_p, last_t, last_w = [], [], []
@@ -240,7 +249,7 @@ class Estimator:
           name = 'fold_' + str(i)
           _, _ = self.run_epoch_cv(sess, train, train=True, filename=name, epoch_num=epoch)
           _, (p, t, w) = self.run_epoch_cv(sess, test, filename=name, epoch_num=epoch)
-          
+
           last_p = p
           last_t = t
           last_w = w

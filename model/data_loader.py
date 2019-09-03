@@ -332,12 +332,14 @@ class NerOnHtml:
     chars = [pad_array(c, b'<pad>', max(lengths)) for c in chars]
     
     # Feature vector. 
-    features = [[float(f) for f in s[2][:2] + s[2][4:9]] for s in sentence]
+    # Group A.
+    features = [[float(f) for f in s[2][:2] + s[2][7:9]] for s in sentence]
+    # Group B.
+    # features = [[float(f) for f in s[2][:2] + s[2][4:9]] for s in sentence]
 
     # HTML features.
     html_features = [[f.encode() for f in s[2][10:]] for s in sentence]
-    html_features = [pad_array(f, b'<pad>', 3) for f in html_features]
-
+    html_features = [pad_array(f, b'<pad>', 3) for f in html_features] 
     # CSS Chars.
     css_chars = [[c.encode() for c in f[2].decode()] for f in html_features]
     css_lengths = [len(c) for c in css_chars]
@@ -361,9 +363,14 @@ class NerOnHtml:
         if t[0] != '-DOCSTART-':
           sentences[i][j] = t[:13] + t[13].split('.') + t[14:]
 
+    # Group A.
+    # feature_cols = [3, 4, 8, 9]
+    # Group B.
+    feature_cols = range(3, 15) 
+
     sentences = prepare_dataset(
       sentences, mode=self.params['dataset_mode'], 
-      label_col=1, feature_cols=range(3, 15), 
+      label_col=1, feature_cols=feature_cols, 
       training=training
     )
 
