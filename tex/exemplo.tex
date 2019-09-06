@@ -87,7 +87,7 @@
   address={Belo Horizonte},
   date={2019-04},
   advisor={Berthier Ribeiro-Neto de Araújo},
-  % approval={pics/approvalsheet.eps},
+  approval={approvalsheet.pdf},
   abstract=[brazil]{Resumo}{resumo},
   abstract={Abstract}{abstract},
   % dedication={dedicatoria},
@@ -198,12 +198,11 @@ later on bibliometric studies.
 %%% Review @1
 %%% Complete.
 
-\textcolor{red}{
 Web Data Extraction emerges in the context of many Web projects.
 It consists of extracting structured information from unstructured web pages to
 build a knowledge base. Wrapper-based methods are effective for extracting regular data
-from similar webpages, for example in price comparison websites. However,
-when a particular extraction task requires more flexibility, such as in cases where
+from similar webpages, for example, when extracting prices from a web catalog. However,
+when a particular extraction task requires more flexibility, such as in the cases where
 the website layout varies significantly between different sources, extraction systems based on 
 machine learning usually perform better. In the cases where these machine learning systems
 need to handle complex entities such as person or organization names, \gls{ner} comes forward as
@@ -213,9 +212,7 @@ plain text, however they usually have a smaller average sentence size and
 a considerable amount of boilerplate text that may hurt the performance of regular \gls{ner} models
 trained to solve extraction tasks in plain text. Also, the webpage layout contains useful 
 information that is typically not present in plain text.
-}
 
-\textcolor{red}{
 A good example of a Web Data Extraction task that requires the type of flexible approach 
 discussed above is the task of acquiring affiliation data from university websites
 to build a researcher affiliation database or complement existing ones.
@@ -224,34 +221,19 @@ each department, extract the researcher names and link these names to their
 public profiles or create new ones if they do not already exist.
 Acquiring this data manually is tedious and
 impractical because of the sheer number of universities and researchers in the 
-world~\footnote{The field of Computer Science alone has more than 2,200,000 researchers 
+world\footnote{The field of Computer Science alone has more than 2,200,000 researchers 
 listed on DBLP: https://dblp.uni-trier.de/.}, so we must resort to automatic methods. 
-}
 
-\textcolor{red}{
 The crawling stage is relatively simple once we have a somewhat reliable way of 
 detecting faculty webpages, but the researcher name extraction stage is trickier. Faculty listings
 vary widely between different universities, and they are not always available in English,
 so we need an extraction system that can handle the possible variations without needing
 to be trained again for each website.
-}
 
-\textcolor{red}{
 The problem of \gls{rne} provides a good study case to attest the performance of different \gls{ner} 
 systems on the Web, because the named entities concerning this problem
 are complex, the faculty directories are usually very different from plain text and the documents
 vary widely between different university websites.
-}
-
-\textcolor{red}{
-\gls{ner} on the Web can vary significantly depending on the end goal, so systems that perform
-well in a specific scenario are not likely to be as effective in other cases, as we concluded
-from our experiments concerning \gls{rne}.
-Therefore, whenever possible, it is desirable that the models be simple to tune for specific extraction 
-tasks. Taking this into consideration, we want to find 
-the best \gls{ner} methods for a specific task, while trying to derive general conclusions
-about their expected performance in other similar tasks.
-}
 
 \section{Objective}
 
@@ -1331,9 +1313,8 @@ a beam-search strategy can be used.
 \subsection{Self-Training} 
 \label{sec:self_training}
 
-\textcolor{red}{
 The self-training strategy is a semi-supervised machine learning technique to improve
-the performance of \gls{hmm}s in web sequence labeling tasks.}
+the performance of \gls{hmm}s in web sequence labeling tasks.
 A \gls{hmm} for the sequence labeling task has the form:
 \begin{equation}
 P(y|x) \propto \prod_{i=1}^n P(x_i|y_i) P(y_i|y_{i-1})
@@ -1447,19 +1428,17 @@ were labeled correctly as a person name in this case.
 %%% Review @2
 %%% Done.
 
-\textcolor{red}{
 The self-training strategy must be employed individually over each webpage. This means
 that, for each webpage, we discard the previously calculated HTML feature probabilities 
 and calculate new ones. The reason for this is that the webpage layouts vary significantly
 between different sources, so general feature probabilities are likely to introduce too much
 noise in the model. In the above mentioned example, we cannot assume that only because tokens 
 inside a \textit{<li>} tag are more likely to be names in the context of that particular 
-webpage, this will also be the case on other webpages. HTML feature probabilities cannot be 
-generalized because of the great variation in webpage layout. For example, another page may be 
-formatted in such a way that tokens inside a list are never named entities, and all tokens 
-inside tables are named entities, therefore, HTML feature probabilities calculated outside
-the scope of the page are likely to lead to bad predictions.
-}
+webpage, this will also be the case for other webpages. HTML feature probabilities cannot be 
+generalized because of the great variation in webpage layout. For example, another webpage may be 
+formatted in such a way that named entities never occur inside a list, and all the tokens 
+inside tables are named entities. Therefore, HTML feature probabilities calculated outside
+the scope of the webpage are likely to lead to bad predictions.
 
 \begin{figure}
   \centering
@@ -2506,46 +2485,38 @@ between different datasets.
 
 %%% Review @3
 
-\textcolor{red}{
 The reduced size of the RNE dataset (only 145 webpages) may prevent us from drawing 
 conclusive judgements about the expected performance of different \gls{ner} models
 in the \gls{rne} task. The matter of sample size is difficult to address because there 
-is no available counterfactual to confirm the claim that the RNE dataset is in fact a
+are no alternative data sources to confirm the claim that the RNE dataset is in fact a
 representative sample of faculty directories across the world. The number of 
 tokens in the RNE dataset is roughly half the number present in the CoNLL-2003 dataset, 
 a dataset that is often used to attest the performance of NER models in plain text. 
 However, the size of the CoNLL-2003 dataset is also small and presents an 
-obstacle in the effort of drawing general conclusions.
-}
+obstacle in the effort of drawing general conclusions about model performance.
 
-\textcolor{red}{
 Some facts may contribute to ascertain the validity of the \gls{rne} dataset as a representative
-sample of faculty directories. It contains webpages from 145 universities 
-from 42 countries. This amounts to rougly 1.5\% of the total number of universities listed in the
+sample of faculty directories. The RNE dataset contains webpages from 145 universities 
+from 42 countries. This amounts to approximately 1.5\% of the total number of universities listed in the
 Universities Worldwide Database.\footnote{https://univ.cc/world.php} 
-Each country contributes to the dataset roughly in proportion to the number 
-of universities in that country relative to the total number. In Table~\ref{tab:countries},
+Each country contributes to the RNE dataset roughly in proportion to the number 
+of universities in that country relative to the total number of universities in the world. In Table~\ref{tab:countries},
 we present the number of documents from each country for the top ten countries with most universities 
 in the RNE dataset. For comparison, we also present the number of universities from each country in
 the Universities Worldwide Database. This database lists 9623 universities.
-}
 
-\textcolor{red}{
 The geographical distribution of the documents in the RNE dataset is roughly proportional to the
 number of universities in larger countries. One of the principal
 limitations of the RNE dataset is that the documents from countries with few universities 
 (below the top ten countries) represent only 29.66\% of all documents in the dataset, while these 
 universities actually represent more than half of the universities in the world (55.01\%) according 
 to the Universities Worldwide Database. 
-}
 
-\textcolor{red}{
 Despite the significant variation in university webpage layouts, the RNE dataset contain a very 
 diverse range of data representations and languages, therefore it is not likely that many 
 university faculty pages outside the RNE dataset will present content in a way that deviates 
 considerably from what is already present in the dataset. We expect that the results obtained 
 with the RNE dataset will remain stable when the models are employed over larger samples.
-}
 
 \begin{table}[h]
   \small
@@ -2911,7 +2882,6 @@ attention architectures for Bi-LSTM-CRFs. In other models, we use features 1 to 
 
 % The current word is strongly correlated with most features besides the URL feature and the ones related to 
 % the HTML structure. 
-\textcolor{red}{
 \gls{hmm}s can benefit considerably from a good feature selection, but too many 
 features can lead to a drop in performance because of the feature
 independence assumption. Correlated features may contribute more to the final 
@@ -2922,7 +2892,6 @@ If too many features are correlated, we can inadvertently give too much weight t
 bad features, what will introduce noise in the predictions. To understand how a feature 
 selection can help or hurt the Hidden Markov Model performance we tested the 
 model using three groups of features:
-}
 %
 \begin{itemize}
   \item Group A: Current word, Exact Match, Partial Match, URL, Capitalized
@@ -4284,7 +4253,6 @@ proposed in this dissertation.
 
 % Review @5
 
-\textcolor{red}{
 Considering the reduced size of the \gls{rne} dataset, we must acknowledge the
 limitations concerning generalizations about the relative performance of 
 the models studied in this dissertation. The naive division of the labeled data 
@@ -4292,12 +4260,10 @@ into three static data files (training, validation and test) may harm the validi
 of our analysis if the data files were randomly selected in a way that favors 
 a model in place of others due to the natural volatility in the process of parameter 
 estimation.
-}
 
-\textcolor{red}{
 When training a machine learning model for a particular prediction task, the model is 
 expected to fit the training data as closely as
-possible as training progresses. If the training is kept going indefinitely, the model will probably
+possible as the training progresses. If the training is kept going indefinitely, the model will probably
 learn spurious patterns (i.e. overfitting the training data),
 what will lead to poor generalizations. That is why the expected performance of a 
 predictive model over unseen data must be checked with the aid of an independent sample
@@ -4308,13 +4274,11 @@ The validation data file is never observed directly by the models.
 Rather, its purpose is to prevent overfitting by monitoring the model performance in
 the validation dataset and stop the training when a given statistic, in this case the
 F1-score, decreases over several epochs. This is called the early stopping strategy~\citep{Caruana2000}. 
-}
 
-\textcolor{red}{
 The problem with splitting the dataset in three files is that the independent sample
 used to test the models may not be a faithful representation of the complete population.
 This problem is less likely to lead to wrong conclusions if the dataset is sizable, but
-in the case of the \gls{rne} dataset, the risk of tarnished results increases due to the
+in the case of the \gls{rne} dataset, the risk of incorrect results increases due to the
 diminished size of the dataset. We can mitigate this problem by employing the strategy
 of K-fold cross-validation. K-fold cross-validation consists in splitting the complete dataset
 into K folds, where $ (K-1) $ folds are used to train the model and one fold is used to
@@ -4322,9 +4286,7 @@ test it. The test fold is rotated $ K $ times until we have trained $ K $ varian
 of the same model and tested it in each fold separately. The averaged statistics obtained 
 in this process will be more trustworthy than the results obtained with the static split
 since each model variation will have been tested against all data points.
-}
 
-\textcolor{red}{
 In this appendix, we discuss the results for the models presented in the preceding
 chapters by performing five fold cross validation in a combination of the training, 
 validation and test data files of the RNE dataset and discussing the results. 
@@ -4332,21 +4294,17 @@ The results for HMMs are presented
 in Section~\ref{sec:hmm_cv}, the results for CRFs are presented in 
 Section~\ref{sec:crf_cv} and the results for Neural Networks are presented in 
 Section~\ref{sec:nn_cv}.
-}
 
 \section{Hidden Markov Models}
 \label{sec:hmm_cv}
 
-\textcolor{red}{
 Table~\ref{tab:hmm_cv} presents the results for all HMM variations 
 when performing five fold cross validation in the RNE dataset. The F1 obtained only 
 in the test set is also presented for ease of comparison. The F1 (test set) is the
 same one presented in the earlier chapters.
 Each cell shows the precision, recall and F1 statistics averaged over five folds 
 and their standard deviations inside parenthesis.
-}
 
-\textcolor{red}{
 The results for the models that employed only the current word as a feature did not
 change dramatically, except for the HMM-3, which had a much better average result
 in the cross validation runs. An important aspect revealed by cross validation
@@ -4366,7 +4324,6 @@ Group B presented consistently less variation in performance.
 The self-training strategy was still useful in improving all models with a 
 substantial margin. Overall, the best HMMs were able to achieve an F1 
 around $ 0.8 $ in the RNE dataset.
-}
 
 \begin{table}[h]
   \small
@@ -4403,20 +4360,16 @@ around $ 0.8 $ in the RNE dataset.
 \section{Conditional Random Fields}
 \label{sec:crf_cv}
 
-\textcolor{red}{
 Table~\ref{tab:crf_cv} presents the results for all CRF variations when 
 performing five fold cross validation in the RNE dataset. 
 Each cell shows the precision, recall and F1 statistics averaged over five folds 
 and their standard deviations in parenthesis.
-}
 
-\textcolor{red}{
 All CRF variations performed worse when considering the average results across five
-folds in comparison to the models tested using only the test set, but the variant 
-using Group B features still achieves top performance between the three variants. As was
-the case for the HMMs, CRFs present a significant standard deviation, what prevents
-strong affirmations about the relative performances of different model variations.
-}
+folds in comparison to the models tested using only the test set. The variant 
+using Group B features still achieved the top performance between the three variants. As was
+the case for the HMMs, CRFs show a significant standard deviation, what prevents
+us from drawing strong conclusions about the relative performances of different model variations.
 
 \begin{table}[h]
   \small
@@ -4441,37 +4394,29 @@ strong affirmations about the relative performances of different model variation
 \section{Neural Networks}
 \label{sec:nn_cv}
 
-\textcolor{red}{
 Table~\ref{tab:nn_cv} presents the results for all Neural Network variations 
 when performing five fold cross validation in the RNE dataset. 
 Each cell shows the precision, recall and F1 statistics averaged over five folds 
 and their standard deviations. All neural networks were trained over ten epochs in
 each fold. No early stopping strategy was used.
-}
 
-\textcolor{red}{
 Almost all neural network variations showed about the same average performance using either 
 only the test set or cross validation. However, it is noteworthy to mention that the 
 choice of the test set hindered the performance of ELMo embeddings quite significantly.
 Overall, ELMo embeddings showed better performance than Word2Vec embeddings but 
 despite adding a lot of complexity to the models, they still performed suboptimally when 
 compared to static GloVe embeddings.
-}
 
-\textcolor{red}{
 The Hard Attention model had the best average F1 among all neural network variations either 
 in the test set or the cross validation runs. The soft attention layer was detrimental
 to the performance of the Bi-LSTM-CRF with LSTM characters on both experiments.
-}
 
-\textcolor{red}{
 When compared to simpler statistical models, neural networks show a lower standard deviation.
 Still, when considering these ranges of variation, the introduction of Neural 
 Networks in the RNE task does not provide a massive gain in performance. However, this gain
 is more significant than previously stated when we compared only the performances in the test set.
 It could be argued that the main benefits of employing Bi-LSTM-CRFs in this task, are the
 improved predictability provided by a smaller standard deviation and a better overall performance.
-}
 
 \begin{table}[h]
   \small
@@ -4498,33 +4443,29 @@ improved predictability provided by a smaller standard deviation and a better ov
 
 \subsection{F-score Optimization}
 
-\textcolor{red}{
 In Table~\ref{tab:f_score_optimization_cv}, we present the cross-validation results for 
 the Bi-LSTM-CRF with an F-$\alpha$ optimization objective, where $\alpha$ ranges from 
 $ 0.1 $ to $ 0.9 $. The previous F-$\alpha$ scores obtained using only the test set are 
 also presented in the table.
-}
 
-\textcolor{red}{
 The cross validation results for the Bi-LSTM-CRFs that optimized the F-$\alpha$ objective 
-did not change tremendously when compared to the results presented using only the test set. 
+did not change tremendously when compared to the results using only the test set. 
 All variants privileged recall over precision and the change in the value of $\alpha$ did 
-not impact the end result significantly. The best F-$\alpha$ was achieved by the variant
-that optimized the F-score with $ \alpha=0.3 $ in contrast with the runs in the test set only, 
-where the best model optimized the F-score with $ \alpha=0.5 $. 
+not impact the end result significantly. The best F-score ($\alpha$) was achieved by the variant
+that optimized the F-score with $ \alpha=0.3 $ in contrast with the runs in the test set, 
+where the best model was the network that optimized the F1-score. 
 It is noteworthy to mention that, different from the results 
 obtained using only the test set, most Neural Network variants showed a preference for Recall over
 Precision in the cross validation results even when optimizing the regular cross
 entropy function, what weakens the case for a custom optimization objective such as 
 the F-score utility function.
-}
 
 \begin{table}[h]
   \small
   \begin{center}
     \begin{tabular}{ lllll }
       \toprule
-      $\alpha$ & P & R & F-$\alpha$ (CV) & F-$\alpha$ (test set) \\
+      $\alpha$ & P & R & F-$\alpha$ (CV) & F-$\alpha$ (Test) \\
       \midrule
       0.1 & 0.832 (0.055) & 0.871 (0.048) & 0.867 (0.048) & 0.832 \\
       0.2 & 0.837 (0.047) & 0.901 (0.052) & 0.887 (0.048) & 0.863 \\
